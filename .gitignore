@@ -9,3 +9,9 @@ captures/
 .kotlin/
 .DS_Store
 .icon-work/
+
+# 发布签名（密钥与密码不入库，见 keystore.properties.example）
+japanlearn-release.jks
+keystore.properties
+*.jks
+*.keystore

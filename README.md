@@ -70,6 +70,14 @@ cd JapanLearn
 
 不想编译？到 [Releases](https://github.com/Ageha6912/JapanLearn/releases) 下载打包好的 APK 直接安装。
 
+## 发布签名
+
+release 构建自动读取根目录 `keystore.properties` 进行正式签名（该文件与密钥均已 gitignore）：
+
+- 首次配置：`cp keystore.properties.example keystore.properties`，填入你的密钥路径与密码
+- 无密钥环境（CI / 新机器）自动退化为未签名 release，`assembleDebug` 不受影响
+- ⚠️ `japanlearn-release.jks` 是应用更新身份的唯一凭证：丢失后已安装用户将无法升级，请异地备份（密码管理器 / 私有云盘）
+
 ## 设计系统与动效
 
 - **配色（和色）**：藍（主色）× 朱（连续学习/强调）× 抹茶（掌握/成功）× 茜（错误），
