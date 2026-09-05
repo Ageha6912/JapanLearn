@@ -1,0 +1,104 @@
+package com.japanlearn.app.domain
+
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotEquals
+import org.junit.Assert.assertTrue
+import org.junit.Test
+import kotlin.random.Random
+
+class QuizGeneratorTest {
+
+    private fun word(id: String, ja: String, zh: String) = QuizWord(id, ja, ja, zh)
+
+    private val pool = listOf(
+        word("w1", "食べる", "吃"),
+        word("w2", "飲む", "喝"),
+        word("w3", "見る", "看"),
+        word("w4", "買う", "买"),
+        word("w5", "行く", "去"),
+        word("w6", "来る", "来"),
+    )
+
+    @Test
+    fun `日语到中文 生成四个选项且包含正确答案`() {
+        val quiz = QuizGenerator.wordQuiz(pool[0], pool, WordQuizDirection.JP_TO_CN, Random(1))
+        assertEquals(QuizGenerator.OPTION_COUNT, quiz.options.size)
+        assertTrue(quiz.options.contains("吃"))
+        assertEquals(quiz.options.indexOf("吃"), quiz.answerIndex)
+        assertEquals(QuizKind.WORD_JP_TO_CN, quiz.kind)
+    }
+
+    @Test
+    fun `选项互不重复`() {
+        repeat(20) { seed ->
+            val quiz = QuizGenerator.wordQuiz(pool[0], pool, WordQuizDirection.JP_TO_CN, Random(seed))
+            assertEquals(quiz.options.size, quiz.options.toSet().size)
+        }
+    }
+
+    @Test
+    fun `中文到日语 正确答案带假名标注`() {
+        val target = QuizWord("w1", "食べる", "たべる", "吃")
+        val fullPool = listOf(target) + pool.drop(1)
+        val quiz = QuizGenerator.wordQuiz(target, fullPool, WordQuizDirection.CN_TO_JP, Random(2))
+        assertEquals(QuizKind.WORD_CN_TO_JP, quiz.kind)
+        assertEquals("食べる（たべる）", quiz.answerText)
+        assertTrue(quiz.options.contains(quiz.answerText))
+    }
+
+    @Test
+    fun `干扰项不与正确答案含义重复`() {
+        repeat(20) { seed ->
+            val quiz = QuizGenerator.wordQuiz(pool[0], pool, WordQuizDirection.JP_TO_CN, Random(seed))
+            val others = quiz.options.filterIndexed { i, _ -> i != quiz.answerIndex }
+            assertTrue(others.none { it == "吃" })
+        }
+    }
+
+    @Test
+    fun `随机种子可复现选项顺序`() {
+        val a = QuizGenerator.wordQuiz(pool[0], pool, WordQuizDirection.JP_TO_CN, Random(7))
+        val b = QuizGenerator.wordQuiz(pool[0], pool, WordQuizDirection.JP_TO_CN, Random(7))
+        assertEquals(a.options, b.options)
+        val c = QuizGenerator.wordQuiz(pool[0], pool, WordQuizDirection.JP_TO_CN, Random(8))
+        assertNotEquals(a.options, c.options)
+    }
+
+    @Test
+    fun `五十音测验 生成四个罗马音选项`() {
+        val kanaPool = listOf(
+            QuizKana("k1", "あ", "ア", "a"),
+            QuizKana("k2", "い", "イ", "i"),
+            QuizKana("k3", "う", "ウ", "u"),
+            QuizKana("k4", "え", "エ", "e"),
+            QuizKana("k5", "お", "オ", "o"),
+        )
+        val quiz = QuizGenerator.kanaQuiz(kanaPool[0], kanaPool, Random(3))
+        assertEquals(4, quiz.options.size)
+        assertTrue(quiz.options.contains("a"))
+        assertEquals(quiz.options.indexOf("a"), quiz.answerIndex)
+        assertTrue(quiz.question.contains("あ"))
+    }
+
+    @Test
+    fun `语法填空 打乱选项后答案索引正确`() {
+        val quiz = QuizGenerator.grammarQuiz(
+            question = "私は学生＿＿。",
+            options = listOf("です", "ます", "でした", "ません"),
+            answerIndex = 0,
+            random = Random(4),
+        )
+        assertEquals(4, quiz.options.size)
+        assertEquals("です", quiz.answerText)
+        assertEquals(quiz.options.indexOf("です"), quiz.answerIndex)
+    }
+
+    @Test
+    fun `内容池过小也能生成不重复选项`() {
+        val small = listOf(word("w1", "食べる", "吃"), word("w2", "飲む", "喝"))
+        val quiz = QuizGenerator.wordQuiz(small[0], small, WordQuizDirection.JP_TO_CN, Random(5))
+        assertEquals(2, quiz.options.size)
+        assertEquals(quiz.options.toSet().size, quiz.options.size)
+        assertTrue(quiz.options.contains("吃"))
+    }
+}
