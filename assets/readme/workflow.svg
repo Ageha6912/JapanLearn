@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="300" viewBox="0 0 1200 300" role="img" aria-labelledby="flow-title flow-desc">
+  <title id="flow-title">JapanLearn 每日学习闭环</title>
+  <desc id="flow-desc">今日学习、即时练习、掌握度自评、SRS 间隔复习、查看进步五个环节组成的闭环，不认识的内容会在会话内重新出现。</desc>
+
+  <rect width="1200" height="300" rx="26" fill="#F7F5F0"/>
+
+  <g transform="translate(64 46)" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif">
+    <text x="0" y="0" font-size="30" font-weight="800" fill="#1B3A5C">一个每天都能走完的闭环</text>
+    <text x="0" y="34" font-size="18" fill="#57524B">每一步的结果都会写入 SRS 调度器，决定这项内容下次出现的时机。</text>
+  </g>
+
+  <!-- 五个环节 -->
+  <g transform="translate(64 116)" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif">
+    <g>
+      <rect width="184" height="96" rx="16" fill="#FFFFFF"/>
+      <text x="18" y="38" font-size="19" font-weight="700" fill="#1B3A5C">① 今日学习</text>
+      <text x="18" y="68" font-size="17" fill="#57524B">新词卡 + 例句</text>
+      <text x="18" y="90" font-size="17" fill="#57524B">TTS 发音</text>
+    </g>
+    <path d="M 192 48 L 216 48" stroke="#C75B5B" stroke-width="2.5"/>
+    <path d="M 210 42 L 218 48 L 210 54" fill="none" stroke="#C75B5B" stroke-width="2.5"/>
+
+    <g transform="translate(226 0)">
+      <rect width="184" height="96" rx="16" fill="#FFFFFF"/>
+      <text x="18" y="38" font-size="19" font-weight="700" fill="#1B3A5C">② 即时练习</text>
+      <text x="18" y="68" font-size="17" fill="#57524B">双向选择题</text>
+      <text x="18" y="90" font-size="17" fill="#57524B">答错即进错题本</text>
+    </g>
+    <path d="M 418 48 L 442 48" stroke="#C75B5B" stroke-width="2.5"/>
+    <path d="M 436 42 L 444 48 L 436 54" fill="none" stroke="#C75B5B" stroke-width="2.5"/>
+
+    <g transform="translate(452 0)">
+      <rect width="184" height="96" rx="16" fill="#FFFFFF"/>
+      <text x="18" y="38" font-size="19" font-weight="700" fill="#1B3A5C">③ 掌握度自评</text>
+      <text x="18" y="68" font-size="17" fill="#57524B">不认识 / 模糊</text>
+      <text x="18" y="90" font-size="17" fill="#57524B">熟悉 / 熟练</text>
+    </g>
+    <path d="M 644 48 L 668 48" stroke="#C75B5B" stroke-width="2.5"/>
+    <path d="M 662 42 L 670 48 L 662 54" fill="none" stroke="#C75B5B" stroke-width="2.5"/>
+
+    <g transform="translate(678 0)">
+      <rect width="184" height="96" rx="16" fill="#1B3A5C"/>
+      <text x="18" y="38" font-size="19" font-weight="700" fill="#FFFFFF">④ SRS 复习</text>
+      <text x="18" y="68" font-size="17" fill="#D9E4F0">到期自动出队</text>
+      <text x="18" y="90" font-size="17" fill="#D9E4F0">每日上限 30 条</text>
+    </g>
+    <path d="M 870 48 L 894 48" stroke="#C75B5B" stroke-width="2.5"/>
+    <path d="M 888 42 L 896 48 L 888 54" fill="none" stroke="#C75B5B" stroke-width="2.5"/>
+
+    <g transform="translate(904 0)">
+      <rect width="184" height="96" rx="16" fill="#FFFFFF"/>
+      <text x="18" y="38" font-size="19" font-weight="700" fill="#C75B5B">⑤ 看到进步</text>
+      <text x="18" y="68" font-size="17" fill="#57524B">连击 · 统计</text>
+      <text x="18" y="90" font-size="17" fill="#57524B">掌握数量</text>
+    </g>
+  </g>
+
+  <!-- 回环箭头：第二天继续 -->
+  <g transform="translate(64 236)" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif">
+    <path d="M 996 6 C 996 34 900 40 560 40 L 92 40 C 40 40 12 34 12 12" fill="none" stroke="#1B3A5C" stroke-opacity="0.45" stroke-width="2" stroke-dasharray="6 6"/>
+    <path d="M 20 22 L 10 10 L 26 8" fill="none" stroke="#1B3A5C" stroke-opacity="0.45" stroke-width="2"/>
+    <circle cx="560" cy="40" r="5" fill="#C75B5B"/>
+    <text x="576" y="46" font-size="18" fill="#57524B">第二天打开 App，先复习到期内容，再学新内容</text>
+
+    <g font-size="17" fill="#1B3A5C">
+      <rect x="0" y="0" width="0" height="0"/>
+    </g>
+  </g>
+
+  <!-- SRS 间隔规则 -->
+  <g transform="translate(64 236)" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif" font-size="17">
+    <rect x="1030" y="8" width="0" height="0"/>
+  </g>
+  <g transform="translate(64 238)" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="17" fill="#1B3A5C">
+    <text x="0" y="0">不认识 → 会话内重排 · 模糊 → 1 天 · 熟悉 → 间隔 ×1.5 · 熟练 → 间隔 ×2（上限 60 天）</text>
+  </g>
+</svg>
