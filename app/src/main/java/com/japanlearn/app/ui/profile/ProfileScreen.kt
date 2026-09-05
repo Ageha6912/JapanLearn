@@ -219,7 +219,7 @@ fun ProfileScreen(nav: NavHostController) {
 
             StaggerIn(4) {
                 SectionCard(title = "关于") {
-                    Text("JapanLearn v0.1.0 (MVP)", style = MaterialTheme.typography.bodyLarge)
+                    Text("JapanLearn v${com.japanlearn.app.BuildConfig.VERSION_NAME}", style = MaterialTheme.typography.bodyLarge)
                     Text(
                         "发音使用系统 TTS（日语语音包）。若设备未安装日语语音，发音可能不可用。",
                         style = MaterialTheme.typography.bodySmall,
