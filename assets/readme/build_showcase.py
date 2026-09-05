@@ -19,7 +19,8 @@ PICKS = [
     ("10_stats.png", "学习统计"),
 ]
 
-PHONE_W, PHONE_H = 360, 800
+PHONE_W, PHONE_H = 360, 757  # 源图 1080x2400，先裁掉底部 130px 系统导航栏再等比缩放
+CROP_BOTTOM = 130
 COLS, ROWS = 3, 2
 MARGIN_X, MARGIN_Y = 80, 80
 GAP_X, GAP_Y = 62, 96
@@ -33,7 +34,10 @@ def rounded_mask(size, radius):
     return m
 
 def phone_tile(path, rotation):
-    img = Image.open(path).convert("RGB").resize((PHONE_W, PHONE_H), Image.LANCZOS)
+    img = Image.open(path).convert("RGB")
+    w, h = img.size
+    img = img.crop((0, 0, w, h - CROP_BOTTOM))  # 去掉系统导航栏
+    img = img.resize((PHONE_W, PHONE_H), Image.LANCZOS)
     # 圆角 + 1px 描边底板
     mask = rounded_mask(img.size, CORNER)
     tile = Image.new("RGBA", img.size, (0, 0, 0, 0))
