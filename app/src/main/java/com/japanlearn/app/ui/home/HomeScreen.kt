@@ -138,51 +138,59 @@ fun HomeScreen(nav: NavHostController) {
             Column(
                 Modifier
                     .padding(padding)
-                    .fillMaxSize()
-                    .verticalScroll(rememberScrollState())
-                    .padding(horizontal = 20.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp),
+                    .fillMaxSize(),
             ) {
-                Spacer(Modifier.height(10.dp))
+                // 固定头部：问候 + 连击徽章，不随内容滚动
+                Column(Modifier.padding(horizontal = 20.dp)) {
+                    Spacer(Modifier.height(10.dp))
 
-                // 问候 + 连击徽章
-                StaggerIn(0) {
-                    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-                        Column(Modifier.weight(1f)) {
-                            Text("こんにちは", style = MaterialTheme.typography.headlineMedium)
-                            Text(
-                                "今天想学点什么？",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-                        }
-                        if (state.streak > 0) {
-                            Surface(
-                                shape = CircleShape,
-                                color = MaterialTheme.colorScheme.secondaryContainer,
-                            ) {
-                                Row(
-                                    Modifier.padding(start = 12.dp, end = 16.dp, top = 8.dp, bottom = 8.dp),
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    // 问候 + 连击徽章
+                    StaggerIn(0) {
+                        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+                            Column(Modifier.weight(1f)) {
+                                Text("こんにちは", style = MaterialTheme.typography.headlineMedium)
+                                Text(
+                                    "今天想学点什么？",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                            }
+                            if (state.streak > 0) {
+                                Surface(
+                                    shape = CircleShape,
+                                    color = MaterialTheme.colorScheme.secondaryContainer,
                                 ) {
-                                    Icon(
-                                        Icons.Filled.LocalFireDepartment,
-                                        contentDescription = null,
-                                        tint = MaterialTheme.colorScheme.secondary,
-                                        modifier = Modifier.size(18.dp),
-                                    )
-                                    Text(
-                                        "${state.streak} 天",
-                                        style = MaterialTheme.typography.titleSmall,
-                                        color = MaterialTheme.colorScheme.onSecondaryContainer,
-                                    )
+                                    Row(
+                                        Modifier.padding(start = 12.dp, end = 16.dp, top = 8.dp, bottom = 8.dp),
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.spacedBy(4.dp),
+                                    ) {
+                                        Icon(
+                                            Icons.Filled.LocalFireDepartment,
+                                            contentDescription = null,
+                                            tint = MaterialTheme.colorScheme.secondary,
+                                            modifier = Modifier.size(18.dp),
+                                        )
+                                        Text(
+                                            "${state.streak} 天",
+                                            style = MaterialTheme.typography.titleSmall,
+                                            color = MaterialTheme.colorScheme.onSecondaryContainer,
+                                        )
+                                    }
                                 }
                             }
                         }
                     }
+                    Spacer(Modifier.height(16.dp))
                 }
 
+                Column(
+                    Modifier
+                        .weight(1f)
+                        .verticalScroll(rememberScrollState())
+                        .padding(horizontal = 20.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                ) {
                 // 今日学习主卡：进度环 + 任务清单
                 StaggerIn(1) {
                     SectionCard {
@@ -297,6 +305,7 @@ fun HomeScreen(nav: NavHostController) {
                     }
                 }
                 Spacer(Modifier.height(10.dp))
+                }
             }
         }
 
