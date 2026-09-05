@@ -81,6 +81,16 @@ cd JapanLearn
   完成彩带 `ConfettiBurst`、按压物理 `pressScale`、骨架屏 shimmer、页签/二级页差异化导航转场
 - **无障碍**：全部动效尊重系统「动画时长缩放 = 0」（减弱动态时退化为静态/即时切换）
 
+## 应用图标
+
+和纸底 + 藍色「あ」+ 圈内朱色点（日の丸意象），与界面设计语言同源：
+
+- 字形轮廓提取自 **Noto Sans JP Bold**（© Google，SIL OFL 1.1），非手绘，字形专业
+- 自适应图标（API 26+）：`drawable/ic_launcher_foreground.xml`（字形 + 朱点）、
+  `ic_launcher_background.xml`（和纸径向微光）、`ic_launcher_monochrome.xml`（Android 13+ 主题图标）
+- 字形已自动适配 66dp 圆形安全区（全部点距画布中心 ≤ 32.5dp，圆形蒙版不裁切）
+- 生成脚本与预览：`.icon-work/`（已 gitignore，可随时重新生成）
+
 ## 技术与结构
 
 Kotlin 2.0 · Jetpack Compose (Material 3) · Room (KSP) · Navigation Compose · kotlinx-serialization · Coroutines/ViewModel。手工依赖注入（`AppContainer`），无后端、无第三方服务。
