@@ -76,10 +76,16 @@ fun TransformCardPopup(
 
     // 卡片：贴着触发角对齐，从 0 放大到 1
     // 弹出节奏与视频一致：约 600ms 从容到位，带一次轻微过冲（冲过头一点点再收回）
+    // 底部锚点（今日一句横条）时底部留出横条高度，卡片出现在横条上方而非覆盖它
     Box(
         modifier = modifier
             .fillMaxSize()
-            .padding(horizontal = 40.dp, vertical = 52.dp),
+            .padding(
+                start = 40.dp,
+                top = 52.dp,
+                end = 40.dp,
+                bottom = if (anchor == PopupAnchor.BottomCenter) 96.dp else 52.dp,
+            ),
         contentAlignment = anchor.alignment(),
     ) {
         AnimatedVisibility(
