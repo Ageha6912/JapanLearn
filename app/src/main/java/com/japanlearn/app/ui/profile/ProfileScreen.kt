@@ -111,15 +111,23 @@ fun ProfileScreen(nav: NavHostController) {
         Column(
             Modifier
                 .padding(padding)
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 20.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
+                .fillMaxSize(),
         ) {
-            Spacer(Modifier.height(10.dp))
-            StaggerIn(0) {
-                Text("我的", style = MaterialTheme.typography.headlineMedium)
+            // 固定头部：标题不随内容滚动
+            Column(Modifier.padding(horizontal = 20.dp)) {
+                StaggerIn(0) {
+                    Text("我的", style = MaterialTheme.typography.headlineMedium)
+                }
+                Spacer(Modifier.height(16.dp))
             }
+
+            Column(
+                Modifier
+                    .weight(1f)
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = 20.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+            ) {
 
             // 学习者卡片
             StaggerIn(1) {
@@ -228,6 +236,7 @@ fun ProfileScreen(nav: NavHostController) {
                 }
             }
             Spacer(Modifier.height(12.dp))
+            }
         }
     }
 }

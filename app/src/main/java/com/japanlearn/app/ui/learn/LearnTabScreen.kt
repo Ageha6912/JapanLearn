@@ -90,7 +90,6 @@ fun LearnTabScreen(nav: NavHostController) {
                 .padding(horizontal = 20.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            Spacer(Modifier.height(10.dp))
             StaggerIn(0) {
                 Text("学习", style = MaterialTheme.typography.headlineMedium)
             }

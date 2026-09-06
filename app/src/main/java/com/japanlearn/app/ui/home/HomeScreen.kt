@@ -142,7 +142,6 @@ fun HomeScreen(nav: NavHostController) {
             ) {
                 // 固定头部：问候 + 连击徽章，不随内容滚动
                 Column(Modifier.padding(horizontal = 20.dp)) {
-                    Spacer(Modifier.height(4.dp))
 
                     // 问候 + 连击徽章
                     StaggerIn(0) {
