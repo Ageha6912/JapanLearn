@@ -4,7 +4,8 @@ from pathlib import Path
 
 CONTENT = Path(__file__).resolve().parent.parent / "app" / "src" / "main" / "assets" / "content"
 MAIN = CONTENT / "grammar.json"
-BATCH = Path(__file__).resolve().parent / "new_grammar.json"
+import sys
+BATCH = Path(__file__).resolve().parent / (sys.argv[1] if len(sys.argv) > 1 else "new_grammar.json")
 
 main = json.loads(MAIN.read_text(encoding="utf-8"))
 batch = json.loads(BATCH.read_text(encoding="utf-8"))

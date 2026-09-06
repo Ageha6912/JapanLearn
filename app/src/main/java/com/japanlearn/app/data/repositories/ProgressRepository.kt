@@ -26,6 +26,12 @@ class SettingsRepository(context: Context) {
     val dailyNewGrammar = MutableStateFlow(prefs.getInt(KEY_NEW_GRAMMAR, DEFAULT_NEW_GRAMMAR))
     val dailyReviewCap = MutableStateFlow(prefs.getInt(KEY_REVIEW_CAP, DEFAULT_REVIEW_CAP))
     val reminderEnabled = MutableStateFlow(prefs.getBoolean(KEY_REMINDER, false))
+    val studyLevel = MutableStateFlow(prefs.getString(KEY_STUDY_LEVEL, DEFAULT_STUDY_LEVEL) ?: DEFAULT_STUDY_LEVEL)
+
+    fun setStudyLevel(value: String) {
+        prefs.edit().putString(KEY_STUDY_LEVEL, value).apply()
+        studyLevel.value = value
+    }
 
     fun setReminderEnabled(value: Boolean) {
         prefs.edit().putBoolean(KEY_REMINDER, value).apply()
@@ -55,6 +61,9 @@ class SettingsRepository(context: Context) {
         private const val KEY_NEW_GRAMMAR = "daily_new_grammar"
         private const val KEY_REVIEW_CAP = "daily_review_cap"
         private const val KEY_REMINDER = "reminder_enabled"
+        private const val KEY_STUDY_LEVEL = "study_level"
+        const val DEFAULT_STUDY_LEVEL = "N5"
+        val STUDY_LEVELS = listOf("N5", "N4")
     }
 }
 
@@ -69,8 +78,8 @@ class ContentRepository(private val db: AppDatabase) {
     suspend fun wordById(id: String): WordEntity? = db.wordDao().byId(id)
     suspend fun grammarById(id: String) = db.grammarDao().byId(id)
 
-    suspend fun nextNewWords(n: Int): List<WordEntity> = db.wordDao().newWords(n)
-    suspend fun nextNewGrammar(n: Int) = db.grammarDao().newGrammar(n)
+    suspend fun nextNewWords(n: Int, level: String): List<WordEntity> = db.wordDao().newWords(n, level)
+    suspend fun nextNewGrammar(n: Int, level: String) = db.grammarDao().newGrammar(n, level)
 }
 
 // ---------------- SRS 进度 / 错题 ----------------
@@ -161,6 +170,10 @@ class ProgressRepository(
 
     fun learnedWordCount(): Flow<Int> = db.progressDao().countWordFlow()
     fun learnedGrammarCount(): Flow<Int> = db.progressDao().countGrammarFlow()
+
+    /** 某类内容已学过的 id 集合（用于按级别统计已学数）。 */
+    fun learnedIds(type: String): Flow<Set<String>> =
+        db.progressDao().allByType(type).map { list -> list.map { it.contentId }.toSet() }
 
     /** 单词 id → 当前掌握度（用于列表色点）。 */
     fun wordMasteryMap(): Flow<Map<String, Int>> =

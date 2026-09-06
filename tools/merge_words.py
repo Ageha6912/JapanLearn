@@ -12,7 +12,7 @@ existing_ids = {int(w["id"][1:]) for w in main["words"]}
 
 next_id = max(existing_ids) + 1
 added, skipped = [], []
-for batch_file in sorted(Path(__file__).resolve().parent.glob("new_words_b*.json")):
+for batch_file in sorted(Path(__file__).resolve().parent.glob("new_words_*.json")):
     batch = json.loads(batch_file.read_text(encoding="utf-8"))
     for w in batch["words"]:
         if w["ja"] in existing_ja or (w["kana"], w["zh"]) in existing_kana_zh:

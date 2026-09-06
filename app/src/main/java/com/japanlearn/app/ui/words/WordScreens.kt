@@ -52,6 +52,7 @@ import com.japanlearn.app.domain.QuizWord
 import com.japanlearn.app.domain.WordQuizDirection
 import com.japanlearn.app.ui.components.AppButton
 import com.japanlearn.app.ui.components.AppTopBar
+import com.japanlearn.app.ui.components.LevelSwitchRow
 import com.japanlearn.app.ui.components.MasteryRow
 import com.japanlearn.app.ui.components.QuizView
 import com.japanlearn.app.ui.components.SectionCard
@@ -72,19 +73,22 @@ import kotlinx.coroutines.launch
 @Composable
 fun WordListScreen(nav: NavHostController) {
     val app = LocalAppContainer.current
-    val words by app.content.wordsAll().collectAsStateWithLifecycle(initialValue = emptyList())
-    val learned by app.progress.learnedWordCount().collectAsStateWithLifecycle(initialValue = 0)
-    val dailyTarget by app.settings.dailyNewWords.collectAsStateWithLifecycle()
+    val wordsAll by app.content.wordsAll().collectAsStateWithLifecycle(initialValue = emptyList())
     val masteryMap by app.progress.wordMasteryMap().collectAsStateWithLifecycle(initialValue = emptyMap())
+    val level by app.settings.studyLevel.collectAsStateWithLifecycle()
+    val dailyTarget by app.settings.dailyNewWords.collectAsStateWithLifecycle()
+    val words = wordsAll.filter { it.level == level }
+    val learned = words.count { it.id in masteryMap }
 
     Scaffold(
-        topBar = { AppTopBar("N5 单词") { nav.popBackStack() } },
+        topBar = { AppTopBar("单词") { nav.popBackStack() } },
     ) { padding ->
         LazyColumn(Modifier.padding(padding).fillMaxSize().padding(horizontal = 20.dp)) {
             item {
                 Column(Modifier.padding(vertical = 12.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    LevelSwitchRow(selected = level, onSelect = { app.settings.setStudyLevel(it) })
                     Text(
-                        "已学 $learned / ${words.size} 个",
+                        "$level 已学 $learned / ${words.size} 个",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -177,13 +181,14 @@ class WordSessionViewModel(
                 refreshNextSteps()
                 return@launch
             }
-            // 等待首次启动的内容装载完成
-            var words = app.content.nextNewWords(effective)
+            // 等待首次启动的内容装载完成（新词队列按当前学习级别取）
+            val level = app.settings.studyLevel.value
+            var words = app.content.nextNewWords(effective, level)
             var retries = 0
             while (words.isEmpty() && retries < 20) {
                 kotlinx.coroutines.delay(300)
                 retries++
-                words = app.content.nextNewWords(effective)
+                words = app.content.nextNewWords(effective, level)
             }
             pool = app.content.wordsAll().first().map { QuizWord(it.id, it.ja, it.kana, it.zh) }
             startedAt = System.currentTimeMillis()
@@ -256,7 +261,7 @@ class WordSessionViewModel(
     }
 
     private suspend fun refreshNextSteps() {
-        val grammarPool = app.content.nextNewGrammar(1)
+        val grammarPool = app.content.nextNewGrammar(1, app.settings.studyLevel.value)
         val grammarTodayRemaining = (app.settings.dailyNewGrammar.value - (app.stats.todayFlow().first()?.newGrammar ?: 0))
         val due = app.progress.dueWordCount().first() + app.progress.dueGrammarCount().first()
         _state.update {

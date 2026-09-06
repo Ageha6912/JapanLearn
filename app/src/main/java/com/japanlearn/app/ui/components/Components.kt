@@ -31,6 +31,7 @@ import androidx.compose.material.icons.filled.VolumeUp
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -69,6 +70,21 @@ import com.japanlearn.app.ui.theme.japanColors
 
 /** 学习会话的阶段，单词/语法/复习会话共用。 */
 enum class SessionPhase { LOADING, CARD, QUIZ, DONE }
+
+/** 学习级别切换（N5 / N4），选项与设置页共享同一常量。 */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun LevelSwitchRow(
+    selected: String,
+    onSelect: (String) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Row(modifier = modifier, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        com.japanlearn.app.data.SettingsRepository.STUDY_LEVELS.forEach { level ->
+            FilterChip(selected = selected == level, onClick = { onSelect(level) }, label = { Text(level) })
+        }
+    }
+}
 
 @Composable
 fun AppButton(

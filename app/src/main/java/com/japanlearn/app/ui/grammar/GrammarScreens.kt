@@ -48,6 +48,7 @@ import com.japanlearn.app.domain.Quiz
 import com.japanlearn.app.domain.QuizGenerator
 import com.japanlearn.app.ui.components.AppButton
 import com.japanlearn.app.ui.components.AppTopBar
+import com.japanlearn.app.ui.components.LevelSwitchRow
 import com.japanlearn.app.ui.components.MasteryRow
 import com.japanlearn.app.ui.components.QuizView
 import com.japanlearn.app.ui.components.SectionCard
@@ -68,18 +69,22 @@ import kotlinx.coroutines.launch
 @Composable
 fun GrammarListScreen(nav: NavHostController) {
     val app = LocalAppContainer.current
-    val grammar by app.content.grammarAll().collectAsStateWithLifecycle(initialValue = emptyList())
-    val learned by app.progress.learnedGrammarCount().collectAsStateWithLifecycle(initialValue = 0)
+    val grammarAll by app.content.grammarAll().collectAsStateWithLifecycle(initialValue = emptyList())
+    val learnedIds by app.progress.learnedIds("grammar").collectAsStateWithLifecycle(initialValue = emptySet())
+    val level by app.settings.studyLevel.collectAsStateWithLifecycle()
     val dailyTarget by app.settings.dailyNewGrammar.collectAsStateWithLifecycle()
+    val grammar = grammarAll.filter { it.level == level }
+    val learned = grammar.count { it.id in learnedIds }
 
     Scaffold(
-        topBar = { AppTopBar("N5 语法") { nav.popBackStack() } },
+        topBar = { AppTopBar("语法") { nav.popBackStack() } },
     ) { padding ->
         LazyColumn(Modifier.padding(padding).fillMaxSize().padding(horizontal = 20.dp)) {
             item {
                 Column(Modifier.padding(vertical = 12.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    LevelSwitchRow(selected = level, onSelect = { app.settings.setStudyLevel(it) })
                     Text(
-                        "已学 $learned / ${grammar.size} 条",
+                        "$level 已学 $learned / ${grammar.size} 条",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -298,12 +303,14 @@ class GrammarSessionViewModel(
                 refreshNextSteps()
                 return@launch
             }
-            var items = app.content.nextNewGrammar(effective)
+            // 新语法队列按当前学习级别取
+            val level = app.settings.studyLevel.value
+            var items = app.content.nextNewGrammar(effective, level)
             var retries = 0
             while (items.isEmpty() && retries < 20) {
                 kotlinx.coroutines.delay(300)
                 retries++
-                items = app.content.nextNewGrammar(effective)
+                items = app.content.nextNewGrammar(effective, level)
             }
             startedAt = System.currentTimeMillis()
             _state.update { it.copy(phase = SessionPhase.CARD, queue = items, index = 0) }

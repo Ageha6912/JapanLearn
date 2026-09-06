@@ -24,13 +24,13 @@ interface WordDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(items: List<WordEntity>)
 
-    /** 尚未开始学习的单词（新词队列） */
+    /** 尚未开始学习的单词（新词队列），按学习级别过滤 */
     @Query(
-        "SELECT * FROM words WHERE id NOT IN " +
+        "SELECT * FROM words WHERE level = :level AND id NOT IN " +
             "(SELECT contentId FROM user_progress WHERE contentType = 'word') " +
             "ORDER BY `order` LIMIT :n"
     )
-    suspend fun newWords(n: Int): List<WordEntity>
+    suspend fun newWords(n: Int, level: String): List<WordEntity>
 
     @Query(
         "SELECT w.* FROM words w JOIN user_progress p ON p.contentId = w.id AND p.contentType = 'word' " +
@@ -57,11 +57,11 @@ interface GrammarDao {
     suspend fun insertAll(items: List<GrammarEntity>)
 
     @Query(
-        "SELECT * FROM grammar WHERE id NOT IN " +
+        "SELECT * FROM grammar WHERE level = :level AND id NOT IN " +
             "(SELECT contentId FROM user_progress WHERE contentType = 'grammar') " +
             "ORDER BY `order` LIMIT :n"
     )
-    suspend fun newGrammar(n: Int): List<GrammarEntity>
+    suspend fun newGrammar(n: Int, level: String): List<GrammarEntity>
 
     @Query(
         "SELECT g.* FROM grammar g JOIN user_progress p ON p.contentId = g.id AND p.contentType = 'grammar' " +

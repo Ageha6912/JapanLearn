@@ -39,6 +39,7 @@ import com.japanlearn.app.AppContainer
 import com.japanlearn.app.LocalAppContainer
 import com.japanlearn.app.Routes
 import com.japanlearn.app.ui.components.AppButton
+import com.japanlearn.app.ui.components.LevelSwitchRow
 import com.japanlearn.app.ui.motion.AnimatedProgressBar
 import com.japanlearn.app.ui.motion.StaggerIn
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -48,8 +49,10 @@ import kotlinx.coroutines.launch
 
 data class LearnUiState(
     val totalKana: Int = 0,
-    val totalWords: Int = 0,
-    val totalGrammar: Int = 0,
+    val studyLevel: String = "N5",
+    /** level -> (总数, 已学数) */
+    val wordStats: Map<String, Pair<Int, Int>> = emptyMap(),
+    val grammarStats: Map<String, Pair<Int, Int>> = emptyMap(),
     val learnedWords: Int = 0,
     val learnedGrammar: Int = 0,
     val dailyNewWords: Int = 10,
@@ -64,12 +67,23 @@ class LearnViewModel(private val app: AppContainer) : ViewModel() {
             viewModelScope.launch { flow.collect { v -> _state.update { cur -> reducer(cur, v) } } }
         }
         collect(app.content.kanaAll()) { s, v -> s.copy(totalKana = v.size) }
-        collect(app.content.wordsAll()) { s, v -> s.copy(totalWords = v.size) }
-        collect(app.content.grammarAll()) { s, v -> s.copy(totalGrammar = v.size) }
+        collect(
+            kotlinx.coroutines.flow.combine(app.content.wordsAll(), app.progress.wordMasteryMap()) { words, mastery ->
+                words.groupBy { it.level }.mapValues { (_, ws) -> ws.size to ws.count { it.id in mastery } }
+            },
+        ) { s, v -> s.copy(wordStats = v) }
+        collect(
+            kotlinx.coroutines.flow.combine(app.content.grammarAll(), app.progress.learnedIds("grammar")) { gs, ids ->
+                gs.groupBy { it.level }.mapValues { (_, list) -> list.size to list.count { it.id in ids } }
+            },
+        ) { s, v -> s.copy(grammarStats = v) }
         collect(app.progress.learnedWordCount()) { s, v -> s.copy(learnedWords = v) }
         collect(app.progress.learnedGrammarCount()) { s, v -> s.copy(learnedGrammar = v) }
         collect(app.settings.dailyNewWords) { s, v -> s.copy(dailyNewWords = v) }
+        collect(app.settings.studyLevel) { s, v -> s.copy(studyLevel = v) }
     }
+
+    fun setLevel(level: String) = app.settings.setStudyLevel(level)
 
     fun speak(text: String) = app.tts.speak(text)
 }
@@ -92,6 +106,11 @@ fun LearnTabScreen(nav: NavHostController) {
                 StaggerIn(0) {
                     Text("学习", style = MaterialTheme.typography.headlineMedium)
                 }
+                Spacer(Modifier.height(12.dp))
+                LevelSwitchRow(
+                    selected = state.studyLevel,
+                    onSelect = { vm.setLevel(it) },
+                )
                 Spacer(Modifier.height(16.dp))
             }
             Column(
@@ -112,22 +131,24 @@ fun LearnTabScreen(nav: NavHostController) {
                 )
             }
             StaggerIn(2) {
+                val (wTotal, wLearned) = state.wordStats[state.studyLevel] ?: (0 to 0)
                 LearnEntry(
-                    title = "N5 单词",
-                    subtitle = "共 ${state.totalWords} 个 · 已学 ${state.learnedWords}",
+                    title = "单词",
+                    subtitle = "${state.studyLevel} 共 $wTotal 个 · 已学 $wLearned",
                     icon = Icons.AutoMirrored.Filled.MenuBook,
                     tint = MaterialTheme.colorScheme.primary,
-                    progress = if (state.totalWords > 0) state.learnedWords.toFloat() / state.totalWords else 0f,
+                    progress = if (wTotal > 0) wLearned.toFloat() / wTotal else 0f,
                     onClick = { nav.navigate(Routes.WORD_LIST) },
                 )
             }
             StaggerIn(3) {
+                val (gTotal, gLearned) = state.grammarStats[state.studyLevel] ?: (0 to 0)
                 LearnEntry(
-                    title = "N5 语法",
-                    subtitle = "共 ${state.totalGrammar} 条 · 已学 ${state.learnedGrammar}",
+                    title = "语法",
+                    subtitle = "${state.studyLevel} 共 $gTotal 条 · 已学 $gLearned",
                     icon = Icons.Outlined.EditNote,
                     tint = MaterialTheme.colorScheme.tertiary,
-                    progress = if (state.totalGrammar > 0) state.learnedGrammar.toFloat() / state.totalGrammar else 0f,
+                    progress = if (gTotal > 0) gLearned.toFloat() / gTotal else 0f,
                     onClick = { nav.navigate(Routes.GRAMMAR_LIST) },
                 )
             }
