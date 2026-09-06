@@ -43,6 +43,7 @@ import com.japanlearn.app.AppContainer
 import com.japanlearn.app.LocalAppContainer
 import com.japanlearn.app.Routes
 import com.japanlearn.app.data.local.KanaEntity
+import com.japanlearn.app.domain.KanaGroup
 import com.japanlearn.app.domain.Quiz
 import com.japanlearn.app.domain.QuizGenerator
 import com.japanlearn.app.domain.QuizKana
@@ -73,7 +74,10 @@ fun KanaScreen(nav: NavHostController) {
     val app = LocalAppContainer.current
     val kanaList by app.content.kanaAll().collectAsStateWithLifecycle(initialValue = emptyList())
     var tab by remember { mutableStateOf(0) } // 0 = 平假名, 1 = 片假名
+    var group by remember { mutableStateOf("seion") }
     var selected by remember { mutableStateOf<KanaEntity?>(null) }
+    val groupLabel = KanaGroup.fromKey(group).label
+    val filtered = kanaList.filter { it.groupName == group }
 
     Scaffold(
         topBar = { AppTopBar("五十音") { nav.popBackStack() } },
@@ -89,23 +93,41 @@ fun KanaScreen(nav: NavHostController) {
                 Spacer(Modifier.weight(1f))
                 FilterChip(selected = false, onClick = { nav.navigate(Routes.KANA_QUIZ) }, label = { Text("开始测验") })
             }
+            Row(
+                Modifier.fillMaxWidth().padding(bottom = 10.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                KanaGroup.entries.forEach { g ->
+                    FilterChip(selected = group == g.key, onClick = { group = g.key }, label = { Text(g.label) })
+                }
+                Spacer(Modifier.weight(1f))
+            }
             AnimatedContent(
-                targetState = tab,
+                targetState = tab to group,
                 transitionSpec = {
                     fadeIn(androidx.compose.animation.core.tween(320)) togetherWith
                         fadeOut(androidx.compose.animation.core.tween(120))
                 },
                 label = "kanaTab",
-            ) { currentTab ->
-                LazyVerticalGrid(
-                    columns = GridCells.Fixed(5),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    modifier = Modifier.fillMaxSize(),
-                ) {
-                    itemsIndexed(kanaList) { index, k ->
-                        val char = if (currentTab == 0) k.hiragana else k.katakana
-                        StaggerIn(index % MotionTokens.MAX_STAGGER_STEPS) {
-                            KanaCell(char = char, onClick = { selected = k })
+            ) { (currentTab, currentGroup) ->
+                val list = kanaList.filter { it.groupName == currentGroup }
+                Column {
+                    Text(
+                        "$groupLabel · ${list.size} 组",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(bottom = 8.dp),
+                    )
+                    LazyVerticalGrid(
+                        columns = GridCells.Fixed(5),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        modifier = Modifier.fillMaxSize(),
+                    ) {
+                        itemsIndexed(list) { index, k ->
+                            val char = if (currentTab == 0) k.hiragana else k.katakana
+                            StaggerIn(index % MotionTokens.MAX_STAGGER_STEPS) {
+                                KanaCell(char = char, onClick = { selected = k })
+                            }
                         }
                     }
                 }
@@ -188,8 +210,10 @@ private fun KanaDetail(kana: KanaEntity, onSpeak: (String) -> Unit) {
 // ---------------- 五十音测验 ----------------
 
 data class KanaQuizUiState(
-    val questions: List<QuizKana> = emptyList(),
+    val started: Boolean = false,
+    val group: String = "seion",
     val pool: List<QuizKana> = emptyList(),
+    val questions: List<QuizKana> = emptyList(),
     val index: Int = 0,
     val quiz: Quiz? = null,
     val selected: Int? = null,
@@ -202,26 +226,37 @@ class KanaQuizViewModel(private val app: AppContainer) : ViewModel() {
     private val _state = MutableStateFlow(KanaQuizUiState())
     val uiState = _state.asStateFlow()
 
+    private var allKana: List<QuizKana> = emptyList()
+
     init {
         viewModelScope.launch {
-            val all = app.content.kanaAll().map { list -> list.map { QuizKana(it.id, it.hiragana, it.katakana, it.romaji) } }
-                .stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
-            all.collect { pool ->
-                if (pool.isNotEmpty() && _state.value.questions.isEmpty()) {
-                    start(pool)
+            app.content.kanaAll().collect { list ->
+                allKana = list.map { QuizKana(it.id, it.hiragana, it.katakana, it.romaji, it.groupName) }
+                if (!_state.value.started) {
+                    _state.update { it.copy(pool = filtered(it.group)) }
                 }
             }
         }
     }
 
-    private fun start(pool: List<QuizKana>) {
-        val questions = pool.shuffled(Random.Default).take(10)
+    private fun filtered(group: String) = allKana.filter { it.group == group }
+
+    fun setGroup(group: String) {
+        _state.update { it.copy(group = group, pool = filtered(group)) }
+    }
+
+    fun startQuiz(count: Int) {
+        val s = _state.value
+        val questions = s.pool.shuffled(Random.Default).take(count)
         _state.update {
-            KanaQuizUiState(
+            it.copy(
+                started = true,
+                finished = false,
                 questions = questions,
-                pool = pool,
                 index = 0,
-                quiz = questions.firstOrNull()?.let { QuizGenerator.kanaQuiz(it, pool) },
+                quiz = questions.firstOrNull()?.let { q -> QuizGenerator.kanaQuiz(q, s.pool) },
+                selected = null,
+                correctCount = 0,
             )
         }
     }
@@ -261,7 +296,7 @@ class KanaQuizViewModel(private val app: AppContainer) : ViewModel() {
 
     fun restart() {
         val s = _state.value
-        if (s.pool.isNotEmpty()) start(s.pool)
+        if (s.pool.isNotEmpty()) startQuiz(s.questions.size)
     }
 }
 
@@ -289,11 +324,50 @@ fun KanaQuizScreen(nav: NavHostController) {
                 label = "kanaQuizState",
                 modifier = Modifier.padding(padding),
             ) { finished ->
+                val countOptions = remember(state.pool.size) {
+                    buildList {
+                        add(10)
+                        if (state.pool.size >= 20) add(20)
+                        if (state.pool.size !in this) add(state.pool.size)
+                    }
+                }
+                var selectedCount by remember(state.group) { mutableStateOf(10) }
                 Column(
                     Modifier.fillMaxSize().padding(20.dp),
                     verticalArrangement = Arrangement.spacedBy(14.dp),
                 ) {
-                    if (finished) {
+                    if (!state.started) {
+                        SectionCard(title = "选择分组") {
+                            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                KanaGroup.entries.forEach { g ->
+                                    FilterChip(
+                                        selected = state.group == g.key,
+                                        onClick = { vm.setGroup(g.key) },
+                                        label = { Text(g.label) },
+                                    )
+                                }
+                            }
+                            Text(
+                                "当前分组共 ${state.pool.size} 组假名",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
+                        SectionCard(title = "题量") {
+                            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                countOptions.forEach { c ->
+                                    FilterChip(
+                                        selected = selectedCount == c,
+                                        onClick = { selectedCount = c },
+                                        label = { Text(if (c == state.pool.size) "全部 $c" else "$c 题") },
+                                    )
+                                }
+                            }
+                        }
+                        AppButton("开始测验", enabled = state.pool.isNotEmpty()) {
+                            vm.startQuiz(selectedCount.coerceAtMost(state.pool.size))
+                        }
+                    } else if (finished) {
                         SectionCard {
                             Column(
                                 horizontalAlignment = Alignment.CenterHorizontally,

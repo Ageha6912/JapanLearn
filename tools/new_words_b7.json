@@ -1,0 +1,23 @@
+{"batch": 7, "words": [
+{"ja":"遊ぶ","kana":"あそぶ","romaji":"asobu","zh":"玩","pos":"动词","cat":"动作","example":"公園で遊びます。","exampleZh":"在公园玩。"},
+{"ja":"遅刻する","kana":"ちこくする","romaji":"chikoku suru","zh":"迟到","pos":"动词","cat":"动作","example":"電車が遅れて遅刻しました。","exampleZh":"电车晚点迟到了。"},
+{"ja":"急ぐ","kana":"いそぐ","romaji":"isogu","zh":"赶快 / 急","pos":"动词","cat":"动作","example":"明日は早いので急ぎます。","exampleZh":"明天要早起，得赶紧。"},
+{"ja":"運ぶ","kana":"はこぶ","romaji":"hakobu","zh":"搬运","pos":"动词","cat":"动作","example":"荷物を運びます。","exampleZh":"搬运行李。"},
+{"ja":"壊す","kana":"こわす","romaji":"kowasu","zh":"弄坏","pos":"动词","cat":"动作","example":"椅子を壊してしまいました。","exampleZh":"不小心把椅子弄坏了。"},
+{"ja":"直す","kana":"なおす","romaji":"naosu","zh":"修理 / 改正","pos":"动词","cat":"动作","example":"車を直します。","exampleZh":"修车。"},
+{"ja":"比べる","kana":"くらべる","romaji":"kuraberu","zh":"比较","pos":"动词","cat":"动作","example":"二つの店を比べます。","exampleZh":"比较两家店。"},
+{"ja":"続ける","kana":"つづける","romaji":"tsuzukeru","zh":"继续","pos":"动词","cat":"动作","example":"勉強を続けます。","exampleZh":"继续学习。"},
+{"ja":"祝う","kana":"いわう","romaji":"iwau","zh":"庆祝","pos":"动词","cat":"动作","example":"誕生日を祝います。","exampleZh":"庆祝生日。"},
+{"ja":"大人","kana":"おとな","romaji":"otona","zh":"大人","pos":"名词","cat":"人物","example":"大人も楽しめます。","exampleZh":"大人也能乐在其中。"},
+{"ja":"老人","kana":"ろうじん","romaji":"roujin","zh":"老人","pos":"名词","cat":"人物","example":"老人に席を譲ります。","exampleZh":"给老人让座。"},
+{"ja":"今度","kana":"こんど","romaji":"kondo","zh":"下次 / 这次","pos":"名词","cat":"时间","example":"今度の日曜に会いましょう。","exampleZh":"这个星期天见吧。"},
+{"ja":"これから","kana":"これから","romaji":"orekara","zh":"从现在起","pos":"名词","cat":"时间","example":"これから出かけます。","exampleZh":"现在出门。"},
+{"ja":"昔","kana":"むかし","romaji":"mukashi","zh":"从前","pos":"名词","cat":"时间","example":"昔ここに寺がありました。","exampleZh":"从前这里有座寺庙。"},
+{"ja":"ぜひ","kana":"ぜひ","romaji":"zehi","zh":"务必","pos":"副词","cat":"副词","example":"ぜひ一度来てください。","exampleZh":"请务必来一次。"},
+{"ja":"もう一度","kana":"もういちど","romaji":"mou ichido","zh":"再来一次","pos":"副词","cat":"副词","example":"もう一度説明します。","exampleZh":"再说明一次。"},
+{"ja":"豊か","kana":"ゆたか","romaji":"yutaka","zh":"丰富的","pos":"形容动词","cat":"形容词","example":"経験が豊かです。","exampleZh":"经验丰富。"},
+{"ja":"すばらしい","kana":"すばらしい","romaji":"subarashii","zh":"极好的","pos":"い形容词","cat":"形容词","example":"すばらしい景色でした。","exampleZh":"是绝美的景色。"},
+{"ja":"正しい","kana":"ただしい","romaji":"tadashii","zh":"正确的","pos":"い形容词","cat":"形容词","example":"正しい答えを選びます。","exampleZh":"选择正确答案。"},
+{"ja":"複雑","kana":"ふくざつ","romaji":"fukuzatsu","zh":"复杂的","pos":"形容动词","cat":"形容词","example":"この問題は複雑です。","exampleZh":"这个问题很复杂。"},
+{"ja":"一緒","kana":"いっしょ","romaji":"issho","zh":"一起","pos":"形容动词","cat":"形容词","example":"一緒に行きましょう。","exampleZh":"一起去吧。"}
+]}

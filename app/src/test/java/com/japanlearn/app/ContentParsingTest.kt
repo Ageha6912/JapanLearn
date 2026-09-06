@@ -34,7 +34,24 @@ class ContentParsingTest {
             assertEquals("a", r)
             assertEquals("あさ", exJa)
             assertEquals("早晨", exZh)
+            // 旧版数据无 group 字段时默认清音
+            assertEquals("seion", group)
         }
+    }
+
+    @Test
+    fun `解析假名分组字段`() {
+        val json = """
+            {"version":2,"kana":[
+              {"id":"k01","h":"あ","k":"ア","r":"a","group":"seion","exJa":"あさ","exZh":"早晨"},
+              {"id":"k47","h":"が","k":"ガ","r":"ga","group":"dakuon","exJa":"がっこう","exZh":"学校"},
+              {"id":"k72","h":"きゃ","k":"キャ","r":"kya","group":"youon","exJa":"きゃく","exZh":"客人"}
+            ]}
+        """.trimIndent()
+        val file = ContentJson.decodeFromString<KanaFile>(json)
+        assertEquals(listOf("seion", "dakuon", "youon"), file.kana.map { it.group })
+        // 拗音是两个字符的假名
+        assertEquals("きゃ", file.kana[2].h)
     }
 
     @Test

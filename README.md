@@ -6,7 +6,7 @@
   <img src="https://img.shields.io/badge/platform-Android%208.0%2B-1B3A5C?logo=android&logoColor=white" alt="Android 8.0 及以上">
   <img src="https://img.shields.io/badge/Kotlin-2.0-7F52FF?logo=kotlin&logoColor=white" alt="Kotlin 2.0">
   <img src="https://img.shields.io/badge/Jetpack%20Compose-Material%203-4285F4?logo=jetpackcompose&logoColor=white" alt="Jetpack Compose Material 3">
-  <img src="https://img.shields.io/badge/tests-46%20passing-4E7D5B" alt="46 项单元测试通过">
+  <img src="https://img.shields.io/badge/tests-55%20passing-4E7D5B" alt="55 项单元测试通过">
   <a href="./LICENSE"><img src="https://img.shields.io/badge/license-MIT-C75B5B" alt="MIT 许可证"></a>
 </p>
 
@@ -48,10 +48,12 @@ JapanLearn 是一个**完全离线、无需账号**的日语入门 App，为日�
 | 模块 | 说明 |
 |---|---|
 | 🏠 今日学习 | 新词 / 语法 / 待复习聚合，实时进度，连击天数 |
-| 🈁 五十音 | 46 组平/片假名，罗马音 + 示例词 + 发音，随机测验 |
-| 📖 N5 单词 | 200 词：假名、词性、例句、分类，学完即练 |
-| ✍️ N5 语法 | 30 条：接续方式、说明、例句、配套选择题 |
+| 🈁 五十音 | 101 组（清音 / 浊音 / 拗音），罗马音 + 示例词 + 发音，分组测验，题量可选 |
+| 📖 N5 单词 | 504 词（11 个分类）：假名、词性、例句，学完即练，列表带掌握度色点 |
+| ✍️ N5 语法 | 50 条：接续方式、说明、例句、配套选择题 |
 | 🔁 SRS 复习 | 到期自动出队，混合单词与语法，限流顺延 |
+| 🔊 听音选词 | 练习中按 30% 概率升级为听音变体（TTS 播放选释义） |
+| 🔔 复习提醒 | 每天 20:00 检查到期内容，有任务才提醒，可开关 |
 | 📝 错题本 | 答错自动收录（含五十音），复习答对自动移除 |
 | 📊 学习统计 | 连击、累计时长、近 7 日柱状图、内容进度 |
 | 🗾 每日一句 | 30 条场景句（餐厅 / 便利店 / 旅游 / 动漫…）带词汇拆解 |
@@ -65,7 +67,7 @@ JapanLearn 是一个**完全离线、无需账号**的日语入门 App，为日�
 git clone https://github.com/Ageha6912/JapanLearn.git
 cd JapanLearn
 ./gradlew :app:assembleDebug     # 产出 app/build/outputs/apk/debug/app-debug.apk
-./gradlew :app:testDebugUnitTest # 运行 46 项单元测试
+./gradlew :app:testDebugUnitTest # 运行 55 项单元测试
 ```
 
 不想编译？到 [Releases](https://github.com/Ageha6912/JapanLearn/releases) 下载打包好的 APK 直接安装。
@@ -116,13 +118,14 @@ app/src/main/java/com/japanlearn/app/
 
 ## 测试
 
-46 项单元测试全绿（PRD §17.8 强制要求）：
+55 项单元测试全绿（PRD §17.8 强制要求）：
 
 - `SrsSchedulerTest`：四级掌握度的间隔/到期时间、间隔递增与 60 天上限、掌握判定
 - `QuizGeneratorTest`：选项数量、含正确答案、不重复、双向词卡、种子可复现、小内容池退化
 - `StreakCalculatorTest`：跨天连击、中断归零、今天未学仍延续
 - `ReviewPlannerTest`：每日复习限流截断与顺延
-- `ContentParsingTest`：内容 JSON schema 解析与未知字段向前兼容
+- `ContentParsingTest`：内容 JSON schema 解析、假名分组字段与未知字段向前兼容
+- `ReminderSchedulerTest`：提醒触发时刻计算（当天/顺延/边界）
 - `UiMathTest`：今日进度/柱状图占比/入场级联延迟的边界（0 除、截断、封顶）
 - `FormatTest`：学习时长展示格式（h/m、负数钳制）
 
@@ -132,15 +135,15 @@ app/src/main/java/com/japanlearn/app/
 
 | 文件 | 内容 | 关键字段 |
 |---|---|---|
-| `kana.json` | 五十音 | `h / k / r` + 示例词 |
+| `kana.json` | 五十音 | `h / k / r / group` + 示例词 |
 | `words_n5.json` | N5 单词 | `ja / kana / romaji / zh / pos / cat / example` |
 | `grammar_n5.json` | N5 语法 | `title / meaning / connection / explanation / examples / exercises` |
 | `sentences.json` | 每日一句 | `scene / ja / zh / breakdown[]` |
 
 ## 路线图
 
-- [ ] 单词扩充至 500，补充浊音 / 拗音
-- [ ] 每日复习提醒通知
+- [x] 单词扩充至 500+，补充浊音 / 拗音（v0.2）
+- [x] 每日复习提醒通知（v0.2）
 - [ ] 登录与多设备同步（可选）
 - [ ] SRS 升级为 FSRS 算法
 - [ ] AI 日语助手（翻译 / 语法解释 / 纠错，走自建后端）

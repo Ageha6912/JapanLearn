@@ -34,7 +34,7 @@ class ContentLoader(private val context: Context, private val db: AppDatabase) {
         if (installed == totalVersion.toString()) return
 
         db.kanaDao().insertAll(kana.kana.mapIndexed { i, k ->
-            KanaEntity(id = k.id, hiragana = k.h, katakana = k.k, romaji = k.r, exampleJa = k.exJa, exampleZh = k.exZh, order = i)
+            KanaEntity(id = k.id, hiragana = k.h, katakana = k.k, romaji = k.r, groupName = k.group, exampleJa = k.exJa, exampleZh = k.exZh, order = i)
         })
         db.wordDao().insertAll(words.words.mapIndexed { i, w ->
             WordEntity(

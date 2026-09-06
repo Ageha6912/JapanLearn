@@ -42,6 +42,14 @@ class JapanLearnApp : Application() {
         super.onCreate()
         container = AppContainer(this)
         // 内容装载在 IO 线程进行；Room 的 Flow 查询会在数据就绪后自动刷新 UI
-        kotlinx.coroutines.CoroutineScope(appScope).launch { container.seedContent() }
+        kotlinx.coroutines.CoroutineScope(appScope).launch {
+            container.seedContent()
+            // 恢复复习提醒的调度状态（WorkManager 任务在系统重启后由 WorkManager 自行恢复，
+            // 这里覆盖一次以保证开关状态与调度一致）
+            com.japanlearn.app.work.ReviewReminder.schedule(
+                this@JapanLearnApp,
+                container.settings.reminderEnabled.value,
+            )
+        }
     }
 }

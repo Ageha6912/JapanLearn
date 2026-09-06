@@ -114,6 +114,9 @@ interface ProgressDao {
     @Query("SELECT COUNT(*) FROM user_progress WHERE contentType = :type")
     suspend fun countByType(type: String): Int
 
+    @Query("SELECT * FROM user_progress WHERE contentType = :type")
+    fun allByType(type: String): Flow<List<UserProgressEntity>>
+
     @Query("SELECT COUNT(*) FROM user_progress WHERE contentType = 'word' AND dueAt <= :now")
     fun dueWordCount(now: Long): Flow<Int>
 

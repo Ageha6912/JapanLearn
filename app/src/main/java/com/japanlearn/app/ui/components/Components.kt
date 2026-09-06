@@ -294,14 +294,32 @@ fun QuizView(
     selected: Int?,
     onSelect: (Int) -> Unit,
     modifier: Modifier = Modifier,
+    onSpeak: ((String) -> Unit)? = null,
 ) {
     val jc = japanColors()
     var shakeTrigger by remember { mutableIntStateOf(0) }
     LaunchedEffect(selected) {
         if (selected != null && selected != quiz.answerIndex) shakeTrigger++
     }
+    // 听音题：出现时自动朗读一次
+    LaunchedEffect(quiz) {
+        if (quiz.audioText != null) onSpeak?.invoke(quiz.audioText)
+    }
 
     Column(modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        if (quiz.audioText != null && onSpeak != null) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                TtsButton(quiz.audioText, onSpeak)
+                Text(
+                    "点击喇叭可以重新播放",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+        }
         Text(quiz.question, style = MaterialTheme.typography.titleLarge)
         if (quiz.subQuestion != null) {
             Text(

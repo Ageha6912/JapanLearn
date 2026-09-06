@@ -48,6 +48,7 @@ import com.japanlearn.app.data.examples
 import com.japanlearn.app.data.exercises
 import com.japanlearn.app.data.local.GrammarEntity
 import com.japanlearn.app.data.local.WordEntity
+import com.japanlearn.app.domain.AudioQuizPolicy
 import com.japanlearn.app.domain.Mastery
 import com.japanlearn.app.domain.Quiz
 import com.japanlearn.app.domain.QuizGenerator
@@ -114,15 +115,22 @@ fun ReviewHomeScreen(nav: NavHostController) {
         Column(
             Modifier
                 .padding(padding)
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 20.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
+                .fillMaxSize(),
         ) {
-            StaggerIn(0) {
-                Text("复习", style = MaterialTheme.typography.headlineMedium)
+            // 固定头部：标题不随内容滚动
+            Column(Modifier.padding(horizontal = 20.dp)) {
+                StaggerIn(0) {
+                    Text("复习", style = MaterialTheme.typography.headlineMedium)
+                }
+                Spacer(Modifier.height(16.dp))
             }
-
+            Column(
+                Modifier
+                    .weight(1f)
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = 20.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+            ) {
             StaggerIn(1) {
                 SectionCard(title = "今日复习") {
                     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -181,6 +189,7 @@ fun ReviewHomeScreen(nav: NavHostController) {
                 }
             }
             Spacer(Modifier.height(10.dp))
+            }
         }
     }
 }
@@ -237,10 +246,12 @@ class ReviewSessionViewModel(private val app: AppContainer) : ViewModel() {
         is ReviewItem.WordItem -> {
             directionToggle = !directionToggle
             val direction = if (directionToggle) WordQuizDirection.JP_TO_CN else WordQuizDirection.CN_TO_JP
+            val audio = AudioQuizPolicy.shouldUseAudio(direction, kotlin.random.Random.nextDouble())
             QuizGenerator.wordQuiz(
                 QuizWord(item.word.id, item.word.ja, item.word.kana, item.word.zh),
                 poolOf(item.word.id),
                 direction,
+                audio = audio,
             )
         }
         is ReviewItem.GrammarItem -> {
@@ -348,7 +359,7 @@ fun ReviewSessionScreen(nav: NavHostController) {
                             if (quiz == null) {
                                 LoadingPlaceholder()
                             } else {
-                                QuizView(quiz, state.selected, onSelect = { vm.onSelect(it) })
+                                QuizView(quiz, state.selected, onSelect = { vm.onSelect(it) }, onSpeak = { vm.speak(it) })
                                 if (state.selected != null) {
                                     val correct = state.selected == quiz.answerIndex
                                     FeedbackText(correct = correct, answerText = quiz.answerText)

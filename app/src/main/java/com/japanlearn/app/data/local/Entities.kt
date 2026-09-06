@@ -36,6 +36,7 @@ data class KanaEntity(
     val hiragana: String,
     val katakana: String,
     val romaji: String,
+    val groupName: String,
     val exampleJa: String,
     val exampleZh: String,
     val order: Int,

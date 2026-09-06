@@ -1,9 +1,14 @@
 package com.japanlearn.app
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -80,6 +85,7 @@ import com.japanlearn.app.ui.stats.StatsScreen
 import com.japanlearn.app.ui.theme.JapanLearnTheme
 import com.japanlearn.app.ui.words.WordListScreen
 import com.japanlearn.app.ui.words.WordSessionScreen
+import com.japanlearn.app.work.ReviewReminder
 
 /** 全局依赖容器 */
 val LocalAppContainer = staticCompositionLocalOf<AppContainer> { error("AppContainer not provided") }
@@ -111,23 +117,40 @@ object Routes {
 }
 
 class MainActivity : ComponentActivity() {
+
+    private val navigateTo = mutableStateOf<String?>(null)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        navigateTo.value = intent?.getStringExtra(ReviewReminder.EXTRA_NAVIGATE_TO)
         setContent {
             val container = (application as JapanLearnApp).container
             CompositionLocalProvider(LocalAppContainer provides container) {
                 JapanLearnTheme {
-                    MainRoot()
+                    MainRoot(navTarget = navigateTo.value)
                 }
             }
         }
     }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        navigateTo.value = intent.getStringExtra(ReviewReminder.EXTRA_NAVIGATE_TO)
+    }
 }
 
 @Composable
-fun MainRoot() {
+fun MainRoot(navTarget: String? = null) {
     val navController = rememberNavController()
+
+    // 通知深链：跳转到复习 Tab
+    LaunchedEffect(navTarget) {
+        if (navTarget == com.japanlearn.app.work.ReviewReminder.NAVIGATE_REVIEW) {
+            navController.navigate(Routes.REVIEW) { launchSingleTop = true }
+        }
+    }
+
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = backStackEntry?.destination?.route
     val isTab = currentRoute in Routes.TABS

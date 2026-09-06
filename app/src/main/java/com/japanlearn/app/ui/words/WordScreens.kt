@@ -18,6 +18,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -39,6 +44,7 @@ import com.japanlearn.app.AppContainer
 import com.japanlearn.app.LocalAppContainer
 import com.japanlearn.app.Routes
 import com.japanlearn.app.data.local.WordEntity
+import com.japanlearn.app.domain.AudioQuizPolicy
 import com.japanlearn.app.domain.Mastery
 import com.japanlearn.app.domain.Quiz
 import com.japanlearn.app.domain.QuizGenerator
@@ -69,6 +75,7 @@ fun WordListScreen(nav: NavHostController) {
     val words by app.content.wordsAll().collectAsStateWithLifecycle(initialValue = emptyList())
     val learned by app.progress.learnedWordCount().collectAsStateWithLifecycle(initialValue = 0)
     val dailyTarget by app.settings.dailyNewWords.collectAsStateWithLifecycle()
+    val masteryMap by app.progress.wordMasteryMap().collectAsStateWithLifecycle(initialValue = emptyMap())
 
     Scaffold(
         topBar = { AppTopBar("N5 单词") { nav.popBackStack() } },
@@ -104,6 +111,8 @@ fun WordListScreen(nav: NavHostController) {
                         modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
                     ) {
                         Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
+                            MasteryDot(masteryMap[w.id])
+                            Spacer(Modifier.width(10.dp))
                             Column(Modifier.weight(1f)) {
                                 Text(w.ja, style = MaterialTheme.typography.titleLarge)
                                 Text(
@@ -194,10 +203,11 @@ class WordSessionViewModel(
         val word = current ?: return
         directionToggle = !directionToggle
         val direction = if (directionToggle) WordQuizDirection.JP_TO_CN else WordQuizDirection.CN_TO_JP
+        val audio = AudioQuizPolicy.shouldUseAudio(direction, kotlin.random.Random.nextDouble())
         _state.update {
             it.copy(
                 phase = SessionPhase.QUIZ,
-                quiz = QuizGenerator.wordQuiz(QuizWord(word.id, word.ja, word.kana, word.zh), pool, direction),
+                quiz = QuizGenerator.wordQuiz(QuizWord(word.id, word.ja, word.kana, word.zh), pool, direction, audio = audio),
                 selected = null,
             )
         }
@@ -304,7 +314,7 @@ fun WordSessionScreen(nav: NavHostController, count: Int) {
 
                         SessionPhase.QUIZ -> {
                             state.quiz?.let { quiz ->
-                                QuizView(quiz, state.selected, onSelect = { vm.onSelect(it) })
+                                QuizView(quiz, state.selected, onSelect = { vm.onSelect(it) }, onSpeak = { vm.speak(it) })
                                 if (state.selected != null) {
                                     val correct = state.selected == quiz.answerIndex
                                     com.japanlearn.app.ui.review.FeedbackText(correct = correct, answerText = quiz.answerText)
@@ -418,4 +428,35 @@ private fun WordCard(word: WordEntity, onSpeak: (String) -> Unit, onPractice: ()
             AppButton("开始练习", onClick = onPractice)
         }
     }
+}
+
+/** 单词掌握度色点：未学=空心，不认识=灰，模糊=黄，熟悉=抹茶，熟练=藍。 */
+@Composable
+private fun MasteryDot(mastery: Int?) {
+    val color = when (mastery) {
+        null -> androidx.compose.ui.graphics.Color.Transparent
+        0 -> androidx.compose.ui.graphics.Color(0xFFB9B2A6)
+        1 -> androidx.compose.ui.graphics.Color(0xFFE7C86D)
+        2 -> androidx.compose.ui.graphics.Color(0xFF4E7D5B)
+        else -> androidx.compose.ui.graphics.Color(0xFF1B3A5C)
+    }
+    Box(
+        Modifier
+            .size(12.dp)
+            .background(
+                color = color,
+                shape = CircleShape,
+            )
+            .then(
+                if (mastery == null) {
+                    Modifier.border(
+                        width = 1.5.dp,
+                        color = androidx.compose.ui.graphics.Color(0xFFD8D2C5),
+                        shape = CircleShape,
+                    )
+                } else {
+                    Modifier
+                },
+            ),
+    )
 }

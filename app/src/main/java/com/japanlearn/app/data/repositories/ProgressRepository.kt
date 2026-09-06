@@ -25,6 +25,12 @@ class SettingsRepository(context: Context) {
     val dailyNewWords = MutableStateFlow(prefs.getInt(KEY_NEW_WORDS, DEFAULT_NEW_WORDS))
     val dailyNewGrammar = MutableStateFlow(prefs.getInt(KEY_NEW_GRAMMAR, DEFAULT_NEW_GRAMMAR))
     val dailyReviewCap = MutableStateFlow(prefs.getInt(KEY_REVIEW_CAP, DEFAULT_REVIEW_CAP))
+    val reminderEnabled = MutableStateFlow(prefs.getBoolean(KEY_REMINDER, false))
+
+    fun setReminderEnabled(value: Boolean) {
+        prefs.edit().putBoolean(KEY_REMINDER, value).apply()
+        reminderEnabled.value = value
+    }
 
     fun setDailyNewWords(value: Int) {
         prefs.edit().putInt(KEY_NEW_WORDS, value).apply()
@@ -48,6 +54,7 @@ class SettingsRepository(context: Context) {
         private const val KEY_NEW_WORDS = "daily_new_words"
         private const val KEY_NEW_GRAMMAR = "daily_new_grammar"
         private const val KEY_REVIEW_CAP = "daily_review_cap"
+        private const val KEY_REMINDER = "reminder_enabled"
     }
 }
 
@@ -154,6 +161,10 @@ class ProgressRepository(
 
     fun learnedWordCount(): Flow<Int> = db.progressDao().countWordFlow()
     fun learnedGrammarCount(): Flow<Int> = db.progressDao().countGrammarFlow()
+
+    /** 单词 id → 当前掌握度（用于列表色点）。 */
+    fun wordMasteryMap(): Flow<Map<String, Int>> =
+        db.progressDao().allByType("word").map { rows -> rows.associate { it.contentId to it.mastery } }
     fun masteredWordCount(): Flow<Int> = db.progressDao().masteredWordCount(SrsScheduler.MASTERED_INTERVAL_DAYS)
 
     fun wrongAnswers(): Flow<List<WrongAnswerEntity>> = db.wrongAnswerDao().all()

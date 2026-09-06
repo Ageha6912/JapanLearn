@@ -1,6 +1,7 @@
 package com.japanlearn.app.domain
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -100,5 +101,36 @@ class QuizGeneratorTest {
         assertEquals(2, quiz.options.size)
         assertEquals(quiz.options.toSet().size, quiz.options.size)
         assertTrue(quiz.options.contains("吃"))
+    }
+
+    @Test
+    fun `听音选词变体 不暴露日文文本且携带音频字段`() {
+        val quiz = QuizGenerator.wordQuiz(pool[0], pool, WordQuizDirection.JP_TO_CN, Random(9), audio = true)
+        assertEquals(QuizKind.AUDIO_WORD_JP_TO_CN, quiz.kind)
+        assertEquals("食べる", quiz.audioText)
+        assertTrue(quiz.question.contains("听发音"))
+        // 关键：题面和副题都不能出现日文原词，否则听音题失去意义
+        assertTrue(!quiz.question.contains("食べる"))
+        assertEquals(null, quiz.subQuestion)
+        assertTrue(quiz.options.contains("吃"))
+        assertEquals(quiz.options.indexOf("吃"), quiz.answerIndex)
+        assertEquals(4, quiz.options.size)
+        assertEquals(quiz.options.toSet().size, quiz.options.size)
+    }
+
+    @Test
+    fun `听音标记不影响中文到日语方向`() {
+        val quiz = QuizGenerator.wordQuiz(pool[0], pool, WordQuizDirection.CN_TO_JP, Random(10), audio = true)
+        // CN_TO_JP 不做听音变体，仍为普通方向题
+        assertEquals(QuizKind.WORD_CN_TO_JP, quiz.kind)
+        assertEquals(null, quiz.audioText)
+    }
+
+    @Test
+    fun `听音触发策略 仅日语到中文方向且命中概率时生效`() {
+        assertTrue(AudioQuizPolicy.shouldUseAudio(WordQuizDirection.JP_TO_CN, roll = 0.29))
+        assertFalse(AudioQuizPolicy.shouldUseAudio(WordQuizDirection.JP_TO_CN, roll = 0.31))
+        assertFalse(AudioQuizPolicy.shouldUseAudio(WordQuizDirection.CN_TO_JP, roll = 0.0))
+        assertTrue(AudioQuizPolicy.shouldUseAudio(WordQuizDirection.JP_TO_CN, roll = 0.05, chance = 0.5))
     }
 }

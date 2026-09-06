@@ -1,5 +1,10 @@
 package com.japanlearn.app.ui.profile
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -21,6 +26,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -30,7 +36,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
@@ -51,6 +59,7 @@ data class ProfileUiState(
     val dailyNewWords: Int = 10,
     val dailyNewGrammar: Int = 3,
     val dailyReviewCap: Int = 30,
+    val reminderEnabled: Boolean = false,
     val streak: Int = 0,
     val learnedWords: Int = 0,
     val masteredWords: Int = 0,
@@ -68,6 +77,7 @@ class ProfileViewModel(private val app: AppContainer) : ViewModel() {
         collect(app.settings.dailyNewWords) { s, v -> s.copy(dailyNewWords = v) }
         collect(app.settings.dailyNewGrammar) { s, v -> s.copy(dailyNewGrammar = v) }
         collect(app.settings.dailyReviewCap) { s, v -> s.copy(dailyReviewCap = v) }
+        collect(app.settings.reminderEnabled) { s, v -> s.copy(reminderEnabled = v) }
         collect(app.stats.weekly()) { s, v -> s.copy(streak = v.streak) }
         collect(app.progress.learnedWordCount()) { s, v -> s.copy(learnedWords = v) }
         collect(app.progress.masteredWordCount()) { s, v -> s.copy(masteredWords = v) }
@@ -77,6 +87,11 @@ class ProfileViewModel(private val app: AppContainer) : ViewModel() {
     fun setDailyNewWords(v: Int) = app.settings.setDailyNewWords(v)
     fun setDailyNewGrammar(v: Int) = app.settings.setDailyNewGrammar(v)
     fun setDailyReviewCap(v: Int) = app.settings.setDailyReviewCap(v)
+
+    fun setReminderEnabled(context: android.content.Context, v: Boolean) {
+        app.settings.setReminderEnabled(v)
+        com.japanlearn.app.work.ReviewReminder.schedule(context, v)
+    }
 
     fun resetAll() {
         viewModelScope.launch { app.progress.resetAll() }
@@ -201,7 +216,40 @@ fun ProfileScreen(nav: NavHostController) {
             }
 
             StaggerIn(3) {
-                SectionCard(title = "数据") {
+                SectionCard(title = "提醒") {
+                val context = LocalContext.current
+                val permissionLauncher = rememberLauncherForActivityResult(
+                    ActivityResultContracts.RequestPermission(),
+                ) { }
+                Row(
+                    Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Column(Modifier.weight(1f)) {
+                        Text("每日复习提醒", style = MaterialTheme.typography.titleSmall)
+                        Text(
+                            "每天 20:00 检查一次，有到期内容时提醒",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                    Switch(
+                        checked = state.reminderEnabled,
+                        onCheckedChange = { enabled ->
+                            if (enabled && Build.VERSION.SDK_INT >= 33 &&
+                                ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) !=
+                                PackageManager.PERMISSION_GRANTED
+                            ) {
+                                permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                            }
+                            vm.setReminderEnabled(context, enabled)
+                        },
+                    )
+                }
+            }
+
+            SectionCard(title = "数据") {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(8.dp),

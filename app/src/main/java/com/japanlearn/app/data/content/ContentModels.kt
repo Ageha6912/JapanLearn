@@ -9,7 +9,7 @@ import kotlinx.serialization.json.Json
 data class KanaFile(val version: Int, val kana: List<KanaItem>)
 
 @Serializable
-data class KanaItem(val id: String, val h: String, val k: String, val r: String, val exJa: String, val exZh: String)
+data class KanaItem(val id: String, val h: String, val k: String, val r: String, val group: String = "seion", val exJa: String, val exZh: String)
 
 @Serializable
 data class WordsFile(val version: Int, val words: List<WordItem>)
