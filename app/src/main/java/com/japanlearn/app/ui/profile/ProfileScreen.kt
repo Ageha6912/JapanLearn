@@ -18,6 +18,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Backup
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.LocalFireDepartment
 import androidx.compose.material3.AlertDialog
@@ -97,6 +98,43 @@ class ProfileViewModel(private val app: AppContainer) : ViewModel() {
         viewModelScope.launch { app.progress.resetAll() }
     }
 
+    /** 导出学习数据到用户选择的 URI（SAF），完成后回调反馈文案。 */
+    fun exportData(context: android.content.Context, uri: android.net.Uri, onDone: (String) -> Unit) {
+        viewModelScope.launch {
+            try {
+                val json = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) { app.backup.exportJson() }
+                kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+                    context.contentResolver.openOutputStream(uri)?.use { it.write(json.toByteArray()) }
+                        ?: error("无法写入所选位置")
+                }
+                onDone("备份已导出")
+            } catch (e: Exception) {
+                onDone("导出失败：${e.message}")
+            }
+        }
+    }
+
+    /** 从用户选择的 JSON 备份恢复（合并写入，不清空现有数据）。 */
+    fun importData(context: android.content.Context, uri: android.net.Uri, onDone: (String) -> Unit) {
+        viewModelScope.launch {
+            try {
+                val text = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+                    context.contentResolver.openInputStream(uri)?.bufferedReader()?.use { it.readText() }
+                        ?: error("无法读取所选文件")
+                }
+                val file = com.japanlearn.app.data.BackupFileSchema.parse(text)
+                if (file == null) {
+                    onDone("导入失败：不是有效的 JapanLearn 备份文件")
+                } else {
+                    val s = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) { app.backup.import(file) }
+                    onDone("恢复完成：进度 ${s.progress}、错题 ${s.wrongAnswers}、统计 ${s.dailyStudy}、复习记录 ${s.reviewRecords}")
+                }
+            } catch (e: Exception) {
+                onDone("导入失败：${e.message}")
+            }
+        }
+    }
+
     fun speak(text: String) = app.tts.speak(text)
 }
 
@@ -110,6 +148,24 @@ fun ProfileScreen(nav: NavHostController) {
     val permissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission(),
     ) { }
+    val exportLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.CreateDocument("application/json"),
+    ) { uri ->
+        if (uri != null) {
+            vm.exportData(context, uri) { msg ->
+                android.widget.Toast.makeText(context, msg, android.widget.Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+    val importLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.OpenDocument(),
+    ) { uri ->
+        if (uri != null) {
+            vm.importData(context, uri) { msg ->
+                android.widget.Toast.makeText(context, msg, android.widget.Toast.LENGTH_LONG).show()
+            }
+        }
+    }
 
     if (showResetDialog) {
         AlertDialog(
@@ -252,6 +308,40 @@ fun ProfileScreen(nav: NavHostController) {
 
             StaggerIn(4) {
                 SectionCard(title = "数据") {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        Icon(
+                            Icons.Filled.Backup,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(18.dp),
+                        )
+                        Column {
+                            Text("备份与恢复", style = MaterialTheme.typography.titleSmall)
+                            Text(
+                                "进度、错题、统计导出为 JSON；导入按记录合并恢复",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
+                    }
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        AppButton(
+                            "导出数据",
+                            modifier = Modifier.weight(1f),
+                            onClick = {
+                                exportLauncher.launch("japanlearn-backup-" + java.time.LocalDate.now() + ".json")
+                            },
+                        )
+                        AppButton(
+                            "导入数据",
+                            modifier = Modifier.weight(1f),
+                            onClick = { importLauncher.launch(arrayOf("application/json")) },
+                        )
+                    }
+                    Spacer(Modifier.height(6.dp))
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(8.dp),

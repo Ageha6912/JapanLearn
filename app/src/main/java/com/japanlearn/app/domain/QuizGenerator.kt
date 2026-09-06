@@ -140,6 +140,7 @@ object QuizGenerator {
             val distractors = pool.asSequence()
                 .filter { it.id != target.id }
                 .filter { it.kana != target.kana }
+                .filter { KanjiQuizPolicy.hasKanjiForm(it.ja, it.kana) }
                 .map { it.ja }
                 .filter { it != answerText }
                 .distinct()

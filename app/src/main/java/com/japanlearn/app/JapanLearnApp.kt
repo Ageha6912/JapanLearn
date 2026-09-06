@@ -1,6 +1,7 @@
 package com.japanlearn.app
 
 import android.app.Application
+import com.japanlearn.app.data.BackupManager
 import com.japanlearn.app.data.ContentLoader
 import com.japanlearn.app.data.ContentRepository
 import com.japanlearn.app.data.ProgressRepository
@@ -23,6 +24,7 @@ class AppContainer(context: Application) {
     val content = ContentRepository(db)
     val progress = ProgressRepository(db, dateProvider)
     val stats = StatsRepository(db, dateProvider)
+    val backup = BackupManager(db)
     private val loader = ContentLoader(context, db)
 
     /** 装载课程内容（首次启动或内容版本升级时生效），IO 线程调用。 */

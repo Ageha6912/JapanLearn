@@ -3,7 +3,9 @@ package com.japanlearn.app.data.local
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import kotlinx.serialization.Serializable
 
+@Serializable
 @Entity(tableName = "words")
 data class WordEntity(
     @PrimaryKey val id: String,
@@ -55,6 +57,7 @@ data class SentenceEntity(
 )
 
 /** 用户学习进度（SRS 状态），contentType: word / grammar / kana */
+@Serializable
 @Entity(
     tableName = "user_progress",
     indices = [Index(value = ["contentType", "contentId"], unique = true)],
@@ -72,6 +75,7 @@ data class UserProgressEntity(
     val lastReviewedAt: Long? = null,
 )
 
+@Serializable
 @Entity(tableName = "review_records")
 data class ReviewRecordEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
@@ -84,6 +88,7 @@ data class ReviewRecordEntity(
 )
 
 /** 每日学习记录，date 格式 yyyy-MM-dd */
+@Serializable
 @Entity(tableName = "daily_study")
 data class DailyStudyEntity(
     @PrimaryKey val date: String,
@@ -94,6 +99,7 @@ data class DailyStudyEntity(
 )
 
 /** 错题本 */
+@Serializable
 @Entity(tableName = "wrong_answers", primaryKeys = ["contentType", "contentId"])
 data class WrongAnswerEntity(
     val contentType: String,

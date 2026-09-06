@@ -184,6 +184,15 @@ class QuizGeneratorTest {
     }
 
     @Test
+    fun `看假名选汉字 干扰项均为汉字形词汇`() {
+        val mixed = kanjiPool + listOf(QuizWord("w7", "はさみ", "はさみ", "剪刀"))
+        repeat(20) { seed ->
+            val quiz = QuizGenerator.kanjiQuiz(kanjiPool[0], mixed, toKanji = true, random = Random(seed))
+            assertTrue(quiz.options.none { it == "はさみ" })
+        }
+    }
+
+    @Test
     fun `看假名选汉字 同音异形词不作干扰项`() {
         val target = QuizWord("hashi1", "箸", "はし", "筷子")
         val pool = listOf(

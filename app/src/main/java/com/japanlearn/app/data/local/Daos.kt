@@ -117,6 +117,10 @@ interface ProgressDao {
     @Query("SELECT * FROM user_progress WHERE contentType = :type")
     fun allByType(type: String): Flow<List<UserProgressEntity>>
 
+    /** 备份导出用：全表一次性读取 */
+    @Query("SELECT * FROM user_progress")
+    suspend fun allOnce(): List<UserProgressEntity>
+
     @Query("SELECT COUNT(*) FROM user_progress WHERE contentType = 'word' AND dueAt <= :now")
     fun dueWordCount(now: Long): Flow<Int>
 
@@ -146,6 +150,10 @@ interface ReviewRecordDao {
 
     @Query("DELETE FROM review_records")
     suspend fun clear()
+
+    /** 备份导出用：全表一次性读取 */
+    @Query("SELECT * FROM review_records")
+    suspend fun allOnce(): List<ReviewRecordEntity>
 }
 
 @Dao
@@ -176,12 +184,20 @@ interface DailyStudyDao {
 
     @Query("DELETE FROM daily_study")
     suspend fun clear()
+
+    /** 备份导出用：全表一次性读取 */
+    @Query("SELECT * FROM daily_study")
+    suspend fun allOnce(): List<DailyStudyEntity>
 }
 
 @Dao
 interface WrongAnswerDao {
     @Query("SELECT * FROM wrong_answers ORDER BY lastWrongAt DESC")
     fun all(): Flow<List<WrongAnswerEntity>>
+
+    /** 备份导出用：全表一次性读取 */
+    @Query("SELECT * FROM wrong_answers")
+    suspend fun allOnce(): List<WrongAnswerEntity>
 
     @Query("SELECT COUNT(*) FROM wrong_answers")
     fun count(): Flow<Int>
