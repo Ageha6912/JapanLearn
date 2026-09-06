@@ -30,6 +30,7 @@ import androidx.compose.material.icons.filled.SentimentVerySatisfied
 import androidx.compose.material.icons.filled.VolumeUp
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilledTonalIconButton
@@ -37,6 +38,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -44,6 +46,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -205,8 +208,15 @@ fun StatTile(
 @Composable
 fun TtsButton(text: String, onSpeak: (String) -> Unit, modifier: Modifier = Modifier) {
     val interaction = remember { MutableInteractionSource() }
+    val app = com.japanlearn.app.LocalAppContainer.current
+    var showVoiceGuide by remember { mutableStateOf(false) }
+    if (showVoiceGuide) {
+        VoiceDataGuideDialog(onDismiss = { showVoiceGuide = false })
+    }
     FilledTonalIconButton(
-        onClick = { onSpeak(text) },
+        onClick = {
+            if (app.tts.needsVoiceData()) showVoiceGuide = true else onSpeak(text)
+        },
         interactionSource = interaction,
         modifier = modifier.pressScale(interaction, 0.9f),
         colors = androidx.compose.material3.IconButtonDefaults.filledTonalIconButtonColors(
@@ -219,6 +229,41 @@ fun TtsButton(text: String, onSpeak: (String) -> Unit, modifier: Modifier = Modi
 }
 
 /** 发音占位骨架 */
+/** 日语语音数据缺失时的下载引导（v0.3.1）：优先拉起系统语音数据安装页，无引擎时退回 TTS 设置。 */
+@Composable
+private fun VoiceDataGuideDialog(onDismiss: () -> Unit) {
+    val context = androidx.compose.ui.platform.LocalContext.current
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("缺少日语语音包") },
+        text = {
+            Text("设备还没有安装日语发音数据，下载后即可离线发音（通常只需几 MB）。下载完成后回到 App 再点一次喇叭即可。")
+        },
+        confirmButton = {
+            TextButton(onClick = {
+                onDismiss()
+                val newTask = android.content.Intent.FLAG_ACTIVITY_NEW_TASK
+                try {
+                    context.startActivity(
+                        android.content.Intent("android.speech.tts.engine.INSTALL_TTS_DATA").addFlags(newTask),
+                    )
+                } catch (_: android.content.ActivityNotFoundException) {
+                    try {
+                        context.startActivity(android.content.Intent("com.android.settings.TTS_SETTINGS").addFlags(newTask))
+                    } catch (_: Exception) {
+                        android.widget.Toast.makeText(
+                            context,
+                            "当前设备没有可用的语音引擎，无法下载日语语音",
+                            android.widget.Toast.LENGTH_LONG,
+                        ).show()
+                    }
+                }
+            }) { Text("去下载语音数据") }
+        },
+        dismissButton = { TextButton(onClick = onDismiss) { Text("取消") } },
+    )
+}
+
 @Composable
 fun SkeletonBlock(modifier: Modifier = Modifier, radius: Int = 12) {
     Box(
