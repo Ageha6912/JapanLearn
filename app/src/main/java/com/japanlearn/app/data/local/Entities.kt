@@ -15,6 +15,7 @@ data class WordEntity(
     val cat: String,
     val example: String,
     val exampleZh: String,
+    val level: String,
     val order: Int,
 )
 
@@ -27,6 +28,7 @@ data class GrammarEntity(
     val explanation: String,
     val examplesJson: String,
     val exercisesJson: String,
+    val level: String,
     val order: Int,
 )
 

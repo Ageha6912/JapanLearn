@@ -68,6 +68,35 @@ class ContentParsingTest {
         assertEquals("たべる", w.kana)
         assertEquals("吃", w.zh)
         assertEquals("动作", w.cat)
+        // 旧版数据无 level 字段时默认 N5
+        assertEquals("N5", w.level)
+    }
+
+    @Test
+    fun `解析单词级别字段`() {
+        val json = """
+            {"version":4,"words":[
+              {"id":"w001","ja":"食べる","kana":"たべる","romaji":"taberu","zh":"吃",
+               "pos":"动词","cat":"动作","example":"毎日ご飯を食べます。","exampleZh":"每天吃饭。","level":"N5"},
+              {"id":"w505","ja":"経験","kana":"けいけん","romaji":"keiken","zh":"经验",
+               "pos":"名词","cat":"物品","example":"経験が豊かです。","exampleZh":"经验丰富。","level":"N4"}
+            ]}
+        """.trimIndent()
+        val file = ContentJson.decodeFromString<WordsFile>(json)
+        assertEquals(listOf("N5", "N4"), file.words.map { it.level })
+    }
+
+    @Test
+    fun `解析语法级别字段 旧数据默认N5`() {
+        val json = """
+            {"version":1,"grammar":[
+              {"id":"g01","title":"～です","meaning":"是……","connection":"名词 + です","explanation":"判断句。",
+               "examples":[{"ja":"私は学生です。","zh":"我是学生。"}],
+               "exercises":[{"question":"私は学生＿＿。","options":["です","ます","でした","ません"],"answer":0,"explanation":"名词句。"}]}
+            ]}
+        """.trimIndent()
+        val file = ContentJson.decodeFromString<GrammarFile>(json)
+        assertEquals("N5", file.grammar.single().level)
     }
 
     @Test

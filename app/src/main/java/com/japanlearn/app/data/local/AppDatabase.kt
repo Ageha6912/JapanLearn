@@ -17,7 +17,7 @@ import androidx.room.RoomDatabase
         WrongAnswerEntity::class,
         MetaEntity::class,
     ],
-    version = 2,
+    version = 3,
     exportSchema = false,
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -39,9 +39,17 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
+        /** words/grammar 表新增 level 列（v0.3 N4 内容）。 */
+        private val MIGRATION_2_3 = object : androidx.room.migration.Migration(2, 3) {
+            override fun migrate(db: androidx.sqlite.db.SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE words ADD COLUMN level TEXT NOT NULL DEFAULT 'N5'")
+                db.execSQL("ALTER TABLE grammar ADD COLUMN level TEXT NOT NULL DEFAULT 'N5'")
+            }
+        }
+
         fun build(context: Context): AppDatabase =
             Room.databaseBuilder(context, AppDatabase::class.java, "japanlearn.db")
-                .addMigrations(MIGRATION_1_2)
+                .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
                 .build()
     }
 }

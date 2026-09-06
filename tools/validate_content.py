@@ -17,6 +17,7 @@ JP_SENTENCE_RE = re.compile(r"^[\u3040-\u309F\u30A0-\u30FF\u3005\u4E00-\u9FFF。
 CATEGORIES = {"人物", "数字", "时间", "食物", "地点", "物品", "动作", "形容词", "副词", "自然", "身体"}
 KANA_GROUPS = {"seion", "dakuon", "youon"}
 SCENES = {"日常聊天", "餐厅", "便利店", "旅游", "学校", "工作", "动漫 / 娱乐"}
+LEVELS = {"N5", "N4"}
 
 errors: list[str] = []
 
@@ -72,6 +73,8 @@ def validate_words(data, kana_set):
         if w["id"] in seen_ids:
             err(f"word 重复 id: {w['id']}")
         seen_ids.add(w["id"])
+        if w.get("level") not in LEVELS:
+            err(f"word {w['id']} {w['ja']}: 非法级别 {w.get('level')!r}")
         if w["cat"] not in CATEGORIES:
             err(f"word {w['id']} {w['ja']}: 非法分类 {w['cat']}")
         if not KANA_RE.match(w["kana"]):
@@ -85,10 +88,11 @@ def validate_words(data, kana_set):
         if not JP_SENTENCE_RE.match(w["example"]):
             err(f"word {w['id']}: 例句含异常字符 {w['example']!r}")
     non_empty(data["words"], "id", ["ja", "kana", "romaji", "zh", "pos", "cat", "example", "exampleZh"], "word")
-    cats = {}
+    cats, levels = {}, {}
     for w in data["words"]:
         cats[w["cat"]] = cats.get(w["cat"], 0) + 1
-    print(f"words: {len(data['words'])} 条 ✓  分布 {cats}")
+        levels[w.get("level")] = levels.get(w.get("level"), 0) + 1
+    print(f"words: {len(data['words'])} 条 ✓  级别 {levels}  分布 {cats}")
 
 
 def validate_grammar(data):
@@ -99,6 +103,8 @@ def validate_grammar(data):
         if g["id"] in seen:
             err(f"grammar 重复 id: {g['id']}")
         seen.add(g["id"])
+        if g.get("level") not in LEVELS:
+            err(f"grammar {g['id']} {g['title']}: 非法级别 {g.get('level')!r}")
         if not g["examples"]:
             err(f"grammar {g['id']}: 无例句")
         if not g["exercises"]:
@@ -111,7 +117,10 @@ def validate_grammar(data):
             if len(set(ex["options"])) != len(ex["options"]):
                 err(f"grammar {g['id']} 练习{i}: 选项重复")
     non_empty(data["grammar"], "id", ["title", "meaning", "connection", "explanation"], "grammar")
-    print(f"grammar: {len(data['grammar'])} 条 ✓")
+    levels = {}
+    for g in data["grammar"]:
+        levels[g.get("level")] = levels.get(g.get("level"), 0) + 1
+    print(f"grammar: {len(data['grammar'])} 条 ✓  级别 {levels}")
 
 
 def validate_sentences(data):
@@ -132,8 +141,8 @@ def validate_sentences(data):
 
 def main():
     kana = load("kana.json")
-    words = load("words_n5.json")
-    grammar = load("grammar_n5.json")
+    words = load("words.json")
+    grammar = load("grammar.json")
     sentences = load("sentences.json")
 
     versions = {}

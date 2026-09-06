@@ -1,5 +1,5 @@
 {
-  "version": 3,
+  "version": 4,
   "words": [
     {
       "id": "w001",
@@ -10,7 +10,8 @@
       "pos": "代词",
       "cat": "人物",
       "example": "私は学生です。",
-      "exampleZh": "我是学生。"
+      "exampleZh": "我是学生。",
+      "level": "N5"
     },
     {
       "id": "w002",
@@ -21,7 +22,8 @@
       "pos": "代词",
       "cat": "人物",
       "example": "あなたの名前は何ですか。",
-      "exampleZh": "你的名字是什么？"
+      "exampleZh": "你的名字是什么？",
+      "level": "N5"
     },
     {
       "id": "w003",
@@ -32,7 +34,8 @@
       "pos": "代词",
       "cat": "人物",
       "example": "彼は先生です。",
-      "exampleZh": "他是老师。"
+      "exampleZh": "他是老师。",
+      "level": "N5"
     },
     {
       "id": "w004",
@@ -43,7 +46,8 @@
       "pos": "代词",
       "cat": "人物",
       "example": "彼女は日本人です。",
-      "exampleZh": "她是日本人。"
+      "exampleZh": "她是日本人。",
+      "level": "N5"
     },
     {
       "id": "w005",
@@ -54,7 +58,8 @@
       "pos": "名词",
       "cat": "人物",
       "example": "田中先生は親切です。",
-      "exampleZh": "田中老师很热情。"
+      "exampleZh": "田中老师很热情。",
+      "level": "N5"
     },
     {
       "id": "w006",
@@ -65,7 +70,8 @@
       "pos": "名词",
       "cat": "人物",
       "example": "私は大学生です。",
-      "exampleZh": "我是大学生。"
+      "exampleZh": "我是大学生。",
+      "level": "N5"
     },
     {
       "id": "w007",
@@ -76,7 +82,8 @@
       "pos": "名词",
       "cat": "人物",
       "example": "子どもが三人います。",
-      "exampleZh": "有三个孩子。"
+      "exampleZh": "有三个孩子。",
+      "level": "N5"
     },
     {
       "id": "w008",
@@ -87,7 +94,8 @@
       "pos": "名词",
       "cat": "人物",
       "example": "あの男の人は誰ですか。",
-      "exampleZh": "那个男人是谁？"
+      "exampleZh": "那个男人是谁？",
+      "level": "N5"
     },
     {
       "id": "w009",
@@ -98,7 +106,8 @@
       "pos": "名词",
       "cat": "人物",
       "example": "女の人が話しています。",
-      "exampleZh": "一个女人在说话。"
+      "exampleZh": "一个女人在说话。",
+      "level": "N5"
     },
     {
       "id": "w010",
@@ -109,7 +118,8 @@
       "pos": "名词",
       "cat": "人物",
       "example": "公園に人が多いです。",
-      "exampleZh": "公园里人很多。"
+      "exampleZh": "公园里人很多。",
+      "level": "N5"
     },
     {
       "id": "w011",
@@ -120,7 +130,8 @@
       "pos": "名词",
       "cat": "人物",
       "example": "友達と映画を見ます。",
-      "exampleZh": "和朋友看电影。"
+      "exampleZh": "和朋友看电影。",
+      "level": "N5"
     },
     {
       "id": "w012",
@@ -131,7 +142,8 @@
       "pos": "名词",
       "cat": "人物",
       "example": "家族は四人です。",
-      "exampleZh": "家里有四口人。"
+      "exampleZh": "家里有四口人。",
+      "level": "N5"
     },
     {
       "id": "w013",
@@ -142,7 +154,8 @@
       "pos": "名词",
       "cat": "人物",
       "example": "父は会社員です。",
-      "exampleZh": "我父亲是公司职员。"
+      "exampleZh": "我父亲是公司职员。",
+      "level": "N5"
     },
     {
       "id": "w014",
@@ -153,7 +166,8 @@
       "pos": "名词",
       "cat": "人物",
       "example": "母は料理が上手です。",
-      "exampleZh": "我母亲擅长做菜。"
+      "exampleZh": "我母亲擅长做菜。",
+      "level": "N5"
     },
     {
       "id": "w015",
@@ -164,7 +178,8 @@
       "pos": "名词",
       "cat": "人物",
       "example": "兄は東京に住んでいます。",
-      "exampleZh": "哥哥住在东京。"
+      "exampleZh": "哥哥住在东京。",
+      "level": "N5"
     },
     {
       "id": "w016",
@@ -175,7 +190,8 @@
       "pos": "名词",
       "cat": "人物",
       "example": "姉は看護師です。",
-      "exampleZh": "姐姐是护士。"
+      "exampleZh": "姐姐是护士。",
+      "level": "N5"
     },
     {
       "id": "w017",
@@ -186,7 +202,8 @@
       "pos": "名词",
       "cat": "人物",
       "example": "弟はまだ学生です。",
-      "exampleZh": "弟弟还是学生。"
+      "exampleZh": "弟弟还是学生。",
+      "level": "N5"
     },
     {
       "id": "w018",
@@ -197,7 +214,8 @@
       "pos": "名词",
       "cat": "人物",
       "example": "妹は音楽が好きです。",
-      "exampleZh": "妹妹喜欢音乐。"
+      "exampleZh": "妹妹喜欢音乐。",
+      "level": "N5"
     },
     {
       "id": "w019",
@@ -208,7 +226,8 @@
       "pos": "数词",
       "cat": "数字",
       "example": "一つください。",
-      "exampleZh": "请给我一个。"
+      "exampleZh": "请给我一个。",
+      "level": "N5"
     },
     {
       "id": "w020",
@@ -219,7 +238,8 @@
       "pos": "数词",
       "cat": "数字",
       "example": "二人で行きます。",
-      "exampleZh": "两个人一起去。"
+      "exampleZh": "两个人一起去。",
+      "level": "N5"
     },
     {
       "id": "w021",
@@ -230,7 +250,8 @@
       "pos": "数词",
       "cat": "数字",
       "example": "三時に会いましょう。",
-      "exampleZh": "三点见吧。"
+      "exampleZh": "三点见吧。",
+      "level": "N5"
     },
     {
       "id": "w022",
@@ -241,7 +262,8 @@
       "pos": "数词",
       "cat": "数字",
       "example": "四月は桜の季節です。",
-      "exampleZh": "四月是樱花的季节。"
+      "exampleZh": "四月是樱花的季节。",
+      "level": "N5"
     },
     {
       "id": "w023",
@@ -252,7 +274,8 @@
       "pos": "数词",
       "cat": "数字",
       "example": "五分待ってください。",
-      "exampleZh": "请等我五分钟。"
+      "exampleZh": "请等我五分钟。",
+      "level": "N5"
     },
     {
       "id": "w024",
@@ -263,7 +286,8 @@
       "pos": "数词",
       "cat": "数字",
       "example": "六時に起きます。",
-      "exampleZh": "六点起床。"
+      "exampleZh": "六点起床。",
+      "level": "N5"
     },
     {
       "id": "w025",
@@ -274,7 +298,8 @@
       "pos": "数词",
       "cat": "数字",
       "example": "七時半に家を出ます。",
-      "exampleZh": "七点半出门。"
+      "exampleZh": "七点半出门。",
+      "level": "N5"
     },
     {
       "id": "w026",
@@ -285,7 +310,8 @@
       "pos": "数词",
       "cat": "数字",
       "example": "八月は暑いです。",
-      "exampleZh": "八月很热。"
+      "exampleZh": "八月很热。",
+      "level": "N5"
     },
     {
       "id": "w027",
@@ -296,7 +322,8 @@
       "pos": "数词",
       "cat": "数字",
       "example": "九月は涼しいです。",
-      "exampleZh": "九月很凉爽。"
+      "exampleZh": "九月很凉爽。",
+      "level": "N5"
     },
     {
       "id": "w028",
@@ -307,7 +334,8 @@
       "pos": "数词",
       "cat": "数字",
       "example": "十時に寝ます。",
-      "exampleZh": "十点睡觉。"
+      "exampleZh": "十点睡觉。",
+      "level": "N5"
     },
     {
       "id": "w029",
@@ -318,7 +346,8 @@
       "pos": "数词",
       "cat": "数字",
       "example": "百円です。",
-      "exampleZh": "是一百日元。"
+      "exampleZh": "是一百日元。",
+      "level": "N5"
     },
     {
       "id": "w030",
@@ -329,7 +358,8 @@
       "pos": "数词",
       "cat": "数字",
       "example": "千円を払いました。",
-      "exampleZh": "付了一千日元。"
+      "exampleZh": "付了一千日元。",
+      "level": "N5"
     },
     {
       "id": "w031",
@@ -340,7 +370,8 @@
       "pos": "数词",
       "cat": "数字",
       "example": "一万円ありました。",
-      "exampleZh": "有一万日元。"
+      "exampleZh": "有一万日元。",
+      "level": "N5"
     },
     {
       "id": "w032",
@@ -351,7 +382,8 @@
       "pos": "疑问词",
       "cat": "数字",
       "example": "これはいくらですか。",
-      "exampleZh": "这个多少钱？"
+      "exampleZh": "这个多少钱？",
+      "level": "N5"
     },
     {
       "id": "w033",
@@ -362,7 +394,8 @@
       "pos": "疑问词",
       "cat": "数字",
       "example": "りんごはいくつありますか。",
-      "exampleZh": "苹果有几个？"
+      "exampleZh": "苹果有几个？",
+      "level": "N5"
     },
     {
       "id": "w034",
@@ -373,7 +406,8 @@
       "pos": "名词",
       "cat": "时间",
       "example": "今日は暑いです。",
-      "exampleZh": "今天很热。"
+      "exampleZh": "今天很热。",
+      "level": "N5"
     },
     {
       "id": "w035",
@@ -384,7 +418,8 @@
       "pos": "名词",
       "cat": "时间",
       "example": "明日学校へ行きます。",
-      "exampleZh": "明天去学校。"
+      "exampleZh": "明天去学校。",
+      "level": "N5"
     },
     {
       "id": "w036",
@@ -395,7 +430,8 @@
       "pos": "名词",
       "cat": "时间",
       "example": "昨日映画を見ました。",
-      "exampleZh": "昨天看了电影。"
+      "exampleZh": "昨天看了电影。",
+      "level": "N5"
     },
     {
       "id": "w037",
@@ -406,7 +442,8 @@
       "pos": "名词",
       "cat": "时间",
       "example": "今朝コーヒーを飲みました。",
-      "exampleZh": "今天早上喝了咖啡。"
+      "exampleZh": "今天早上喝了咖啡。",
+      "level": "N5"
     },
     {
       "id": "w038",
@@ -417,7 +454,8 @@
       "pos": "名词",
       "cat": "时间",
       "example": "今晩勉強します。",
-      "exampleZh": "今晚学习。"
+      "exampleZh": "今晚学习。",
+      "level": "N5"
     },
     {
       "id": "w039",
@@ -428,7 +466,8 @@
       "pos": "名词",
       "cat": "时间",
       "example": "毎日日本語を勉強します。",
-      "exampleZh": "每天学习日语。"
+      "exampleZh": "每天学习日语。",
+      "level": "N5"
     },
     {
       "id": "w040",
@@ -439,7 +478,8 @@
       "pos": "名词",
       "cat": "时间",
       "example": "朝ご飯を食べます。",
-      "exampleZh": "吃早饭。"
+      "exampleZh": "吃早饭。",
+      "level": "N5"
     },
     {
       "id": "w041",
@@ -450,7 +490,8 @@
       "pos": "名词",
       "cat": "时间",
       "example": "昼休みに食べます。",
-      "exampleZh": "午休时吃饭。"
+      "exampleZh": "午休时吃饭。",
+      "level": "N5"
     },
     {
       "id": "w042",
@@ -461,7 +502,8 @@
       "pos": "名词",
       "cat": "时间",
       "example": "晩ご飯は何ですか。",
-      "exampleZh": "晚饭吃什么？"
+      "exampleZh": "晚饭吃什么？",
+      "level": "N5"
     },
     {
       "id": "w043",
@@ -472,7 +514,8 @@
       "pos": "名词",
       "cat": "时间",
       "example": "夜は静かです。",
-      "exampleZh": "夜里很安静。"
+      "exampleZh": "夜里很安静。",
+      "level": "N5"
     },
     {
       "id": "w044",
@@ -483,7 +526,8 @@
       "pos": "名词",
       "cat": "时间",
       "example": "午前中に電話します。",
-      "exampleZh": "上午打电话。"
+      "exampleZh": "上午打电话。",
+      "level": "N5"
     },
     {
       "id": "w045",
@@ -494,7 +538,8 @@
       "pos": "名词",
       "cat": "时间",
       "example": "午後から雨です。",
-      "exampleZh": "下午开始下雨。"
+      "exampleZh": "下午开始下雨。",
+      "level": "N5"
     },
     {
       "id": "w046",
@@ -505,7 +550,8 @@
       "pos": "名词",
       "cat": "时间",
       "example": "時間がありません。",
-      "exampleZh": "没有时间。"
+      "exampleZh": "没有时间。",
+      "level": "N5"
     },
     {
       "id": "w047",
@@ -516,7 +562,8 @@
       "pos": "量词",
       "cat": "时间",
       "example": "十分待ちました。",
-      "exampleZh": "等了十分钟。"
+      "exampleZh": "等了十分钟。",
+      "level": "N5"
     },
     {
       "id": "w048",
@@ -527,7 +574,8 @@
       "pos": "名词",
       "cat": "时间",
       "example": "一年勉強しました。",
-      "exampleZh": "学习了一年。"
+      "exampleZh": "学习了一年。",
+      "level": "N5"
     },
     {
       "id": "w049",
@@ -538,7 +586,8 @@
       "pos": "量词",
       "cat": "时间",
       "example": "一週間休みました。",
-      "exampleZh": "休息了一周。"
+      "exampleZh": "休息了一周。",
+      "level": "N5"
     },
     {
       "id": "w050",
@@ -549,7 +598,8 @@
       "pos": "名词",
       "cat": "时间",
       "example": "今何時ですか。",
-      "exampleZh": "现在几点？"
+      "exampleZh": "现在几点？",
+      "level": "N5"
     },
     {
       "id": "w051",
@@ -560,7 +610,8 @@
       "pos": "量词",
       "cat": "时间",
       "example": "九時に会います。",
-      "exampleZh": "九点见面。"
+      "exampleZh": "九点见面。",
+      "level": "N5"
     },
     {
       "id": "w052",
@@ -571,7 +622,8 @@
       "pos": "名词",
       "cat": "时间",
       "example": "今日は休みです。",
-      "exampleZh": "今天是休息日。"
+      "exampleZh": "今天是休息日。",
+      "level": "N5"
     },
     {
       "id": "w053",
@@ -582,7 +634,8 @@
       "pos": "名词",
       "cat": "时间",
       "example": "週末は何をしますか。",
-      "exampleZh": "周末做什么？"
+      "exampleZh": "周末做什么？",
+      "level": "N5"
     },
     {
       "id": "w054",
@@ -593,7 +646,8 @@
       "pos": "名词",
       "cat": "时间",
       "example": "誕生日はいつですか。",
-      "exampleZh": "生日是什么时候？"
+      "exampleZh": "生日是什么时候？",
+      "level": "N5"
     },
     {
       "id": "w055",
@@ -604,7 +658,8 @@
       "pos": "名词",
       "cat": "食物",
       "example": "水を飲みます。",
-      "exampleZh": "喝水。"
+      "exampleZh": "喝水。",
+      "level": "N5"
     },
     {
       "id": "w056",
@@ -615,7 +670,8 @@
       "pos": "名词",
       "cat": "食物",
       "example": "お茶をどうぞ。",
-      "exampleZh": "请用茶。"
+      "exampleZh": "请用茶。",
+      "level": "N5"
     },
     {
       "id": "w057",
@@ -626,7 +682,8 @@
       "pos": "名词",
       "cat": "食物",
       "example": "朝コーヒーを飲みます。",
-      "exampleZh": "早上喝咖啡。"
+      "exampleZh": "早上喝咖啡。",
+      "level": "N5"
     },
     {
       "id": "w058",
@@ -637,7 +694,8 @@
       "pos": "名词",
       "cat": "食物",
       "example": "ジュースを買いました。",
-      "exampleZh": "买了饮料。"
+      "exampleZh": "买了饮料。",
+      "level": "N5"
     },
     {
       "id": "w059",
@@ -648,7 +706,8 @@
       "pos": "名词",
       "cat": "食物",
       "example": "毎朝牛乳を飲みます。",
-      "exampleZh": "每天早上喝牛奶。"
+      "exampleZh": "每天早上喝牛奶。",
+      "level": "N5"
     },
     {
       "id": "w060",
@@ -659,7 +718,8 @@
       "pos": "名词",
       "cat": "食物",
       "example": "肉が好きです。",
-      "exampleZh": "喜欢吃肉。"
+      "exampleZh": "喜欢吃肉。",
+      "level": "N5"
     },
     {
       "id": "w061",
@@ -670,7 +730,8 @@
       "pos": "名词",
       "cat": "食物",
       "example": "魚を食べたいです。",
-      "exampleZh": "想吃鱼。"
+      "exampleZh": "想吃鱼。",
+      "level": "N5"
     },
     {
       "id": "w062",
@@ -681,7 +742,8 @@
       "pos": "名词",
       "cat": "食物",
       "example": "野菜を食べましょう。",
-      "exampleZh": "吃蔬菜吧。"
+      "exampleZh": "吃蔬菜吧。",
+      "level": "N5"
     },
     {
       "id": "w063",
@@ -692,7 +754,8 @@
       "pos": "名词",
       "cat": "食物",
       "example": "果物が好きです。",
-      "exampleZh": "喜欢水果。"
+      "exampleZh": "喜欢水果。",
+      "level": "N5"
     },
     {
       "id": "w064",
@@ -703,7 +766,8 @@
       "pos": "名词",
       "cat": "食物",
       "example": "ご飯を食べます。",
-      "exampleZh": "吃饭。"
+      "exampleZh": "吃饭。",
+      "level": "N5"
     },
     {
       "id": "w065",
@@ -714,7 +778,8 @@
       "pos": "名词",
       "cat": "食物",
       "example": "朝はパンを食べます。",
-      "exampleZh": "早上吃面包。"
+      "exampleZh": "早上吃面包。",
+      "level": "N5"
     },
     {
       "id": "w066",
@@ -725,7 +790,8 @@
       "pos": "名词",
       "cat": "食物",
       "example": "卵を二つ買いました。",
-      "exampleZh": "买了两个鸡蛋。"
+      "exampleZh": "买了两个鸡蛋。",
+      "level": "N5"
     },
     {
       "id": "w067",
@@ -736,7 +802,8 @@
       "pos": "名词",
       "cat": "食物",
       "example": "塩を少し入れます。",
-      "exampleZh": "放一点盐。"
+      "exampleZh": "放一点盐。",
+      "level": "N5"
     },
     {
       "id": "w068",
@@ -747,7 +814,8 @@
       "pos": "名词",
       "cat": "食物",
       "example": "砂糖は入れません。",
-      "exampleZh": "不放糖。"
+      "exampleZh": "不放糖。",
+      "level": "N5"
     },
     {
       "id": "w069",
@@ -758,7 +826,8 @@
       "pos": "名词",
       "cat": "食物",
       "example": "朝ご飯を食べました。",
-      "exampleZh": "吃了早饭。"
+      "exampleZh": "吃了早饭。",
+      "level": "N5"
     },
     {
       "id": "w070",
@@ -769,7 +838,8 @@
       "pos": "名词",
       "cat": "食物",
       "example": "昼ご飯は食べましたか。",
-      "exampleZh": "吃午饭了吗？"
+      "exampleZh": "吃午饭了吗？",
+      "level": "N5"
     },
     {
       "id": "w071",
@@ -780,7 +850,8 @@
       "pos": "名词",
       "cat": "食物",
       "example": "晩ご飯を作ります。",
-      "exampleZh": "做晚饭。"
+      "exampleZh": "做晚饭。",
+      "level": "N5"
     },
     {
       "id": "w072",
@@ -791,7 +862,8 @@
       "pos": "名词",
       "cat": "食物",
       "example": "りんごは甘いです。",
-      "exampleZh": "苹果很甜。"
+      "exampleZh": "苹果很甜。",
+      "level": "N5"
     },
     {
       "id": "w073",
@@ -802,7 +874,8 @@
       "pos": "名词",
       "cat": "食物",
       "example": "みかんを三つ食べました。",
-      "exampleZh": "吃了三个橘子。"
+      "exampleZh": "吃了三个橘子。",
+      "level": "N5"
     },
     {
       "id": "w074",
@@ -813,7 +886,8 @@
       "pos": "名词",
       "cat": "食物",
       "example": "お酒を飲みません。",
-      "exampleZh": "不喝酒。"
+      "exampleZh": "不喝酒。",
+      "level": "N5"
     },
     {
       "id": "w075",
@@ -824,7 +898,8 @@
       "pos": "名词",
       "cat": "食物",
       "example": "お弁当を持って行きます。",
-      "exampleZh": "带着便当去。"
+      "exampleZh": "带着便当去。",
+      "level": "N5"
     },
     {
       "id": "w076",
@@ -835,7 +910,8 @@
       "pos": "名词",
       "cat": "地点",
       "example": "家に帰ります。",
-      "exampleZh": "回家。"
+      "exampleZh": "回家。",
+      "level": "N5"
     },
     {
       "id": "w077",
@@ -846,7 +922,8 @@
       "pos": "名词",
       "cat": "地点",
       "example": "学校で勉強します。",
-      "exampleZh": "在学校学习。"
+      "exampleZh": "在学校学习。",
+      "level": "N5"
     },
     {
       "id": "w078",
@@ -857,7 +934,8 @@
       "pos": "名词",
       "cat": "地点",
       "example": "会社で働きます。",
-      "exampleZh": "在公司工作。"
+      "exampleZh": "在公司工作。",
+      "level": "N5"
     },
     {
       "id": "w079",
@@ -868,7 +946,8 @@
       "pos": "名词",
       "cat": "地点",
       "example": "駅まで歩きます。",
-      "exampleZh": "步行到车站。"
+      "exampleZh": "步行到车站。",
+      "level": "N5"
     },
     {
       "id": "w080",
@@ -879,7 +958,8 @@
       "pos": "名词",
       "cat": "地点",
       "example": "店でパンを買います。",
-      "exampleZh": "在店里买面包。"
+      "exampleZh": "在店里买面包。",
+      "level": "N5"
     },
     {
       "id": "w081",
@@ -890,7 +970,8 @@
       "pos": "名词",
       "cat": "地点",
       "example": "病院へ行きます。",
-      "exampleZh": "去医院。"
+      "exampleZh": "去医院。",
+      "level": "N5"
     },
     {
       "id": "w082",
@@ -901,7 +982,8 @@
       "pos": "名词",
       "cat": "地点",
       "example": "銀行はどこですか。",
-      "exampleZh": "银行在哪里？"
+      "exampleZh": "银行在哪里？",
+      "level": "N5"
     },
     {
       "id": "w083",
@@ -912,7 +994,8 @@
       "pos": "名词",
       "cat": "地点",
       "example": "郵便局で切手を買います。",
-      "exampleZh": "在邮局买邮票。"
+      "exampleZh": "在邮局买邮票。",
+      "level": "N5"
     },
     {
       "id": "w084",
@@ -923,7 +1006,8 @@
       "pos": "名词",
       "cat": "地点",
       "example": "図書館で本を読みます。",
-      "exampleZh": "在图书馆读书。"
+      "exampleZh": "在图书馆读书。",
+      "level": "N5"
     },
     {
       "id": "w085",
@@ -934,7 +1018,8 @@
       "pos": "名词",
       "cat": "地点",
       "example": "公園を散歩します。",
-      "exampleZh": "在公园散步。"
+      "exampleZh": "在公园散步。",
+      "level": "N5"
     },
     {
       "id": "w086",
@@ -945,7 +1030,8 @@
       "pos": "名词",
       "cat": "地点",
       "example": "教室に学生がいます。",
-      "exampleZh": "教室里有学生。"
+      "exampleZh": "教室里有学生。",
+      "level": "N5"
     },
     {
       "id": "w087",
@@ -956,7 +1042,8 @@
       "pos": "名词",
       "cat": "地点",
       "example": "トイレはどこですか。",
-      "exampleZh": "厕所在哪里？"
+      "exampleZh": "厕所在哪里？",
+      "level": "N5"
     },
     {
       "id": "w088",
@@ -967,7 +1054,8 @@
       "pos": "名词",
       "cat": "地点",
       "example": "部屋はきれいです。",
-      "exampleZh": "房间很干净。"
+      "exampleZh": "房间很干净。",
+      "level": "N5"
     },
     {
       "id": "w089",
@@ -978,7 +1066,8 @@
       "pos": "名词",
       "cat": "地点",
       "example": "台所で料理を作ります。",
-      "exampleZh": "在厨房做菜。"
+      "exampleZh": "在厨房做菜。",
+      "level": "N5"
     },
     {
       "id": "w090",
@@ -989,7 +1078,8 @@
       "pos": "名词",
       "cat": "地点",
       "example": "どこの国から来ましたか。",
-      "exampleZh": "你来自哪个国家？"
+      "exampleZh": "你来自哪个国家？",
+      "level": "N5"
     },
     {
       "id": "w091",
@@ -1000,7 +1090,8 @@
       "pos": "专有名词",
       "cat": "地点",
       "example": "日本へ行きたいです。",
-      "exampleZh": "想去日本。"
+      "exampleZh": "想去日本。",
+      "level": "N5"
     },
     {
       "id": "w092",
@@ -1011,7 +1102,8 @@
       "pos": "专有名词",
       "cat": "地点",
       "example": "東京に住んでいます。",
-      "exampleZh": "住在东京。"
+      "exampleZh": "住在东京。",
+      "level": "N5"
     },
     {
       "id": "w093",
@@ -1022,7 +1114,8 @@
       "pos": "名词",
       "cat": "地点",
       "example": "会う場所を決めましょう。",
-      "exampleZh": "决定见面的地点吧。"
+      "exampleZh": "决定见面的地点吧。",
+      "level": "N5"
     },
     {
       "id": "w094",
@@ -1033,7 +1126,8 @@
       "pos": "名词",
       "cat": "物品",
       "example": "本を読みます。",
-      "exampleZh": "读书。"
+      "exampleZh": "读书。",
+      "level": "N5"
     },
     {
       "id": "w095",
@@ -1044,7 +1138,8 @@
       "pos": "名词",
       "cat": "物品",
       "example": "朝新聞を読みます。",
-      "exampleZh": "早上读报纸。"
+      "exampleZh": "早上读报纸。",
+      "level": "N5"
     },
     {
       "id": "w096",
@@ -1055,7 +1150,8 @@
       "pos": "名词",
       "cat": "物品",
       "example": "雑誌を買いました。",
-      "exampleZh": "买了杂志。"
+      "exampleZh": "买了杂志。",
+      "level": "N5"
     },
     {
       "id": "w097",
@@ -1066,7 +1162,8 @@
       "pos": "名词",
       "cat": "物品",
       "example": "辞書で調べます。",
-      "exampleZh": "查词典。"
+      "exampleZh": "查词典。",
+      "level": "N5"
     },
     {
       "id": "w098",
@@ -1077,7 +1174,8 @@
       "pos": "名词",
       "cat": "物品",
       "example": "ノートに書きます。",
-      "exampleZh": "写在笔记本上。"
+      "exampleZh": "写在笔记本上。",
+      "level": "N5"
     },
     {
       "id": "w099",
@@ -1088,7 +1186,8 @@
       "pos": "名词",
       "cat": "物品",
       "example": "鉛筆で書いてください。",
-      "exampleZh": "请用铅笔写。"
+      "exampleZh": "请用铅笔写。",
+      "level": "N5"
     },
     {
       "id": "w100",
@@ -1099,7 +1198,8 @@
       "pos": "名词",
       "cat": "物品",
       "example": "ペンがありません。",
-      "exampleZh": "没有笔。"
+      "exampleZh": "没有笔。",
+      "level": "N5"
     },
     {
       "id": "w101",
@@ -1110,7 +1210,8 @@
       "pos": "名词",
       "cat": "物品",
       "example": "紙を一枚ください。",
-      "exampleZh": "请给我一张纸。"
+      "exampleZh": "请给我一张纸。",
+      "level": "N5"
     },
     {
       "id": "w102",
@@ -1121,7 +1222,8 @@
       "pos": "名词",
       "cat": "物品",
       "example": "財布を忘れました。",
-      "exampleZh": "忘带钱包了。"
+      "exampleZh": "忘带钱包了。",
+      "level": "N5"
     },
     {
       "id": "w103",
@@ -1132,7 +1234,8 @@
       "pos": "名词",
       "cat": "物品",
       "example": "傘を持っていますか。",
-      "exampleZh": "你带伞了吗？"
+      "exampleZh": "你带伞了吗？",
+      "level": "N5"
     },
     {
       "id": "w104",
@@ -1143,7 +1246,8 @@
       "pos": "名词",
       "cat": "物品",
       "example": "かばんの中に本があります。",
-      "exampleZh": "包里有书。"
+      "exampleZh": "包里有书。",
+      "level": "N5"
     },
     {
       "id": "w105",
@@ -1154,7 +1258,8 @@
       "pos": "名词",
       "cat": "物品",
       "example": "時計を見てください。",
-      "exampleZh": "请看表。"
+      "exampleZh": "请看表。",
+      "level": "N5"
     },
     {
       "id": "w106",
@@ -1165,7 +1270,8 @@
       "pos": "名词",
       "cat": "物品",
       "example": "眼鏡をかけています。",
-      "exampleZh": "戴着眼镜。"
+      "exampleZh": "戴着眼镜。",
+      "level": "N5"
     },
     {
       "id": "w107",
@@ -1176,7 +1282,8 @@
       "pos": "名词",
       "cat": "物品",
       "example": "車を運転します。",
-      "exampleZh": "开汽车。"
+      "exampleZh": "开汽车。",
+      "level": "N5"
     },
     {
       "id": "w108",
@@ -1187,7 +1294,8 @@
       "pos": "名词",
       "cat": "物品",
       "example": "電車で行きます。",
-      "exampleZh": "坐电车去。"
+      "exampleZh": "坐电车去。",
+      "level": "N5"
     },
     {
       "id": "w109",
@@ -1198,7 +1306,8 @@
       "pos": "名词",
       "cat": "物品",
       "example": "バスで学校へ行きます。",
-      "exampleZh": "坐公交去学校。"
+      "exampleZh": "坐公交去学校。",
+      "level": "N5"
     },
     {
       "id": "w110",
@@ -1209,7 +1318,8 @@
       "pos": "名词",
       "cat": "物品",
       "example": "自転車に乗ります。",
-      "exampleZh": "骑自行车。"
+      "exampleZh": "骑自行车。",
+      "level": "N5"
     },
     {
       "id": "w111",
@@ -1220,7 +1330,8 @@
       "pos": "名词",
       "cat": "物品",
       "example": "飛行機で旅行します。",
-      "exampleZh": "坐飞机旅行。"
+      "exampleZh": "坐飞机旅行。",
+      "level": "N5"
     },
     {
       "id": "w112",
@@ -1231,7 +1342,8 @@
       "pos": "名词",
       "cat": "物品",
       "example": "電話をかけます。",
-      "exampleZh": "打电话。"
+      "exampleZh": "打电话。",
+      "level": "N5"
     },
     {
       "id": "w113",
@@ -1242,7 +1354,8 @@
       "pos": "名词",
       "cat": "物品",
       "example": "カメラで写真を撮ります。",
-      "exampleZh": "用相机拍照。"
+      "exampleZh": "用相机拍照。",
+      "level": "N5"
     },
     {
       "id": "w114",
@@ -1253,7 +1366,8 @@
       "pos": "名词",
       "cat": "物品",
       "example": "テレビを見ます。",
-      "exampleZh": "看电视。"
+      "exampleZh": "看电视。",
+      "level": "N5"
     },
     {
       "id": "w115",
@@ -1264,7 +1378,8 @@
       "pos": "名词",
       "cat": "物品",
       "example": "コンピュータで仕事をします。",
-      "exampleZh": "用电脑工作。"
+      "exampleZh": "用电脑工作。",
+      "level": "N5"
     },
     {
       "id": "w116",
@@ -1275,7 +1390,8 @@
       "pos": "名词",
       "cat": "物品",
       "example": "机の上に本があります。",
-      "exampleZh": "桌子上有书。"
+      "exampleZh": "桌子上有书。",
+      "level": "N5"
     },
     {
       "id": "w117",
@@ -1286,7 +1402,8 @@
       "pos": "名词",
       "cat": "物品",
       "example": "椅子に座ってください。",
-      "exampleZh": "请坐在椅子上。"
+      "exampleZh": "请坐在椅子上。",
+      "level": "N5"
     },
     {
       "id": "w118",
@@ -1297,7 +1414,8 @@
       "pos": "名词",
       "cat": "物品",
       "example": "ドアを開けます。",
-      "exampleZh": "开门。"
+      "exampleZh": "开门。",
+      "level": "N5"
     },
     {
       "id": "w119",
@@ -1308,7 +1426,8 @@
       "pos": "名词",
       "cat": "物品",
       "example": "窓を閉めてください。",
-      "exampleZh": "请关上窗户。"
+      "exampleZh": "请关上窗户。",
+      "level": "N5"
     },
     {
       "id": "w120",
@@ -1319,7 +1438,8 @@
       "pos": "名词",
       "cat": "物品",
       "example": "お金が足りません。",
-      "exampleZh": "钱不够。"
+      "exampleZh": "钱不够。",
+      "level": "N5"
     },
     {
       "id": "w121",
@@ -1330,7 +1450,8 @@
       "pos": "名词",
       "cat": "物品",
       "example": "写真を撮ってもいいですか。",
-      "exampleZh": "可以拍照吗？"
+      "exampleZh": "可以拍照吗？",
+      "level": "N5"
     },
     {
       "id": "w122",
@@ -1341,7 +1462,8 @@
       "pos": "名词",
       "cat": "物品",
       "example": "新しい服を買いました。",
-      "exampleZh": "买了新衣服。"
+      "exampleZh": "买了新衣服。",
+      "level": "N5"
     },
     {
       "id": "w123",
@@ -1352,7 +1474,8 @@
       "pos": "动词",
       "cat": "动作",
       "example": "明日東京へ行きます。",
-      "exampleZh": "明天去东京。"
+      "exampleZh": "明天去东京。",
+      "level": "N5"
     },
     {
       "id": "w124",
@@ -1363,7 +1486,8 @@
       "pos": "动词",
       "cat": "动作",
       "example": "友達が来ます。",
-      "exampleZh": "朋友要来。"
+      "exampleZh": "朋友要来。",
+      "level": "N5"
     },
     {
       "id": "w125",
@@ -1374,7 +1498,8 @@
       "pos": "动词",
       "cat": "动作",
       "example": "六時に家へ帰ります。",
-      "exampleZh": "六点回家。"
+      "exampleZh": "六点回家。",
+      "level": "N5"
     },
     {
       "id": "w126",
@@ -1385,7 +1510,8 @@
       "pos": "动词",
       "cat": "动作",
       "example": "毎日ご飯を食べます。",
-      "exampleZh": "每天吃饭。"
+      "exampleZh": "每天吃饭。",
+      "level": "N5"
     },
     {
       "id": "w127",
@@ -1396,7 +1522,8 @@
       "pos": "动词",
       "cat": "动作",
       "example": "コーヒーを飲みます。",
-      "exampleZh": "喝咖啡。"
+      "exampleZh": "喝咖啡。",
+      "level": "N5"
     },
     {
       "id": "w128",
@@ -1407,7 +1534,8 @@
       "pos": "动词",
       "cat": "动作",
       "example": "映画を見ます。",
-      "exampleZh": "看电影。"
+      "exampleZh": "看电影。",
+      "level": "N5"
     },
     {
       "id": "w129",
@@ -1418,7 +1546,8 @@
       "pos": "动词",
       "cat": "动作",
       "example": "音楽を聞きます。",
-      "exampleZh": "听音乐。"
+      "exampleZh": "听音乐。",
+      "level": "N5"
     },
     {
       "id": "w130",
@@ -1429,7 +1558,8 @@
       "pos": "动词",
       "cat": "动作",
       "example": "本を読みます。",
-      "exampleZh": "读书。"
+      "exampleZh": "读书。",
+      "level": "N5"
     },
     {
       "id": "w131",
@@ -1440,7 +1570,8 @@
       "pos": "动词",
       "cat": "动作",
       "example": "手紙を書きます。",
-      "exampleZh": "写信。"
+      "exampleZh": "写信。",
+      "level": "N5"
     },
     {
       "id": "w132",
@@ -1451,7 +1582,8 @@
       "pos": "动词",
       "cat": "动作",
       "example": "日本語を話します。",
-      "exampleZh": "说日语。"
+      "exampleZh": "说日语。",
+      "level": "N5"
     },
     {
       "id": "w133",
@@ -1462,7 +1594,8 @@
       "pos": "动词",
       "cat": "动作",
       "example": "本を買います。",
-      "exampleZh": "买书。"
+      "exampleZh": "买书。",
+      "level": "N5"
     },
     {
       "id": "w134",
@@ -1473,7 +1606,8 @@
       "pos": "动词",
       "cat": "动作",
       "example": "料理を作ります。",
-      "exampleZh": "做菜。"
+      "exampleZh": "做菜。",
+      "level": "N5"
     },
     {
       "id": "w135",
@@ -1484,7 +1618,8 @@
       "pos": "动词",
       "cat": "动作",
       "example": "友達に会います。",
-      "exampleZh": "和朋友见面。"
+      "exampleZh": "和朋友见面。",
+      "level": "N5"
     },
     {
       "id": "w136",
@@ -1495,7 +1630,8 @@
       "pos": "动词",
       "cat": "动作",
       "example": "明日何をしますか。",
-      "exampleZh": "明天做什么？"
+      "exampleZh": "明天做什么？",
+      "level": "N5"
     },
     {
       "id": "w137",
@@ -1506,7 +1642,8 @@
       "pos": "动词",
       "cat": "动作",
       "example": "日本語を勉強します。",
-      "exampleZh": "学习日语。"
+      "exampleZh": "学习日语。",
+      "level": "N5"
     },
     {
       "id": "w138",
@@ -1517,7 +1654,8 @@
       "pos": "动词",
       "cat": "动作",
       "example": "会社で働きます。",
-      "exampleZh": "在公司工作。"
+      "exampleZh": "在公司工作。",
+      "level": "N5"
     },
     {
       "id": "w139",
@@ -1528,7 +1666,8 @@
       "pos": "动词",
       "cat": "动作",
       "example": "今日は休みます。",
-      "exampleZh": "今天休息。"
+      "exampleZh": "今天休息。",
+      "level": "N5"
     },
     {
       "id": "w140",
@@ -1539,7 +1678,8 @@
       "pos": "动词",
       "cat": "动作",
       "example": "朝六時に起きます。",
-      "exampleZh": "早上六点起床。"
+      "exampleZh": "早上六点起床。",
+      "level": "N5"
     },
     {
       "id": "w141",
@@ -1550,7 +1690,8 @@
       "pos": "动词",
       "cat": "动作",
       "example": "十一時に寝ます。",
-      "exampleZh": "十一点睡觉。"
+      "exampleZh": "十一点睡觉。",
+      "level": "N5"
     },
     {
       "id": "w142",
@@ -1561,7 +1702,8 @@
       "pos": "动词",
       "cat": "动作",
       "example": "ちょっと待ってください。",
-      "exampleZh": "请稍等一下。"
+      "exampleZh": "请稍等一下。",
+      "level": "N5"
     },
     {
       "id": "w143",
@@ -1572,7 +1714,8 @@
       "pos": "动词",
       "cat": "动作",
       "example": "部屋に入ります。",
-      "exampleZh": "进入房间。"
+      "exampleZh": "进入房间。",
+      "level": "N5"
     },
     {
       "id": "w144",
@@ -1583,7 +1726,8 @@
       "pos": "动词",
       "cat": "动作",
       "example": "七時に家を出ます。",
-      "exampleZh": "七点出门。"
+      "exampleZh": "七点出门。",
+      "level": "N5"
     },
     {
       "id": "w145",
@@ -1594,7 +1738,8 @@
       "pos": "动词",
       "cat": "动作",
       "example": "バスに乗ります。",
-      "exampleZh": "坐公交车。"
+      "exampleZh": "坐公交车。",
+      "level": "N5"
     },
     {
       "id": "w146",
@@ -1605,7 +1750,8 @@
       "pos": "动词",
       "cat": "动作",
       "example": "次の駅で降ります。",
-      "exampleZh": "在下一站下车。"
+      "exampleZh": "在下一站下车。",
+      "level": "N5"
     },
     {
       "id": "w147",
@@ -1616,7 +1762,8 @@
       "pos": "动词",
       "cat": "动作",
       "example": "駅まで歩きます。",
-      "exampleZh": "步行到车站。"
+      "exampleZh": "步行到车站。",
+      "level": "N5"
     },
     {
       "id": "w148",
@@ -1627,7 +1774,8 @@
       "pos": "动词",
       "cat": "动作",
       "example": "公園を走ります。",
-      "exampleZh": "在公园跑步。"
+      "exampleZh": "在公园跑步。",
+      "level": "N5"
     },
     {
       "id": "w149",
@@ -1638,7 +1786,8 @@
       "pos": "动词",
       "cat": "动作",
       "example": "夏は海で泳ぎます。",
-      "exampleZh": "夏天在海里游泳。"
+      "exampleZh": "夏天在海里游泳。",
+      "level": "N5"
     },
     {
       "id": "w150",
@@ -1649,7 +1798,8 @@
       "pos": "动词",
       "cat": "动作",
       "example": "東京に住んでいます。",
-      "exampleZh": "住在东京。"
+      "exampleZh": "住在东京。",
+      "level": "N5"
     },
     {
       "id": "w151",
@@ -1660,7 +1810,8 @@
       "pos": "动词",
       "cat": "动作",
       "example": "日本語を教えます。",
-      "exampleZh": "教日语。"
+      "exampleZh": "教日语。",
+      "level": "N5"
     },
     {
       "id": "w152",
@@ -1671,7 +1822,8 @@
       "pos": "动词",
       "cat": "动作",
       "example": "手伝いましょうか。",
-      "exampleZh": "要我帮忙吗？"
+      "exampleZh": "要我帮忙吗？",
+      "level": "N5"
     },
     {
       "id": "w153",
@@ -1682,7 +1834,8 @@
       "pos": "动词",
       "cat": "动作",
       "example": "意味がわかります。",
-      "exampleZh": "明白意思。"
+      "exampleZh": "明白意思。",
+      "level": "N5"
     },
     {
       "id": "w154",
@@ -1693,7 +1846,8 @@
       "pos": "い形容词",
       "cat": "形容词",
       "example": "大きい犬がいます。",
-      "exampleZh": "有一只大狗。"
+      "exampleZh": "有一只大狗。",
+      "level": "N5"
     },
     {
       "id": "w155",
@@ -1704,7 +1858,8 @@
       "pos": "い形容词",
       "cat": "形容词",
       "example": "小さい店が好きです。",
-      "exampleZh": "喜欢小商店。"
+      "exampleZh": "喜欢小商店。",
+      "level": "N5"
     },
     {
       "id": "w156",
@@ -1715,7 +1870,8 @@
       "pos": "い形容词",
       "cat": "形容词",
       "example": "新しい本を買いました。",
-      "exampleZh": "买了新书。"
+      "exampleZh": "买了新书。",
+      "level": "N5"
     },
     {
       "id": "w157",
@@ -1726,7 +1882,8 @@
       "pos": "い形容词",
       "cat": "形容词",
       "example": "古い家に住んでいます。",
-      "exampleZh": "住在旧房子里。"
+      "exampleZh": "住在旧房子里。",
+      "level": "N5"
     },
     {
       "id": "w158",
@@ -1737,7 +1894,8 @@
       "pos": "い形容词",
       "cat": "形容词",
       "example": "天気がいいです。",
-      "exampleZh": "天气很好。"
+      "exampleZh": "天气很好。",
+      "level": "N5"
     },
     {
       "id": "w159",
@@ -1748,7 +1906,8 @@
       "pos": "い形容词",
       "cat": "形容词",
       "example": "天気が悪いです。",
-      "exampleZh": "天气不好。"
+      "exampleZh": "天气不好。",
+      "level": "N5"
     },
     {
       "id": "w160",
@@ -1759,7 +1918,8 @@
       "pos": "い形容词",
       "cat": "形容词",
       "example": "この本は高いです。",
-      "exampleZh": "这本书很贵。"
+      "exampleZh": "这本书很贵。",
+      "level": "N5"
     },
     {
       "id": "w161",
@@ -1770,7 +1930,8 @@
       "pos": "い形容词",
       "cat": "形容词",
       "example": "安い店を知っています。",
-      "exampleZh": "知道便宜的店。"
+      "exampleZh": "知道便宜的店。",
+      "level": "N5"
     },
     {
       "id": "w162",
@@ -1781,7 +1942,8 @@
       "pos": "い形容词",
       "cat": "形容词",
       "example": "今日は寒いです。",
-      "exampleZh": "今天很冷。"
+      "exampleZh": "今天很冷。",
+      "level": "N5"
     },
     {
       "id": "w163",
@@ -1792,7 +1954,8 @@
       "pos": "い形容词",
       "cat": "形容词",
       "example": "夏は暑いです。",
-      "exampleZh": "夏天很热。"
+      "exampleZh": "夏天很热。",
+      "level": "N5"
     },
     {
       "id": "w164",
@@ -1803,7 +1966,8 @@
       "pos": "い形容词",
       "cat": "形容词",
       "example": "秋は涼しいです。",
-      "exampleZh": "秋天很凉爽。"
+      "exampleZh": "秋天很凉爽。",
+      "level": "N5"
     },
     {
       "id": "w165",
@@ -1814,7 +1978,8 @@
       "pos": "い形容词",
       "cat": "形容词",
       "example": "春は暖かいです。",
-      "exampleZh": "春天很温暖。"
+      "exampleZh": "春天很温暖。",
+      "level": "N5"
     },
     {
       "id": "w166",
@@ -1825,7 +1990,8 @@
       "pos": "い形容词",
       "cat": "形容词",
       "example": "この映画は面白いです。",
-      "exampleZh": "这部电影很有趣。"
+      "exampleZh": "这部电影很有趣。",
+      "level": "N5"
     },
     {
       "id": "w167",
@@ -1836,7 +2002,8 @@
       "pos": "い形容词",
       "cat": "形容词",
       "example": "その番組はつまらないです。",
-      "exampleZh": "那个节目很无聊。"
+      "exampleZh": "那个节目很无聊。",
+      "level": "N5"
     },
     {
       "id": "w168",
@@ -1847,7 +2014,8 @@
       "pos": "い形容词",
       "cat": "形容词",
       "example": "このパンはおいしいです。",
-      "exampleZh": "这个面包很好吃。"
+      "exampleZh": "这个面包很好吃。",
+      "level": "N5"
     },
     {
       "id": "w169",
@@ -1858,7 +2026,8 @@
       "pos": "い形容词",
       "cat": "形容词",
       "example": "今週は忙しいです。",
-      "exampleZh": "这周很忙。"
+      "exampleZh": "这周很忙。",
+      "level": "N5"
     },
     {
       "id": "w170",
@@ -1869,7 +2038,8 @@
       "pos": "い形容词",
       "cat": "形容词",
       "example": "旅行は楽しいです。",
-      "exampleZh": "旅行很愉快。"
+      "exampleZh": "旅行很愉快。",
+      "level": "N5"
     },
     {
       "id": "w171",
@@ -1880,7 +2050,8 @@
       "pos": "い形容词",
       "cat": "形容词",
       "example": "日本語は難しいです。",
-      "exampleZh": "日语很难。"
+      "exampleZh": "日语很难。",
+      "level": "N5"
     },
     {
       "id": "w172",
@@ -1891,7 +2062,8 @@
       "pos": "い形容词",
       "cat": "形容词",
       "example": "先生はやさしいです。",
-      "exampleZh": "老师很温柔。"
+      "exampleZh": "老师很温柔。",
+      "level": "N5"
     },
     {
       "id": "w173",
@@ -1902,7 +2074,8 @@
       "pos": "い形容词",
       "cat": "形容词",
       "example": "長い髪の女の人です。",
-      "exampleZh": "是长头发的女人。"
+      "exampleZh": "是长头发的女人。",
+      "level": "N5"
     },
     {
       "id": "w174",
@@ -1913,7 +2086,8 @@
       "pos": "い形容词",
       "cat": "形容词",
       "example": "文章が短いです。",
-      "exampleZh": "文章很短。"
+      "exampleZh": "文章很短。",
+      "level": "N5"
     },
     {
       "id": "w175",
@@ -1924,7 +2098,8 @@
       "pos": "い形容词",
       "cat": "形容词",
       "example": "このケーキは甘いです。",
-      "exampleZh": "这个蛋糕很甜。"
+      "exampleZh": "这个蛋糕很甜。",
+      "level": "N5"
     },
     {
       "id": "w176",
@@ -1935,7 +2110,8 @@
       "pos": "形容动词",
       "cat": "形容词",
       "example": "この部屋はきれいです。",
-      "exampleZh": "这个房间很干净。"
+      "exampleZh": "这个房间很干净。",
+      "level": "N5"
     },
     {
       "id": "w177",
@@ -1946,7 +2122,8 @@
       "pos": "形容动词",
       "cat": "形容词",
       "example": "毎日元気です。",
-      "exampleZh": "每天都很有精神。"
+      "exampleZh": "每天都很有精神。",
+      "level": "N5"
     },
     {
       "id": "w178",
@@ -1957,7 +2134,8 @@
       "pos": "形容动词",
       "cat": "形容词",
       "example": "図書館は静かです。",
-      "exampleZh": "图书馆很安静。"
+      "exampleZh": "图书馆很安静。",
+      "level": "N5"
     },
     {
       "id": "w179",
@@ -1968,7 +2146,8 @@
       "pos": "形容动词",
       "cat": "形容词",
       "example": "この町はにぎやかです。",
-      "exampleZh": "这个城镇很热闹。"
+      "exampleZh": "这个城镇很热闹。",
+      "level": "N5"
     },
     {
       "id": "w180",
@@ -1979,7 +2158,8 @@
       "pos": "形容动词",
       "cat": "形容词",
       "example": "富士山は有名です。",
-      "exampleZh": "富士山很有名。"
+      "exampleZh": "富士山很有名。",
+      "level": "N5"
     },
     {
       "id": "w181",
@@ -1990,7 +2170,8 @@
       "pos": "形容动词",
       "cat": "形容词",
       "example": "この駅は便利です。",
-      "exampleZh": "这个车站很方便。"
+      "exampleZh": "这个车站很方便。",
+      "level": "N5"
     },
     {
       "id": "w182",
@@ -2001,7 +2182,8 @@
       "pos": "形容动词",
       "cat": "形容词",
       "example": "音楽が好きです。",
-      "exampleZh": "喜欢音乐。"
+      "exampleZh": "喜欢音乐。",
+      "level": "N5"
     },
     {
       "id": "w183",
@@ -2012,7 +2194,8 @@
       "pos": "形容动词",
       "cat": "形容词",
       "example": "辛い物が嫌いです。",
-      "exampleZh": "讨厌辣的东西。"
+      "exampleZh": "讨厌辣的东西。",
+      "level": "N5"
     },
     {
       "id": "w184",
@@ -2023,7 +2206,8 @@
       "pos": "副词",
       "cat": "副词",
       "example": "とても面白いです。",
-      "exampleZh": "非常有趣。"
+      "exampleZh": "非常有趣。",
+      "level": "N5"
     },
     {
       "id": "w185",
@@ -2034,7 +2218,8 @@
       "pos": "副词",
       "cat": "副词",
       "example": "ちょっと待ってください。",
-      "exampleZh": "请稍等一下。"
+      "exampleZh": "请稍等一下。",
+      "level": "N5"
     },
     {
       "id": "w186",
@@ -2045,7 +2230,8 @@
       "pos": "副词",
       "cat": "副词",
       "example": "日本語が少しわかります。",
-      "exampleZh": "懂一点日语。"
+      "exampleZh": "懂一点日语。",
+      "level": "N5"
     },
     {
       "id": "w187",
@@ -2056,7 +2242,8 @@
       "pos": "副词",
       "cat": "副词",
       "example": "本がたくさんあります。",
-      "exampleZh": "有很多书。"
+      "exampleZh": "有很多书。",
+      "level": "N5"
     },
     {
       "id": "w188",
@@ -2067,7 +2254,8 @@
       "pos": "副词",
       "cat": "副词",
       "example": "よく映画を見ます。",
-      "exampleZh": "经常看电影。"
+      "exampleZh": "经常看电影。",
+      "level": "N5"
     },
     {
       "id": "w189",
@@ -2078,7 +2266,8 @@
       "pos": "副词",
       "cat": "副词",
       "example": "いつも七時に起きます。",
-      "exampleZh": "总是七点起床。"
+      "exampleZh": "总是七点起床。",
+      "level": "N5"
     },
     {
       "id": "w190",
@@ -2089,7 +2278,8 @@
       "pos": "副词",
       "cat": "副词",
       "example": "時々公園を散歩します。",
-      "exampleZh": "有时在公园散步。"
+      "exampleZh": "有时在公园散步。",
+      "level": "N5"
     },
     {
       "id": "w191",
@@ -2100,7 +2290,8 @@
       "pos": "副词",
       "cat": "副词",
       "example": "まだ食べていません。",
-      "exampleZh": "还没吃。"
+      "exampleZh": "还没吃。",
+      "level": "N5"
     },
     {
       "id": "w192",
@@ -2111,7 +2302,8 @@
       "pos": "副词",
       "cat": "副词",
       "example": "もう食べました。",
-      "exampleZh": "已经吃过了。"
+      "exampleZh": "已经吃过了。",
+      "level": "N5"
     },
     {
       "id": "w193",
@@ -2122,7 +2314,8 @@
       "pos": "副词",
       "cat": "副词",
       "example": "たぶん雨です。",
-      "exampleZh": "可能会下雨。"
+      "exampleZh": "可能会下雨。",
+      "level": "N5"
     },
     {
       "id": "w194",
@@ -2133,7 +2326,8 @@
       "pos": "副词",
       "cat": "副词",
       "example": "きっと上手になります。",
-      "exampleZh": "一定会变擅长。"
+      "exampleZh": "一定会变擅长。",
+      "level": "N5"
     },
     {
       "id": "w195",
@@ -2144,7 +2338,8 @@
       "pos": "副词",
       "cat": "副词",
       "example": "ゆっくり話してください。",
-      "exampleZh": "请说慢一点。"
+      "exampleZh": "请说慢一点。",
+      "level": "N5"
     },
     {
       "id": "w196",
@@ -2155,7 +2350,8 @@
       "pos": "副词",
       "cat": "副词",
       "example": "すぐ行きます。",
-      "exampleZh": "马上去。"
+      "exampleZh": "马上去。",
+      "level": "N5"
     },
     {
       "id": "w197",
@@ -2166,7 +2362,8 @@
       "pos": "副词",
       "cat": "副词",
       "example": "また明日会いましょう。",
-      "exampleZh": "明天再见吧。"
+      "exampleZh": "明天再见吧。",
+      "level": "N5"
     },
     {
       "id": "w198",
@@ -2177,7 +2374,8 @@
       "pos": "副词",
       "cat": "副词",
       "example": "いっしょに昼ご飯を食べましょう。",
-      "exampleZh": "一起吃午饭吧。"
+      "exampleZh": "一起吃午饭吧。",
+      "level": "N5"
     },
     {
       "id": "w199",
@@ -2188,7 +2386,8 @@
       "pos": "副词",
       "cat": "副词",
       "example": "ぜんぜんわかりません。",
-      "exampleZh": "完全不明白。"
+      "exampleZh": "完全不明白。",
+      "level": "N5"
     },
     {
       "id": "w200",
@@ -2199,7 +2398,8 @@
       "pos": "副词",
       "cat": "副词",
       "example": "寿司が一番好きです。",
-      "exampleZh": "最喜欢寿司。"
+      "exampleZh": "最喜欢寿司。",
+      "level": "N5"
     },
     {
       "ja": "医者",
@@ -2210,7 +2410,8 @@
       "cat": "人物",
       "example": "兄は医者です。",
       "exampleZh": "哥哥是医生。",
-      "id": "w201"
+      "id": "w201",
+      "level": "N5"
     },
     {
       "ja": "看護師",
@@ -2221,7 +2422,8 @@
       "cat": "人物",
       "example": "姉は看護師です。",
       "exampleZh": "姐姐是护士。",
-      "id": "w202"
+      "id": "w202",
+      "level": "N5"
     },
     {
       "ja": "警察",
@@ -2232,7 +2434,8 @@
       "cat": "人物",
       "example": "警察に電話します。",
       "exampleZh": "打电话给警察。",
-      "id": "w203"
+      "id": "w203",
+      "level": "N5"
     },
     {
       "ja": "運転手",
@@ -2243,7 +2446,8 @@
       "cat": "人物",
       "example": "運転手さん、そこで止めてください。",
       "exampleZh": "司机先生，请在那儿停车。",
-      "id": "w204"
+      "id": "w204",
+      "level": "N5"
     },
     {
       "ja": "コック",
@@ -2254,7 +2458,8 @@
       "cat": "人物",
       "example": "父はコックです。",
       "exampleZh": "我父亲是厨师。",
-      "id": "w205"
+      "id": "w205",
+      "level": "N5"
     },
     {
       "ja": "歌手",
@@ -2265,7 +2470,8 @@
       "cat": "人物",
       "example": "妹は歌手が好きです。",
       "exampleZh": "妹妹喜欢歌手。",
-      "id": "w206"
+      "id": "w206",
+      "level": "N5"
     },
     {
       "ja": "画家",
@@ -2276,7 +2482,8 @@
       "cat": "人物",
       "example": "彼は有名な画家です。",
       "exampleZh": "他是有名的画家。",
-      "id": "w207"
+      "id": "w207",
+      "level": "N5"
     },
     {
       "ja": "店員",
@@ -2287,7 +2494,8 @@
       "cat": "人物",
       "example": "店員さんに聞きます。",
       "exampleZh": "问店员。",
-      "id": "w208"
+      "id": "w208",
+      "level": "N5"
     },
     {
       "ja": "郵便屋",
@@ -2298,7 +2506,8 @@
       "cat": "人物",
       "example": "郵便屋さんが手紙を届けました。",
       "exampleZh": "邮递员送来了信。",
-      "id": "w209"
+      "id": "w209",
+      "level": "N5"
     },
     {
       "ja": "農家",
@@ -2309,7 +2518,8 @@
       "cat": "人物",
       "example": "祖父は農家です。",
       "exampleZh": "爷爷是农民。",
-      "id": "w210"
+      "id": "w210",
+      "level": "N5"
     },
     {
       "ja": "社長",
@@ -2320,7 +2530,8 @@
       "cat": "人物",
       "example": "社長はとても親切です。",
       "exampleZh": "社长非常热情。",
-      "id": "w211"
+      "id": "w211",
+      "level": "N5"
     },
     {
       "ja": "部長",
@@ -2331,7 +2542,8 @@
       "cat": "人物",
       "example": "部長に会います。",
       "exampleZh": "和部长见面。",
-      "id": "w212"
+      "id": "w212",
+      "level": "N5"
     },
     {
       "ja": "同僚",
@@ -2342,7 +2554,8 @@
       "cat": "人物",
       "example": "同僚と昼ご飯を食べます。",
       "exampleZh": "和同事吃午饭。",
-      "id": "w213"
+      "id": "w213",
+      "level": "N5"
     },
     {
       "ja": "先輩",
@@ -2353,7 +2566,8 @@
       "cat": "人物",
       "example": "先輩に教えてもらいます。",
       "exampleZh": "向前辈请教。",
-      "id": "w214"
+      "id": "w214",
+      "level": "N5"
     },
     {
       "ja": "後輩",
@@ -2364,7 +2578,8 @@
       "cat": "人物",
       "example": "後輩を手伝います。",
       "exampleZh": "帮助后辈。",
-      "id": "w215"
+      "id": "w215",
+      "level": "N5"
     },
     {
       "ja": "赤ちゃん",
@@ -2375,7 +2590,8 @@
       "cat": "人物",
       "example": "赤ちゃんが寝ています。",
       "exampleZh": "婴儿在睡觉。",
-      "id": "w216"
+      "id": "w216",
+      "level": "N5"
     },
     {
       "ja": "隣の人",
@@ -2386,7 +2602,8 @@
       "cat": "人物",
       "example": "隣の人はやさしいです。",
       "exampleZh": "邻居很和善。",
-      "id": "w217"
+      "id": "w217",
+      "level": "N5"
     },
     {
       "ja": "みんな",
@@ -2397,7 +2614,8 @@
       "cat": "人物",
       "example": "みんなで行きましょう。",
       "exampleZh": "大家一起去吧。",
-      "id": "w218"
+      "id": "w218",
+      "level": "N5"
     },
     {
       "ja": "誰か",
@@ -2408,7 +2626,8 @@
       "cat": "人物",
       "example": "誰かが来ました。",
       "exampleZh": "有人来了。",
-      "id": "w219"
+      "id": "w219",
+      "level": "N5"
     },
     {
       "ja": "お客様",
@@ -2419,7 +2638,8 @@
       "cat": "人物",
       "example": "お客様が来ます。",
       "exampleZh": "客人要来。",
-      "id": "w220"
+      "id": "w220",
+      "level": "N5"
     },
     {
       "ja": "零",
@@ -2430,7 +2650,8 @@
       "cat": "数字",
       "example": "点数は零です。",
       "exampleZh": "分数是零。",
-      "id": "w221"
+      "id": "w221",
+      "level": "N5"
     },
     {
       "ja": "半",
@@ -2441,7 +2662,8 @@
       "cat": "数字",
       "example": "九時半に会いましょう。",
       "exampleZh": "九点半见吧。",
-      "id": "w222"
+      "id": "w222",
+      "level": "N5"
     },
     {
       "ja": "第一",
@@ -2452,7 +2674,8 @@
       "cat": "数字",
       "example": "第一課を勉強します。",
       "exampleZh": "学习第一课。",
-      "id": "w223"
+      "id": "w223",
+      "level": "N5"
     },
     {
       "ja": "〜冊",
@@ -2463,7 +2686,8 @@
       "cat": "数字",
       "example": "本を二冊買いました。",
       "exampleZh": "买了两本书。",
-      "id": "w224"
+      "id": "w224",
+      "level": "N5"
     },
     {
       "ja": "〜枚",
@@ -2474,7 +2698,8 @@
       "cat": "数字",
       "example": "切手を三枚ください。",
       "exampleZh": "请给我三张邮票。",
-      "id": "w225"
+      "id": "w225",
+      "level": "N5"
     },
     {
       "ja": "〜匹",
@@ -2485,7 +2710,8 @@
       "cat": "数字",
       "example": "猫が二匹います。",
       "exampleZh": "有两只猫。",
-      "id": "w226"
+      "id": "w226",
+      "level": "N5"
     },
     {
       "ja": "〜本",
@@ -2496,7 +2722,8 @@
       "cat": "数字",
       "example": "ペンを一本買います。",
       "exampleZh": "买一支笔。",
-      "id": "w227"
+      "id": "w227",
+      "level": "N5"
     },
     {
       "ja": "〜台",
@@ -2507,7 +2734,8 @@
       "cat": "数字",
       "example": "車が三台あります。",
       "exampleZh": "有三辆车。",
-      "id": "w228"
+      "id": "w228",
+      "level": "N5"
     },
     {
       "ja": "〜歳",
@@ -2518,7 +2746,8 @@
       "cat": "数字",
       "example": "妹は十歳です。",
       "exampleZh": "妹妹十岁。",
-      "id": "w229"
+      "id": "w229",
+      "level": "N5"
     },
     {
       "ja": "何人",
@@ -2529,7 +2758,8 @@
       "cat": "数字",
       "example": "クラスに何人いますか。",
       "exampleZh": "班里有几个人？",
-      "id": "w230"
+      "id": "w230",
+      "level": "N5"
     },
     {
       "ja": "月曜日",
@@ -2540,7 +2770,8 @@
       "cat": "时间",
       "example": "月曜日に仕事があります。",
       "exampleZh": "星期一有工作。",
-      "id": "w231"
+      "id": "w231",
+      "level": "N5"
     },
     {
       "ja": "火曜日",
@@ -2551,7 +2782,8 @@
       "cat": "时间",
       "example": "火曜日は忙しいです。",
       "exampleZh": "星期二很忙。",
-      "id": "w232"
+      "id": "w232",
+      "level": "N5"
     },
     {
       "ja": "水曜日",
@@ -2562,7 +2794,8 @@
       "cat": "时间",
       "example": "水曜日に試験があります。",
       "exampleZh": "星期三有考试。",
-      "id": "w233"
+      "id": "w233",
+      "level": "N5"
     },
     {
       "ja": "木曜日",
@@ -2573,7 +2806,8 @@
       "cat": "时间",
       "example": "木曜日まで待ってください。",
       "exampleZh": "请等到星期四。",
-      "id": "w234"
+      "id": "w234",
+      "level": "N5"
     },
     {
       "ja": "金曜日",
@@ -2584,7 +2818,8 @@
       "cat": "时间",
       "example": "金曜日の夜は暇です。",
       "exampleZh": "星期五晚上有空。",
-      "id": "w235"
+      "id": "w235",
+      "level": "N5"
     },
     {
       "ja": "土曜日",
@@ -2595,7 +2830,8 @@
       "cat": "时间",
       "example": "土曜日に映画を見ます。",
       "exampleZh": "星期六看电影。",
-      "id": "w236"
+      "id": "w236",
+      "level": "N5"
     },
     {
       "ja": "日曜日",
@@ -2606,7 +2842,8 @@
       "cat": "时间",
       "example": "日曜日は休みです。",
       "exampleZh": "星期日休息。",
-      "id": "w237"
+      "id": "w237",
+      "level": "N5"
     },
     {
       "ja": "先月",
@@ -2617,7 +2854,8 @@
       "cat": "时间",
       "example": "先月日本へ行きました。",
       "exampleZh": "上个月去了日本。",
-      "id": "w238"
+      "id": "w238",
+      "level": "N5"
     },
     {
       "ja": "来月",
@@ -2628,7 +2866,8 @@
       "cat": "时间",
       "example": "来月から忙しくなります。",
       "exampleZh": "下个月开始变忙。",
-      "id": "w239"
+      "id": "w239",
+      "level": "N5"
     },
     {
       "ja": "去年",
@@ -2639,7 +2878,8 @@
       "cat": "时间",
       "example": "去年の冬は寒かったです。",
       "exampleZh": "去年冬天很冷。",
-      "id": "w240"
+      "id": "w240",
+      "level": "N5"
     },
     {
       "ja": "今年",
@@ -2650,7 +2890,8 @@
       "cat": "时间",
       "example": "今年は二十歳になります。",
       "exampleZh": "今年满二十岁。",
-      "id": "w241"
+      "id": "w241",
+      "level": "N5"
     },
     {
       "ja": "来年",
@@ -2661,7 +2902,8 @@
       "cat": "时间",
       "example": "来年も勉強します。",
       "exampleZh": "明年也学习。",
-      "id": "w242"
+      "id": "w242",
+      "level": "N5"
     },
     {
       "ja": "さっき",
@@ -2672,7 +2914,8 @@
       "cat": "时间",
       "example": "さっき電話がありました。",
       "exampleZh": "刚才来了电话。",
-      "id": "w243"
+      "id": "w243",
+      "level": "N5"
     },
     {
       "ja": "最近",
@@ -2683,7 +2926,8 @@
       "cat": "时间",
       "example": "最近暑いです。",
       "exampleZh": "最近很热。",
-      "id": "w244"
+      "id": "w244",
+      "level": "N5"
     },
     {
       "ja": "春",
@@ -2694,7 +2938,8 @@
       "cat": "时间",
       "example": "春は暖かいです。",
       "exampleZh": "春天很温暖。",
-      "id": "w245"
+      "id": "w245",
+      "level": "N5"
     },
     {
       "ja": "秋",
@@ -2705,7 +2950,8 @@
       "cat": "时间",
       "example": "秋は涼しいです。",
       "exampleZh": "秋天很凉爽。",
-      "id": "w246"
+      "id": "w246",
+      "level": "N5"
     },
     {
       "ja": "季節",
@@ -2716,7 +2962,8 @@
       "cat": "时间",
       "example": "好きな季節は春です。",
       "exampleZh": "喜欢的季节是春天。",
-      "id": "w247"
+      "id": "w247",
+      "level": "N5"
     },
     {
       "ja": "予定",
@@ -2727,7 +2974,8 @@
       "cat": "时间",
       "example": "明日出かける予定です。",
       "exampleZh": "预定明天出门。",
-      "id": "w248"
+      "id": "w248",
+      "level": "N5"
     },
     {
       "ja": "昼休み",
@@ -2738,7 +2986,8 @@
       "cat": "时间",
       "example": "昼休みに食堂へ行きます。",
       "exampleZh": "午休时去食堂。",
-      "id": "w249"
+      "id": "w249",
+      "level": "N5"
     },
     {
       "ja": "あとで",
@@ -2749,7 +2998,8 @@
       "cat": "时间",
       "example": "あとで電話します。",
       "exampleZh": "稍后打电话。",
-      "id": "w250"
+      "id": "w250",
+      "level": "N5"
     },
     {
       "ja": "もうすぐ",
@@ -2760,7 +3010,8 @@
       "cat": "时间",
       "example": "もうすぐ夏です。",
       "exampleZh": "马上就是夏天了。",
-      "id": "w251"
+      "id": "w251",
+      "level": "N5"
     },
     {
       "ja": "前",
@@ -2771,7 +3022,8 @@
       "cat": "时间",
       "example": "寝る前にお風呂に入ります。",
       "exampleZh": "睡觉前洗澡。",
-      "id": "w252"
+      "id": "w252",
+      "level": "N5"
     },
     {
       "ja": "後",
@@ -2782,7 +3034,8 @@
       "cat": "时间",
       "example": "ご飯の後、散歩します。",
       "exampleZh": "饭后散步。",
-      "id": "w253"
+      "id": "w253",
+      "level": "N5"
     },
     {
       "ja": "初めて",
@@ -2793,7 +3046,8 @@
       "cat": "时间",
       "example": "初めて寿司を食べました。",
       "exampleZh": "第一次吃了寿司。",
-      "id": "w254"
+      "id": "w254",
+      "level": "N5"
     },
     {
       "ja": "年中",
@@ -2804,7 +3058,8 @@
       "cat": "时间",
       "example": "年中勉強しています。",
       "exampleZh": "一年到头都在学习。",
-      "id": "w255"
+      "id": "w255",
+      "level": "N5"
     },
     {
       "ja": "今週",
@@ -2815,7 +3070,8 @@
       "cat": "时间",
       "example": "今週は暇です。",
       "exampleZh": "这周有空。",
-      "id": "w256"
+      "id": "w256",
+      "level": "N5"
     },
     {
       "ja": "来週",
@@ -2826,7 +3082,8 @@
       "cat": "时间",
       "example": "来週旅行します。",
       "exampleZh": "下周去旅行。",
-      "id": "w257"
+      "id": "w257",
+      "level": "N5"
     },
     {
       "ja": "おととい",
@@ -2837,7 +3094,8 @@
       "cat": "时间",
       "example": "おととい雨でした。",
       "exampleZh": "前天下雨了。",
-      "id": "w258"
+      "id": "w258",
+      "level": "N5"
     },
     {
       "ja": "あさって",
@@ -2848,7 +3106,8 @@
       "cat": "时间",
       "example": "あさって会いましょう。",
       "exampleZh": "后天见吧。",
-      "id": "w259"
+      "id": "w259",
+      "level": "N5"
     },
     {
       "ja": "夜中",
@@ -2859,7 +3118,8 @@
       "cat": "时间",
       "example": "夜中に目が覚めました。",
       "exampleZh": "半夜醒了。",
-      "id": "w260"
+      "id": "w260",
+      "level": "N5"
     },
     {
       "ja": "ラーメン",
@@ -2870,7 +3130,8 @@
       "cat": "食物",
       "example": "ラーメンを食べたいです。",
       "exampleZh": "想吃拉面。",
-      "id": "w261"
+      "id": "w261",
+      "level": "N5"
     },
     {
       "ja": "寿司",
@@ -2881,7 +3142,8 @@
       "cat": "食物",
       "example": "寿司は一番好きです。",
       "exampleZh": "最喜欢寿司。",
-      "id": "w262"
+      "id": "w262",
+      "level": "N5"
     },
     {
       "ja": "カレー",
@@ -2892,7 +3154,8 @@
       "cat": "食物",
       "example": "明日はカレーを作ります。",
       "exampleZh": "明天做咖喱。",
-      "id": "w263"
+      "id": "w263",
+      "level": "N5"
     },
     {
       "ja": "うどん",
@@ -2903,7 +3166,8 @@
       "cat": "食物",
       "example": "温かいうどんが食べたいです。",
       "exampleZh": "想吃热乌冬面。",
-      "id": "w264"
+      "id": "w264",
+      "level": "N5"
     },
     {
       "ja": "そば",
@@ -2914,7 +3178,8 @@
       "cat": "食物",
       "example": "そばを一口食べました。",
       "exampleZh": "吃了一口荞麦面。",
-      "id": "w265"
+      "id": "w265",
+      "level": "N5"
     },
     {
       "ja": "天ぷら",
@@ -2925,7 +3190,8 @@
       "cat": "食物",
       "example": "天ぷらはおいしいです。",
       "exampleZh": "天妇罗很好吃。",
-      "id": "w266"
+      "id": "w266",
+      "level": "N5"
     },
     {
       "ja": "ハンバーガー",
@@ -2936,7 +3202,8 @@
       "cat": "食物",
       "example": "ハンバーガーを食べます。",
       "exampleZh": "吃汉堡包。",
-      "id": "w267"
+      "id": "w267",
+      "level": "N5"
     },
     {
       "ja": "ケーキ",
@@ -2947,7 +3214,8 @@
       "cat": "食物",
       "example": "誕生日にケーキを食べます。",
       "exampleZh": "生日吃蛋糕。",
-      "id": "w268"
+      "id": "w268",
+      "level": "N5"
     },
     {
       "ja": "アイスクリーム",
@@ -2958,7 +3226,8 @@
       "cat": "食物",
       "example": "夏はアイスクリームがおいしいです。",
       "exampleZh": "夏天的冰淇淋很好吃。",
-      "id": "w269"
+      "id": "w269",
+      "level": "N5"
     },
     {
       "ja": "チョコレート",
@@ -2969,7 +3238,8 @@
       "cat": "食物",
       "example": "チョコレートが好きです。",
       "exampleZh": "喜欢巧克力。",
-      "id": "w270"
+      "id": "w270",
+      "level": "N5"
     },
     {
       "ja": "お菓子",
@@ -2980,7 +3250,8 @@
       "cat": "食物",
       "example": "お菓子を買いすぎました。",
       "exampleZh": "买了太多点心。",
-      "id": "w271"
+      "id": "w271",
+      "level": "N5"
     },
     {
       "ja": "ぶどう",
@@ -2991,7 +3262,8 @@
       "cat": "食物",
       "example": "ぶどうは甘いです。",
       "exampleZh": "葡萄很甜。",
-      "id": "w272"
+      "id": "w272",
+      "level": "N5"
     },
     {
       "ja": "すいか",
@@ -3002,7 +3274,8 @@
       "cat": "食物",
       "example": "夏にすいかを食べます。",
       "exampleZh": "夏天吃西瓜。",
-      "id": "w273"
+      "id": "w273",
+      "level": "N5"
     },
     {
       "ja": "いちご",
@@ -3013,7 +3286,8 @@
       "cat": "食物",
       "example": "いちごが大好きです。",
       "exampleZh": "最喜欢草莓。",
-      "id": "w274"
+      "id": "w274",
+      "level": "N5"
     },
     {
       "ja": "バナナ",
@@ -3024,7 +3298,8 @@
       "cat": "食物",
       "example": "毎朝バナナを食べます。",
       "exampleZh": "每天早上吃香蕉。",
-      "id": "w275"
+      "id": "w275",
+      "level": "N5"
     },
     {
       "ja": "れもん",
@@ -3035,7 +3310,8 @@
       "cat": "食物",
       "example": "れもんは酸っぱいです。",
       "exampleZh": "柠檬很酸。",
-      "id": "w276"
+      "id": "w276",
+      "level": "N5"
     },
     {
       "ja": "もも",
@@ -3046,7 +3322,8 @@
       "cat": "食物",
       "example": "ももはやわらかいです。",
       "exampleZh": "桃子很软。",
-      "id": "w277"
+      "id": "w277",
+      "level": "N5"
     },
     {
       "ja": "にんじん",
@@ -3057,7 +3334,8 @@
       "cat": "食物",
       "example": "にんじんを入れます。",
       "exampleZh": "放入胡萝卜。",
-      "id": "w278"
+      "id": "w278",
+      "level": "N5"
     },
     {
       "ja": "じゃがいも",
@@ -3068,7 +3346,8 @@
       "cat": "食物",
       "example": "じゃがいもを煮ます。",
       "exampleZh": "煮土豆。",
-      "id": "w279"
+      "id": "w279",
+      "level": "N5"
     },
     {
       "ja": "たまねぎ",
@@ -3079,7 +3358,8 @@
       "cat": "食物",
       "example": "たまねぎの切り方が分かりません。",
       "exampleZh": "不知道洋葱的切法。",
-      "id": "w280"
+      "id": "w280",
+      "level": "N5"
     },
     {
       "ja": "トマト",
@@ -3090,7 +3370,8 @@
       "cat": "食物",
       "example": "トマトは赤いです。",
       "exampleZh": "番茄是红色的。",
-      "id": "w281"
+      "id": "w281",
+      "level": "N5"
     },
     {
       "ja": "きゅうり",
@@ -3101,7 +3382,8 @@
       "cat": "食物",
       "example": "きゅうりは安いです。",
       "exampleZh": "黄瓜很便宜。",
-      "id": "w282"
+      "id": "w282",
+      "level": "N5"
     },
     {
       "ja": "なす",
@@ -3112,7 +3394,8 @@
       "cat": "食物",
       "example": "なすを焼きます。",
       "exampleZh": "烤茄子。",
-      "id": "w283"
+      "id": "w283",
+      "level": "N5"
     },
     {
       "ja": "ほうれんそう",
@@ -3123,7 +3406,8 @@
       "cat": "食物",
       "example": "ほうれんそうを洗います。",
       "exampleZh": "洗菠菜。",
-      "id": "w284"
+      "id": "w284",
+      "level": "N5"
     },
     {
       "ja": "紅茶",
@@ -3134,7 +3418,8 @@
       "cat": "食物",
       "example": "紅茶を飲みます。",
       "exampleZh": "喝红茶。",
-      "id": "w285"
+      "id": "w285",
+      "level": "N5"
     },
     {
       "ja": "緑茶",
@@ -3145,7 +3430,8 @@
       "cat": "食物",
       "example": "緑茶が好きです。",
       "exampleZh": "喜欢绿茶。",
-      "id": "w286"
+      "id": "w286",
+      "level": "N5"
     },
     {
       "ja": "ビール",
@@ -3156,7 +3442,8 @@
       "cat": "食物",
       "example": "父はビールを飲みます。",
       "exampleZh": "父亲喝啤酒。",
-      "id": "w287"
+      "id": "w287",
+      "level": "N5"
     },
     {
       "ja": "スープ",
@@ -3167,7 +3454,8 @@
       "cat": "食物",
       "example": "スープを温めます。",
       "exampleZh": "热汤。",
-      "id": "w288"
+      "id": "w288",
+      "level": "N5"
     },
     {
       "ja": "サラダ",
@@ -3178,7 +3466,8 @@
       "cat": "食物",
       "example": "サラダを注文します。",
       "exampleZh": "点沙拉。",
-      "id": "w289"
+      "id": "w289",
+      "level": "N5"
     },
     {
       "ja": "牛肉",
@@ -3189,7 +3478,8 @@
       "cat": "食物",
       "example": "牛肉を買いました。",
       "exampleZh": "买了牛肉。",
-      "id": "w290"
+      "id": "w290",
+      "level": "N5"
     },
     {
       "ja": "豚肉",
@@ -3200,7 +3490,8 @@
       "cat": "食物",
       "example": "豚肉が安いです。",
       "exampleZh": "猪肉便宜。",
-      "id": "w291"
+      "id": "w291",
+      "level": "N5"
     },
     {
       "ja": "鶏肉",
@@ -3211,7 +3502,8 @@
       "cat": "食物",
       "example": "鶏肉でからあげを作ります。",
       "exampleZh": "用鸡肉做炸鸡。",
-      "id": "w292"
+      "id": "w292",
+      "level": "N5"
     },
     {
       "ja": "お粥",
@@ -3222,7 +3514,8 @@
       "cat": "食物",
       "example": "お粥を食べます。",
       "exampleZh": "喝粥。",
-      "id": "w293"
+      "id": "w293",
+      "level": "N5"
     },
     {
       "ja": "味噌汁",
@@ -3233,7 +3526,8 @@
       "cat": "食物",
       "example": "朝は味噌汁を飲みます。",
       "exampleZh": "早上喝味噌汤。",
-      "id": "w294"
+      "id": "w294",
+      "level": "N5"
     },
     {
       "ja": "お茶碗",
@@ -3244,7 +3538,8 @@
       "cat": "食物",
       "example": "お茶碗を洗います。",
       "exampleZh": "洗碗。",
-      "id": "w295"
+      "id": "w295",
+      "level": "N5"
     },
     {
       "ja": "コップ",
@@ -3255,7 +3550,8 @@
       "cat": "食物",
       "example": "コップに水を入れます。",
       "exampleZh": "往杯子里倒水。",
-      "id": "w296"
+      "id": "w296",
+      "level": "N5"
     },
     {
       "ja": "フォーク",
@@ -3266,7 +3562,8 @@
       "cat": "食物",
       "example": "フォークを使います。",
       "exampleZh": "用叉子。",
-      "id": "w297"
+      "id": "w297",
+      "level": "N5"
     },
     {
       "ja": "スプーン",
@@ -3277,7 +3574,8 @@
       "cat": "食物",
       "example": "スプーンをください。",
       "exampleZh": "请给我勺子。",
-      "id": "w298"
+      "id": "w298",
+      "level": "N5"
     },
     {
       "ja": "はし",
@@ -3288,7 +3586,8 @@
       "cat": "食物",
       "example": "はしの持ち方が上手です。",
       "exampleZh": "拿筷子的姿势很熟练。",
-      "id": "w299"
+      "id": "w299",
+      "level": "N5"
     },
     {
       "ja": "朝食",
@@ -3299,7 +3598,8 @@
       "cat": "食物",
       "example": "朝食はパンです。",
       "exampleZh": "早餐是面包。",
-      "id": "w300"
+      "id": "w300",
+      "level": "N5"
     },
     {
       "ja": "夕食",
@@ -3310,7 +3610,8 @@
       "cat": "食物",
       "example": "夕食を作ります。",
       "exampleZh": "做晚餐。",
-      "id": "w301"
+      "id": "w301",
+      "level": "N5"
     },
     {
       "ja": "塩こしょう",
@@ -3321,7 +3622,8 @@
       "cat": "食物",
       "example": "塩こしょうをふります。",
       "exampleZh": "撒上盐和胡椒。",
-      "id": "w302"
+      "id": "w302",
+      "level": "N5"
     },
     {
       "ja": "醤油",
@@ -3332,7 +3634,8 @@
       "cat": "食物",
       "example": "醤油は少しだけ入れてください。",
       "exampleZh": "请只放一点酱油。",
-      "id": "w303"
+      "id": "w303",
+      "level": "N5"
     },
     {
       "ja": "おかわり",
@@ -3343,7 +3646,8 @@
       "cat": "食物",
       "example": "おかわりをください。",
       "exampleZh": "请再给我来一碗。",
-      "id": "w304"
+      "id": "w304",
+      "level": "N5"
     },
     {
       "ja": "空港",
@@ -3354,7 +3658,8 @@
       "cat": "地点",
       "example": "空港へ迎えに来ました。",
       "exampleZh": "来机场接机了。",
-      "id": "w305"
+      "id": "w305",
+      "level": "N5"
     },
     {
       "ja": "スーパー",
@@ -3365,7 +3670,8 @@
       "cat": "地点",
       "example": "スーパーで買い物をします。",
       "exampleZh": "在超市购物。",
-      "id": "w306"
+      "id": "w306",
+      "level": "N5"
     },
     {
       "ja": "コンビニ",
@@ -3376,7 +3682,8 @@
       "cat": "地点",
       "example": "コンビニでお弁当を買います。",
       "exampleZh": "在便利店买便当。",
-      "id": "w307"
+      "id": "w307",
+      "level": "N5"
     },
     {
       "ja": "レストラン",
@@ -3387,7 +3694,8 @@
       "cat": "地点",
       "example": "レストランを予約します。",
       "exampleZh": "预订餐厅。",
-      "id": "w308"
+      "id": "w308",
+      "level": "N5"
     },
     {
       "ja": "ホテル",
@@ -3398,7 +3706,8 @@
       "cat": "地点",
       "example": "ホテルに泊まります。",
       "exampleZh": "住酒店。",
-      "id": "w309"
+      "id": "w309",
+      "level": "N5"
     },
     {
       "ja": "旅館",
@@ -3409,7 +3718,8 @@
       "cat": "地点",
       "example": "旅館に一泊します。",
       "exampleZh": "在日式旅馆住一晚。",
-      "id": "w310"
+      "id": "w310",
+      "level": "N5"
     },
     {
       "ja": "映画館",
@@ -3420,7 +3730,8 @@
       "cat": "地点",
       "example": "映画館で映画を見ます。",
       "exampleZh": "在电影院看电影。",
-      "id": "w311"
+      "id": "w311",
+      "level": "N5"
     },
     {
       "ja": "美術館",
@@ -3431,7 +3742,8 @@
       "cat": "地点",
       "example": "美術館へ絵を見に行きます。",
       "exampleZh": "去美术馆看画。",
-      "id": "w312"
+      "id": "w312",
+      "level": "N5"
     },
     {
       "ja": "動物園",
@@ -3442,7 +3754,8 @@
       "cat": "地点",
       "example": "動物園でパンダを見ました。",
       "exampleZh": "在动物园看了熊猫。",
-      "id": "w313"
+      "id": "w313",
+      "level": "N5"
     },
     {
       "ja": "水族館",
@@ -3453,7 +3766,8 @@
       "cat": "地点",
       "example": "水族館へ行きたいです。",
       "exampleZh": "想去水族馆。",
-      "id": "w314"
+      "id": "w314",
+      "level": "N5"
     },
     {
       "ja": "神社",
@@ -3464,7 +3778,8 @@
       "cat": "地点",
       "example": "神社でお参りをします。",
       "exampleZh": "在神社参拜。",
-      "id": "w315"
+      "id": "w315",
+      "level": "N5"
     },
     {
       "ja": "お寺",
@@ -3475,7 +3790,8 @@
       "cat": "地点",
       "example": "お寺を見学します。",
       "exampleZh": "参观寺庙。",
-      "id": "w316"
+      "id": "w316",
+      "level": "N5"
     },
     {
       "ja": "交差点",
@@ -3486,7 +3802,8 @@
       "cat": "地点",
       "example": "交差点で待っています。",
       "exampleZh": "在十字路口等。",
-      "id": "w317"
+      "id": "w317",
+      "level": "N5"
     },
     {
       "ja": "橋",
@@ -3497,7 +3814,8 @@
       "cat": "地点",
       "example": "橋を渡ります。",
       "exampleZh": "过桥。",
-      "id": "w318"
+      "id": "w318",
+      "level": "N5"
     },
     {
       "ja": "道",
@@ -3508,7 +3826,8 @@
       "cat": "地点",
       "example": "この道は静かです。",
       "exampleZh": "这条路很安静。",
-      "id": "w319"
+      "id": "w319",
+      "level": "N5"
     },
     {
       "ja": "角",
@@ -3519,7 +3838,8 @@
       "cat": "地点",
       "example": "角の店です。",
       "exampleZh": "是拐角处的店。",
-      "id": "w320"
+      "id": "w320",
+      "level": "N5"
     },
     {
       "ja": "海外",
@@ -3530,7 +3850,8 @@
       "cat": "地点",
       "example": "海外へ行ったことがあります。",
       "exampleZh": "去过海外。",
-      "id": "w321"
+      "id": "w321",
+      "level": "N5"
     },
     {
       "ja": "田舎",
@@ -3541,7 +3862,8 @@
       "cat": "地点",
       "example": "田舎に帰ります。",
       "exampleZh": "回乡下。",
-      "id": "w322"
+      "id": "w322",
+      "level": "N5"
     },
     {
       "ja": "都会",
@@ -3552,7 +3874,8 @@
       "cat": "地点",
       "example": "都会はにぎやかです。",
       "exampleZh": "大城市很热闹。",
-      "id": "w323"
+      "id": "w323",
+      "level": "N5"
     },
     {
       "ja": "ビル",
@@ -3563,7 +3886,8 @@
       "cat": "地点",
       "example": "高いビルがたくさんあります。",
       "exampleZh": "有很多高楼。",
-      "id": "w324"
+      "id": "w324",
+      "level": "N5"
     },
     {
       "ja": "エレベーター",
@@ -3574,7 +3898,8 @@
       "cat": "地点",
       "example": "エレベーターを使います。",
       "exampleZh": "乘电梯。",
-      "id": "w325"
+      "id": "w325",
+      "level": "N5"
     },
     {
       "ja": "階段",
@@ -3585,7 +3910,8 @@
       "cat": "地点",
       "example": "階段で上ります。",
       "exampleZh": "走楼梯上去。",
-      "id": "w326"
+      "id": "w326",
+      "level": "N5"
     },
     {
       "ja": "玄関",
@@ -3596,7 +3922,8 @@
       "cat": "地点",
       "example": "玄関で靴を脱ぎます。",
       "exampleZh": "在玄关脱鞋。",
-      "id": "w327"
+      "id": "w327",
+      "level": "N5"
     },
     {
       "ja": "お風呂",
@@ -3607,7 +3934,8 @@
       "cat": "地点",
       "example": "お風呂に入ります。",
       "exampleZh": "泡澡。",
-      "id": "w328"
+      "id": "w328",
+      "level": "N5"
     },
     {
       "ja": "庭",
@@ -3618,7 +3946,8 @@
       "cat": "地点",
       "example": "庭に木があります。",
       "exampleZh": "院子里有树。",
-      "id": "w329"
+      "id": "w329",
+      "level": "N5"
     },
     {
       "ja": "空",
@@ -3629,7 +3958,8 @@
       "cat": "自然",
       "example": "空が青いです。",
       "exampleZh": "天空很蓝。",
-      "id": "w330"
+      "id": "w330",
+      "level": "N5"
     },
     {
       "ja": "海",
@@ -3640,7 +3970,8 @@
       "cat": "自然",
       "example": "海へ行きたいです。",
       "exampleZh": "想去海边。",
-      "id": "w331"
+      "id": "w331",
+      "level": "N5"
     },
     {
       "ja": "山",
@@ -3651,7 +3982,8 @@
       "cat": "自然",
       "example": "山に登ります。",
       "exampleZh": "登山。",
-      "id": "w332"
+      "id": "w332",
+      "level": "N5"
     },
     {
       "ja": "川",
@@ -3662,7 +3994,8 @@
       "cat": "自然",
       "example": "川で魚を釣ります。",
       "exampleZh": "在河里钓鱼。",
-      "id": "w333"
+      "id": "w333",
+      "level": "N5"
     },
     {
       "ja": "雨",
@@ -3673,7 +4006,8 @@
       "cat": "自然",
       "example": "雨が降っています。",
       "exampleZh": "正在下雨。",
-      "id": "w334"
+      "id": "w334",
+      "level": "N5"
     },
     {
       "ja": "雪",
@@ -3684,7 +4018,8 @@
       "cat": "自然",
       "example": "雪が降りました。",
       "exampleZh": "下雪了。",
-      "id": "w335"
+      "id": "w335",
+      "level": "N5"
     },
     {
       "ja": "風",
@@ -3695,7 +4030,8 @@
       "cat": "自然",
       "example": "風が強いです。",
       "exampleZh": "风很大。",
-      "id": "w336"
+      "id": "w336",
+      "level": "N5"
     },
     {
       "ja": "太陽",
@@ -3706,7 +4042,8 @@
       "cat": "自然",
       "example": "太陽が出ています。",
       "exampleZh": "太阳出来了。",
-      "id": "w337"
+      "id": "w337",
+      "level": "N5"
     },
     {
       "ja": "月",
@@ -3717,7 +4054,8 @@
       "cat": "自然",
       "example": "月がきれいです。",
       "exampleZh": "月亮很美。",
-      "id": "w338"
+      "id": "w338",
+      "level": "N5"
     },
     {
       "ja": "雲",
@@ -3728,7 +4066,8 @@
       "cat": "自然",
       "example": "雲が多いです。",
       "exampleZh": "云很多。",
-      "id": "w339"
+      "id": "w339",
+      "level": "N5"
     },
     {
       "ja": "天気",
@@ -3739,7 +4078,8 @@
       "cat": "自然",
       "example": "明日の天気はどうですか。",
       "exampleZh": "明天天气怎么样？",
-      "id": "w340"
+      "id": "w340",
+      "level": "N5"
     },
     {
       "ja": "木",
@@ -3750,7 +4090,8 @@
       "cat": "自然",
       "example": "公園に大きな木があります。",
       "exampleZh": "公园里有棵大树。",
-      "id": "w341"
+      "id": "w341",
+      "level": "N5"
     },
     {
       "ja": "花",
@@ -3761,7 +4102,8 @@
       "cat": "自然",
       "example": "花が咲きました。",
       "exampleZh": "花开了。",
-      "id": "w342"
+      "id": "w342",
+      "level": "N5"
     },
     {
       "ja": "草",
@@ -3772,7 +4114,8 @@
       "cat": "自然",
       "example": "草を刈ります。",
       "exampleZh": "割草。",
-      "id": "w343"
+      "id": "w343",
+      "level": "N5"
     },
     {
       "ja": "葉",
@@ -3783,7 +4126,8 @@
       "cat": "自然",
       "example": "秋は葉が赤くなります。",
       "exampleZh": "秋天叶子变红。",
-      "id": "w344"
+      "id": "w344",
+      "level": "N5"
     },
     {
       "ja": "石",
@@ -3794,7 +4138,8 @@
       "cat": "自然",
       "example": "石を拾いました。",
       "exampleZh": "捡了石头。",
-      "id": "w345"
+      "id": "w345",
+      "level": "N5"
     },
     {
       "ja": "火",
@@ -3805,7 +4150,8 @@
       "cat": "自然",
       "example": "火をおこします。",
       "exampleZh": "生火。",
-      "id": "w346"
+      "id": "w346",
+      "level": "N5"
     },
     {
       "ja": "森",
@@ -3816,7 +4162,8 @@
       "cat": "自然",
       "example": "森を散歩します。",
       "exampleZh": "在森林散步。",
-      "id": "w347"
+      "id": "w347",
+      "level": "N5"
     },
     {
       "ja": "波",
@@ -3827,7 +4174,8 @@
       "cat": "自然",
       "example": "波が高いです。",
       "exampleZh": "浪很大。",
-      "id": "w348"
+      "id": "w348",
+      "level": "N5"
     },
     {
       "ja": "空気",
@@ -3838,7 +4186,8 @@
       "cat": "自然",
       "example": "朝の空気はきれいです。",
       "exampleZh": "早晨的空气很清新。",
-      "id": "w349"
+      "id": "w349",
+      "level": "N5"
     },
     {
       "ja": "桜",
@@ -3849,7 +4198,8 @@
       "cat": "自然",
       "example": "桜が満開です。",
       "exampleZh": "樱花盛开了。",
-      "id": "w350"
+      "id": "w350",
+      "level": "N5"
     },
     {
       "ja": "橡皮",
@@ -3860,7 +4210,8 @@
       "cat": "物品",
       "example": "橡皮を貸してください。",
       "exampleZh": "请借我橡皮。",
-      "id": "w351"
+      "id": "w351",
+      "level": "N5"
     },
     {
       "ja": "定規",
@@ -3871,7 +4222,8 @@
       "cat": "物品",
       "example": "定規で線を引きます。",
       "exampleZh": "用尺子画线。",
-      "id": "w352"
+      "id": "w352",
+      "level": "N5"
     },
     {
       "ja": "はさみ",
@@ -3882,7 +4234,8 @@
       "cat": "物品",
       "example": "はさみで紙を切ります。",
       "exampleZh": "用剪刀剪纸。",
-      "id": "w353"
+      "id": "w353",
+      "level": "N5"
     },
     {
       "ja": "のり",
@@ -3893,7 +4246,8 @@
       "cat": "物品",
       "example": "のりで貼ります。",
       "exampleZh": "用胶水贴。",
-      "id": "w354"
+      "id": "w354",
+      "level": "N5"
     },
     {
       "ja": "封筒",
@@ -3904,7 +4258,8 @@
       "cat": "物品",
       "example": "封筒に入れます。",
       "exampleZh": "放进信封。",
-      "id": "w355"
+      "id": "w355",
+      "level": "N5"
     },
     {
       "ja": "切手",
@@ -3915,7 +4270,8 @@
       "cat": "物品",
       "example": "切手を貼りました。",
       "exampleZh": "贴上了邮票。",
-      "id": "w356"
+      "id": "w356",
+      "level": "N5"
     },
     {
       "ja": "鍵",
@@ -3926,7 +4282,8 @@
       "cat": "物品",
       "example": "鍵を忘れました。",
       "exampleZh": "忘带钥匙了。",
-      "id": "w357"
+      "id": "w357",
+      "level": "N5"
     },
     {
       "ja": "鏡",
@@ -3937,7 +4294,8 @@
       "cat": "物品",
       "example": "鏡を見ます。",
       "exampleZh": "照镜子。",
-      "id": "w358"
+      "id": "w358",
+      "level": "N5"
     },
     {
       "ja": "くし",
@@ -3948,7 +4306,8 @@
       "cat": "物品",
       "example": "くしで髪をとかします。",
       "exampleZh": "用梳子梳头。",
-      "id": "w359"
+      "id": "w359",
+      "level": "N5"
     },
     {
       "ja": "歯ブラシ",
@@ -3959,7 +4318,8 @@
       "cat": "物品",
       "example": "歯ブラシで歯を磨きます。",
       "exampleZh": "用牙刷刷牙。",
-      "id": "w360"
+      "id": "w360",
+      "level": "N5"
     },
     {
       "ja": "タオル",
@@ -3970,7 +4330,8 @@
       "cat": "物品",
       "example": "タオルで手を拭きます。",
       "exampleZh": "用毛巾擦手。",
-      "id": "w361"
+      "id": "w361",
+      "level": "N5"
     },
     {
       "ja": "石鹸",
@@ -3981,7 +4342,8 @@
       "cat": "物品",
       "example": "石鹸で手を洗います。",
       "exampleZh": "用肥皂洗手。",
-      "id": "w362"
+      "id": "w362",
+      "level": "N5"
     },
     {
       "ja": "シャンプー",
@@ -3992,7 +4354,8 @@
       "cat": "物品",
       "example": "シャンプーを買います。",
       "exampleZh": "买洗发水。",
-      "id": "w363"
+      "id": "w363",
+      "level": "N5"
     },
     {
       "ja": "ティッシュ",
@@ -4003,7 +4366,8 @@
       "cat": "物品",
       "example": "ティッシュを取ります。",
       "exampleZh": "抽纸巾。",
-      "id": "w364"
+      "id": "w364",
+      "level": "N5"
     },
     {
       "ja": "レジ袋",
@@ -4014,7 +4378,8 @@
       "cat": "物品",
       "example": "レジ袋は要りますか。",
       "exampleZh": "需要购物袋吗？",
-      "id": "w365"
+      "id": "w365",
+      "level": "N5"
     },
     {
       "ja": "プレゼント",
@@ -4025,7 +4390,8 @@
       "cat": "物品",
       "example": "友達にプレゼントを送ります。",
       "exampleZh": "给朋友送礼物。",
-      "id": "w366"
+      "id": "w366",
+      "level": "N5"
     },
     {
       "ja": "おもちゃ",
@@ -4036,7 +4402,8 @@
       "cat": "物品",
       "example": "子どもはおもちゃが好きです。",
       "exampleZh": "孩子喜欢玩具。",
-      "id": "w367"
+      "id": "w367",
+      "level": "N5"
     },
     {
       "ja": "ギター",
@@ -4047,7 +4414,8 @@
       "cat": "物品",
       "example": "ギターを弾きます。",
       "exampleZh": "弹吉他。",
-      "id": "w368"
+      "id": "w368",
+      "level": "N5"
     },
     {
       "ja": "ピアノ",
@@ -4058,7 +4426,8 @@
       "cat": "物品",
       "example": "ピアノを習っています。",
       "exampleZh": "正在学钢琴。",
-      "id": "w369"
+      "id": "w369",
+      "level": "N5"
     },
     {
       "ja": "電池",
@@ -4069,7 +4438,8 @@
       "cat": "物品",
       "example": "電池が切れました。",
       "exampleZh": "电池没电了。",
-      "id": "w370"
+      "id": "w370",
+      "level": "N5"
     },
     {
       "ja": "充電器",
@@ -4080,7 +4450,8 @@
       "cat": "物品",
       "example": "充電器を忘れました。",
       "exampleZh": "忘带充电器了。",
-      "id": "w371"
+      "id": "w371",
+      "level": "N5"
     },
     {
       "ja": "ネックレス",
@@ -4091,7 +4462,8 @@
       "cat": "物品",
       "example": "ネックレスをもらいました。",
       "exampleZh": "收到了项链。",
-      "id": "w372"
+      "id": "w372",
+      "level": "N5"
     },
     {
       "ja": "指輪",
@@ -4102,7 +4474,8 @@
       "cat": "物品",
       "example": "指輪をはめています。",
       "exampleZh": "戴着戒指。",
-      "id": "w373"
+      "id": "w373",
+      "level": "N5"
     },
     {
       "ja": "靴",
@@ -4113,7 +4486,8 @@
       "cat": "物品",
       "example": "新しい靴を買います。",
       "exampleZh": "买新鞋。",
-      "id": "w374"
+      "id": "w374",
+      "level": "N5"
     },
     {
       "ja": "帽子",
@@ -4124,7 +4498,8 @@
       "cat": "物品",
       "example": "帽子をかぶります。",
       "exampleZh": "戴帽子。",
-      "id": "w375"
+      "id": "w375",
+      "level": "N5"
     },
     {
       "ja": "ズボン",
@@ -4135,7 +4510,8 @@
       "cat": "物品",
       "example": "ズボンが短いです。",
       "exampleZh": "裤子太短了。",
-      "id": "w376"
+      "id": "w376",
+      "level": "N5"
     },
     {
       "ja": "スカート",
@@ -4146,7 +4522,8 @@
       "cat": "物品",
       "example": "きれいなスカートですね。",
       "exampleZh": "好漂亮的裙子。",
-      "id": "w377"
+      "id": "w377",
+      "level": "N5"
     },
     {
       "ja": "シャツ",
@@ -4157,7 +4534,8 @@
       "cat": "物品",
       "example": "白いシャツを着ています。",
       "exampleZh": "穿着白衬衫。",
-      "id": "w378"
+      "id": "w378",
+      "level": "N5"
     },
     {
       "ja": "上着",
@@ -4168,7 +4546,8 @@
       "cat": "物品",
       "example": "上着を着てください。",
       "exampleZh": "请穿上外套。",
-      "id": "w379"
+      "id": "w379",
+      "level": "N5"
     },
     {
       "ja": "マフラー",
@@ -4179,7 +4558,8 @@
       "cat": "物品",
       "example": "冬はマフラーをします。",
       "exampleZh": "冬天围围巾。",
-      "id": "w380"
+      "id": "w380",
+      "level": "N5"
     },
     {
       "ja": "手袋",
@@ -4190,7 +4570,8 @@
       "cat": "物品",
       "example": "手袋をはめます。",
       "exampleZh": "戴手套。",
-      "id": "w381"
+      "id": "w381",
+      "level": "N5"
     },
     {
       "ja": "靴下",
@@ -4201,7 +4582,8 @@
       "cat": "物品",
       "example": "靴下を洗います。",
       "exampleZh": "洗袜子。",
-      "id": "w382"
+      "id": "w382",
+      "level": "N5"
     },
     {
       "ja": "鍋",
@@ -4212,7 +4594,8 @@
       "cat": "物品",
       "example": "鍋でスープを作ります。",
       "exampleZh": "用锅做汤。",
-      "id": "w383"
+      "id": "w383",
+      "level": "N5"
     },
     {
       "ja": "皿",
@@ -4223,7 +4606,8 @@
       "cat": "物品",
       "example": "皿を並べます。",
       "exampleZh": "摆盘子。",
-      "id": "w384"
+      "id": "w384",
+      "level": "N5"
     },
     {
       "ja": "冷蔵庫",
@@ -4234,7 +4618,8 @@
       "cat": "物品",
       "example": "冷蔵庫に肉があります。",
       "exampleZh": "冰箱里有肉。",
-      "id": "w385"
+      "id": "w385",
+      "level": "N5"
     },
     {
       "ja": "洗濯機",
@@ -4245,7 +4630,8 @@
       "cat": "物品",
       "example": "洗濯機で服を洗います。",
       "exampleZh": "用洗衣机洗衣服。",
-      "id": "w386"
+      "id": "w386",
+      "level": "N5"
     },
     {
       "ja": "エアコン",
@@ -4256,7 +4642,8 @@
       "cat": "物品",
       "example": "エアコンをつけます。",
       "exampleZh": "开空调。",
-      "id": "w387"
+      "id": "w387",
+      "level": "N5"
     },
     {
       "ja": "ベッド",
@@ -4267,7 +4654,8 @@
       "cat": "物品",
       "example": "ベッドで寝ます。",
       "exampleZh": "睡在床上。",
-      "id": "w388"
+      "id": "w388",
+      "level": "N5"
     },
     {
       "ja": "枕",
@@ -4278,7 +4666,8 @@
       "cat": "物品",
       "example": "枕が高いです。",
       "exampleZh": "枕头很高。",
-      "id": "w389"
+      "id": "w389",
+      "level": "N5"
     },
     {
       "ja": "布団",
@@ -4289,7 +4678,8 @@
       "cat": "物品",
       "example": "布団をかけます。",
       "exampleZh": "盖上被子。",
-      "id": "w390"
+      "id": "w390",
+      "level": "N5"
     },
     {
       "ja": "カーテン",
@@ -4300,7 +4690,8 @@
       "cat": "物品",
       "example": "カーテンを開けます。",
       "exampleZh": "拉开窗帘。",
-      "id": "w391"
+      "id": "w391",
+      "level": "N5"
     },
     {
       "ja": "花瓶",
@@ -4311,7 +4702,8 @@
       "cat": "物品",
       "example": "花瓶に花を入れます。",
       "exampleZh": "把花放进花瓶。",
-      "id": "w392"
+      "id": "w392",
+      "level": "N5"
     },
     {
       "ja": "地図",
@@ -4322,7 +4714,8 @@
       "cat": "物品",
       "example": "地図を見ながら歩きます。",
       "exampleZh": "看着地图走。",
-      "id": "w393"
+      "id": "w393",
+      "level": "N5"
     },
     {
       "ja": "洗う",
@@ -4333,7 +4726,8 @@
       "cat": "动作",
       "example": "手を洗います。",
       "exampleZh": "洗手。",
-      "id": "w394"
+      "id": "w394",
+      "level": "N5"
     },
     {
       "ja": "磨く",
@@ -4344,7 +4738,8 @@
       "cat": "动作",
       "example": "毎日歯を磨きます。",
       "exampleZh": "每天刷牙。",
-      "id": "w395"
+      "id": "w395",
+      "level": "N5"
     },
     {
       "ja": "浴びる",
@@ -4355,7 +4750,8 @@
       "cat": "动作",
       "example": "シャワーを浴びます。",
       "exampleZh": "冲淋浴。",
-      "id": "w396"
+      "id": "w396",
+      "level": "N5"
     },
     {
       "ja": "散歩する",
@@ -4366,7 +4762,8 @@
       "cat": "动作",
       "example": "公園を散歩します。",
       "exampleZh": "在公园散步。",
-      "id": "w397"
+      "id": "w397",
+      "level": "N5"
     },
     {
       "ja": "買い物する",
@@ -4377,7 +4774,8 @@
       "cat": "动作",
       "example": "週末買い物します。",
       "exampleZh": "周末购物。",
-      "id": "w398"
+      "id": "w398",
+      "level": "N5"
     },
     {
       "ja": "登る",
@@ -4388,7 +4786,8 @@
       "cat": "动作",
       "example": "富士山に登ります。",
       "exampleZh": "登富士山。",
-      "id": "w399"
+      "id": "w399",
+      "level": "N5"
     },
     {
       "ja": "歌う",
@@ -4399,7 +4798,8 @@
       "cat": "动作",
       "example": "カラオケで歌います。",
       "exampleZh": "在 KTV 唱歌。",
-      "id": "w400"
+      "id": "w400",
+      "level": "N5"
     },
     {
       "ja": "踊る",
@@ -4410,7 +4810,8 @@
       "cat": "动作",
       "example": "音楽に合わせて踊ります。",
       "exampleZh": "跟着音乐跳舞。",
-      "id": "w401"
+      "id": "w401",
+      "level": "N5"
     },
     {
       "ja": "描く",
@@ -4421,7 +4822,8 @@
       "cat": "动作",
       "example": "絵を描きます。",
       "exampleZh": "画画。",
-      "id": "w402"
+      "id": "w402",
+      "level": "N5"
     },
     {
       "ja": "撮る",
@@ -4432,7 +4834,8 @@
       "cat": "动作",
       "example": "写真を撮ります。",
       "exampleZh": "拍照。",
-      "id": "w403"
+      "id": "w403",
+      "level": "N5"
     },
     {
       "ja": "送る",
@@ -4443,7 +4846,8 @@
       "cat": "动作",
       "example": "メールを送ります。",
       "exampleZh": "发邮件。",
-      "id": "w404"
+      "id": "w404",
+      "level": "N5"
     },
     {
       "ja": "借りる",
@@ -4454,7 +4858,8 @@
       "cat": "动作",
       "example": "図書館で本を借ります。",
       "exampleZh": "在图书馆借书。",
-      "id": "w405"
+      "id": "w405",
+      "level": "N5"
     },
     {
       "ja": "返す",
@@ -4465,7 +4870,8 @@
       "cat": "动作",
       "example": "明日本を返します。",
       "exampleZh": "明天还书。",
-      "id": "w406"
+      "id": "w406",
+      "level": "N5"
     },
     {
       "ja": "忘れる",
@@ -4476,7 +4882,8 @@
       "cat": "动作",
       "example": "名前を忘れました。",
       "exampleZh": "忘记名字了。",
-      "id": "w407"
+      "id": "w407",
+      "level": "N5"
     },
     {
       "ja": "覚える",
@@ -4487,7 +4894,8 @@
       "cat": "动作",
       "example": "単語を覚えます。",
       "exampleZh": "记单词。",
-      "id": "w408"
+      "id": "w408",
+      "level": "N5"
     },
     {
       "ja": "探す",
@@ -4498,7 +4906,8 @@
       "cat": "动作",
       "example": "仕事を探します。",
       "exampleZh": "找工作。",
-      "id": "w409"
+      "id": "w409",
+      "level": "N5"
     },
     {
       "ja": "座る",
@@ -4509,7 +4918,8 @@
       "cat": "动作",
       "example": "椅子に座ります。",
       "exampleZh": "坐在椅子上。",
-      "id": "w410"
+      "id": "w410",
+      "level": "N5"
     },
     {
       "ja": "笑う",
@@ -4520,7 +4930,8 @@
       "cat": "动作",
       "example": "みんなが笑いました。",
       "exampleZh": "大家都笑了。",
-      "id": "w411"
+      "id": "w411",
+      "level": "N5"
     },
     {
       "ja": "泣く",
@@ -4531,7 +4942,8 @@
       "cat": "动作",
       "example": "赤ちゃんが泣いています。",
       "exampleZh": "婴儿在哭。",
-      "id": "w412"
+      "id": "w412",
+      "level": "N5"
     },
     {
       "ja": "考える",
@@ -4542,7 +4954,8 @@
       "cat": "动作",
       "example": "よく考えます。",
       "exampleZh": "仔细思考。",
-      "id": "w413"
+      "id": "w413",
+      "level": "N5"
     },
     {
       "ja": "決める",
@@ -4553,7 +4966,8 @@
       "cat": "动作",
       "example": "日付を決めます。",
       "exampleZh": "决定日期。",
-      "id": "w414"
+      "id": "w414",
+      "level": "N5"
     },
     {
       "ja": "答える",
@@ -4564,7 +4978,8 @@
       "cat": "动作",
       "example": "質問に答えます。",
       "exampleZh": "回答问题。",
-      "id": "w415"
+      "id": "w415",
+      "level": "N5"
     },
     {
       "ja": "質問する",
@@ -4575,7 +4990,8 @@
       "cat": "动作",
       "example": "先生に質問します。",
       "exampleZh": "向老师提问。",
-      "id": "w416"
+      "id": "w416",
+      "level": "N5"
     },
     {
       "ja": "開ける",
@@ -4586,7 +5002,8 @@
       "cat": "动作",
       "example": "窓を開けます。",
       "exampleZh": "开窗。",
-      "id": "w417"
+      "id": "w417",
+      "level": "N5"
     },
     {
       "ja": "閉める",
@@ -4597,7 +5014,8 @@
       "cat": "动作",
       "example": "ドアを閉めます。",
       "exampleZh": "关门。",
-      "id": "w418"
+      "id": "w418",
+      "level": "N5"
     },
     {
       "ja": "始める",
@@ -4608,7 +5026,8 @@
       "cat": "动作",
       "example": "授業を始めます。",
       "exampleZh": "开始上课。",
-      "id": "w419"
+      "id": "w419",
+      "level": "N5"
     },
     {
       "ja": "終わる",
@@ -4619,7 +5038,8 @@
       "cat": "动作",
       "example": "仕事が終わりました。",
       "exampleZh": "工作结束了。",
-      "id": "w420"
+      "id": "w420",
+      "level": "N5"
     },
     {
       "ja": "使う",
@@ -4630,7 +5050,8 @@
       "cat": "动作",
       "example": "辞書を使います。",
       "exampleZh": "使用词典。",
-      "id": "w421"
+      "id": "w421",
+      "level": "N5"
     },
     {
       "ja": "持つ",
@@ -4641,7 +5062,8 @@
       "cat": "动作",
       "example": "荷物を持ちます。",
       "exampleZh": "拿行李。",
-      "id": "w422"
+      "id": "w422",
+      "level": "N5"
     },
     {
       "ja": "取る",
@@ -4652,7 +5074,8 @@
       "cat": "动作",
       "example": "新聞を取ります。",
       "exampleZh": "取报纸。",
-      "id": "w423"
+      "id": "w423",
+      "level": "N5"
     },
     {
       "ja": "置く",
@@ -4663,7 +5086,8 @@
       "cat": "动作",
       "example": "机の上に置きます。",
       "exampleZh": "放在桌子上。",
-      "id": "w424"
+      "id": "w424",
+      "level": "N5"
     },
     {
       "ja": "払う",
@@ -4674,7 +5098,8 @@
       "cat": "动作",
       "example": "レジで払います。",
       "exampleZh": "在收银台付款。",
-      "id": "w425"
+      "id": "w425",
+      "level": "N5"
     },
     {
       "ja": "選ぶ",
@@ -4685,7 +5110,8 @@
       "cat": "动作",
       "example": "好きな色を選びます。",
       "exampleZh": "选喜欢的颜色。",
-      "id": "w426"
+      "id": "w426",
+      "level": "N5"
     },
     {
       "ja": "集める",
@@ -4696,7 +5122,8 @@
       "cat": "动作",
       "example": "切手を集めています。",
       "exampleZh": "正在收集邮票。",
-      "id": "w427"
+      "id": "w427",
+      "level": "N5"
     },
     {
       "ja": "うれしい",
@@ -4707,7 +5134,8 @@
       "cat": "形容词",
       "example": "会えてうれしいです。",
       "exampleZh": "见到你很高兴。",
-      "id": "w428"
+      "id": "w428",
+      "level": "N5"
     },
     {
       "ja": "かなしい",
@@ -4718,7 +5146,8 @@
       "cat": "形容词",
       "example": "かなしいニュースを聞きました。",
       "exampleZh": "听到了令人悲伤的新闻。",
-      "id": "w429"
+      "id": "w429",
+      "level": "N5"
     },
     {
       "ja": "さびしい",
@@ -4729,7 +5158,8 @@
       "cat": "形容词",
       "example": "一人はさびしいです。",
       "exampleZh": "一个人很寂寞。",
-      "id": "w430"
+      "id": "w430",
+      "level": "N5"
     },
     {
       "ja": "疲れた",
@@ -4740,7 +5170,8 @@
       "cat": "形容词",
       "example": "今日は疲れました。",
       "exampleZh": "今天累了。",
-      "id": "w431"
+      "id": "w431",
+      "level": "N5"
     },
     {
       "ja": "若い",
@@ -4751,7 +5182,8 @@
       "cat": "形容词",
       "example": "先生は若いです。",
       "exampleZh": "老师很年轻。",
-      "id": "w432"
+      "id": "w432",
+      "level": "N5"
     },
     {
       "ja": "親切",
@@ -4762,7 +5194,8 @@
       "cat": "形容词",
       "example": "あの人は親切です。",
       "exampleZh": "那个人很热情。",
-      "id": "w433"
+      "id": "w433",
+      "level": "N5"
     },
     {
       "ja": "厳しい",
@@ -4773,7 +5206,8 @@
       "cat": "形容词",
       "example": "父は厳しいです。",
       "exampleZh": "父亲很严格。",
-      "id": "w434"
+      "id": "w434",
+      "level": "N5"
     },
     {
       "ja": "頭がいい",
@@ -4784,7 +5218,8 @@
       "cat": "形容词",
       "example": "弟は頭がいいです。",
       "exampleZh": "弟弟很聪明。",
-      "id": "w435"
+      "id": "w435",
+      "level": "N5"
     },
     {
       "ja": "辛い",
@@ -4795,7 +5230,8 @@
       "cat": "形容词",
       "example": "このカレーは辛いです。",
       "exampleZh": "这个咖喱很辣。",
-      "id": "w436"
+      "id": "w436",
+      "level": "N5"
     },
     {
       "ja": "しょっぱい",
@@ -4806,7 +5242,8 @@
       "cat": "形容词",
       "example": "このスープはしょっぱいです。",
       "exampleZh": "这个汤很咸。",
-      "id": "w437"
+      "id": "w437",
+      "level": "N5"
     },
     {
       "ja": "酸っぱい",
@@ -4817,7 +5254,8 @@
       "cat": "形容词",
       "example": "れもんは酸っぱいです。",
       "exampleZh": "柠檬很酸。",
-      "id": "w438"
+      "id": "w438",
+      "level": "N5"
     },
     {
       "ja": "苦い",
@@ -4828,7 +5266,8 @@
       "cat": "形容词",
       "example": "コーヒーは苦いです。",
       "exampleZh": "咖啡是苦的。",
-      "id": "w439"
+      "id": "w439",
+      "level": "N5"
     },
     {
       "ja": "やわらかい",
@@ -4839,7 +5278,8 @@
       "cat": "形容词",
       "example": "このパンはやわらかいです。",
       "exampleZh": "这个面包很软。",
-      "id": "w440"
+      "id": "w440",
+      "level": "N5"
     },
     {
       "ja": "硬い",
@@ -4850,7 +5290,8 @@
       "cat": "形容词",
       "example": "この肉は硬いです。",
       "exampleZh": "这个肉很硬。",
-      "id": "w441"
+      "id": "w441",
+      "level": "N5"
     },
     {
       "ja": "明るい",
@@ -4861,7 +5302,8 @@
       "cat": "形容词",
       "example": "この部屋は明るいです。",
       "exampleZh": "这个房间很明亮。",
-      "id": "w442"
+      "id": "w442",
+      "level": "N5"
     },
     {
       "ja": "暗い",
@@ -4872,7 +5314,8 @@
       "cat": "形容词",
       "example": "夜の道は暗いです。",
       "exampleZh": "夜里的路很暗。",
-      "id": "w443"
+      "id": "w443",
+      "level": "N5"
     },
     {
       "ja": "重い",
@@ -4883,7 +5326,8 @@
       "cat": "形容词",
       "example": "このかばんは重いです。",
       "exampleZh": "这个包很重。",
-      "id": "w444"
+      "id": "w444",
+      "level": "N5"
     },
     {
       "ja": "軽い",
@@ -4894,7 +5338,8 @@
       "cat": "形容词",
       "example": "この箱は軽いです。",
       "exampleZh": "这个箱子很轻。",
-      "id": "w445"
+      "id": "w445",
+      "level": "N5"
     },
     {
       "ja": "広い",
@@ -4905,7 +5350,8 @@
       "cat": "形容词",
       "example": "公園は広いです。",
       "exampleZh": "公园很宽敞。",
-      "id": "w446"
+      "id": "w446",
+      "level": "N5"
     },
     {
       "ja": "狭い",
@@ -4916,7 +5362,8 @@
       "cat": "形容词",
       "example": "この部屋は狭いです。",
       "exampleZh": "这个房间很窄。",
-      "id": "w447"
+      "id": "w447",
+      "level": "N5"
     },
     {
       "ja": "詳しい",
@@ -4927,7 +5374,8 @@
       "cat": "形容词",
       "example": "彼は日本語に詳しいです。",
       "exampleZh": "他精通日语。",
-      "id": "w448"
+      "id": "w448",
+      "level": "N5"
     },
     {
       "ja": "簡単",
@@ -4938,7 +5386,8 @@
       "cat": "形容词",
       "example": "この問題は簡単です。",
       "exampleZh": "这个问题很简单。",
-      "id": "w449"
+      "id": "w449",
+      "level": "N5"
     },
     {
       "ja": "安全",
@@ -4949,7 +5398,8 @@
       "cat": "形容词",
       "example": "この町は安全です。",
       "exampleZh": "这个城镇很安全。",
-      "id": "w450"
+      "id": "w450",
+      "level": "N5"
     },
     {
       "ja": "危ない",
@@ -4960,7 +5410,8 @@
       "cat": "形容词",
       "example": "ここは危ないです。",
       "exampleZh": "这里很危险。",
-      "id": "w451"
+      "id": "w451",
+      "level": "N5"
     },
     {
       "ja": "初めに",
@@ -4971,7 +5422,8 @@
       "cat": "副词",
       "example": "初めに自己紹介をします。",
       "exampleZh": "首先做自我介绍。",
-      "id": "w452"
+      "id": "w452",
+      "level": "N5"
     },
     {
       "ja": "やっと",
@@ -4982,7 +5434,8 @@
       "cat": "副词",
       "example": "やっと終わりました。",
       "exampleZh": "终于结束了。",
-      "id": "w453"
+      "id": "w453",
+      "level": "N5"
     },
     {
       "ja": "実は",
@@ -4993,7 +5446,8 @@
       "cat": "副词",
       "example": "実は日本へ行きます。",
       "exampleZh": "其实我要去日本。",
-      "id": "w454"
+      "id": "w454",
+      "level": "N5"
     },
     {
       "ja": "特に",
@@ -5004,7 +5458,8 @@
       "cat": "副词",
       "example": "夏は特に暑いです。",
       "exampleZh": "夏天特别热。",
-      "id": "w455"
+      "id": "w455",
+      "level": "N5"
     },
     {
       "ja": "やはり",
@@ -5015,7 +5470,8 @@
       "cat": "副词",
       "example": "やはり好きです。",
       "exampleZh": "还是喜欢。",
-      "id": "w456"
+      "id": "w456",
+      "level": "N5"
     },
     {
       "ja": "きちんと",
@@ -5026,7 +5482,8 @@
       "cat": "副词",
       "example": "きちんと並べてください。",
       "exampleZh": "请摆放整齐。",
-      "id": "w457"
+      "id": "w457",
+      "level": "N5"
     },
     {
       "ja": "なるべく",
@@ -5037,7 +5494,8 @@
       "cat": "副词",
       "example": "なるべく早く来ます。",
       "exampleZh": "尽量早点来。",
-      "id": "w458"
+      "id": "w458",
+      "level": "N5"
     },
     {
       "ja": "だいたい",
@@ -5048,7 +5506,8 @@
       "cat": "副词",
       "example": "だいたい分かりました。",
       "exampleZh": "大致明白了。",
-      "id": "w459"
+      "id": "w459",
+      "level": "N5"
     },
     {
       "ja": "どんどん",
@@ -5059,7 +5518,8 @@
       "cat": "副词",
       "example": "日本語がどんどん上手になります。",
       "exampleZh": "日语越来越好。",
-      "id": "w460"
+      "id": "w460",
+      "level": "N5"
     },
     {
       "ja": "突然",
@@ -5070,7 +5530,8 @@
       "cat": "副词",
       "example": "突然雨が降りました。",
       "exampleZh": "突然下雨了。",
-      "id": "w461"
+      "id": "w461",
+      "level": "N5"
     },
     {
       "ja": "ちゃんと",
@@ -5081,7 +5542,8 @@
       "cat": "副词",
       "example": "ちゃんと勉強してください。",
       "exampleZh": "请好好学习。",
-      "id": "w462"
+      "id": "w462",
+      "level": "N5"
     },
     {
       "ja": "絶対",
@@ -5092,7 +5554,8 @@
       "cat": "副词",
       "example": "絶対行きます。",
       "exampleZh": "绝对去。",
-      "id": "w463"
+      "id": "w463",
+      "level": "N5"
     },
     {
       "ja": "もしかして",
@@ -5103,7 +5566,8 @@
       "cat": "副词",
       "example": "もしかして風邪ですか。",
       "exampleZh": "难道是感冒了吗？",
-      "id": "w464"
+      "id": "w464",
+      "level": "N5"
     },
     {
       "ja": "頭",
@@ -5114,7 +5578,8 @@
       "cat": "身体",
       "example": "頭が痛いです。",
       "exampleZh": "头疼。",
-      "id": "w465"
+      "id": "w465",
+      "level": "N5"
     },
     {
       "ja": "顔",
@@ -5125,7 +5590,8 @@
       "cat": "身体",
       "example": "顔を洗います。",
       "exampleZh": "洗脸。",
-      "id": "w466"
+      "id": "w466",
+      "level": "N5"
     },
     {
       "ja": "目",
@@ -5136,7 +5602,8 @@
       "cat": "身体",
       "example": "目が大きいです。",
       "exampleZh": "眼睛很大。",
-      "id": "w467"
+      "id": "w467",
+      "level": "N5"
     },
     {
       "ja": "耳",
@@ -5147,7 +5614,8 @@
       "cat": "身体",
       "example": "耳が遠いです。",
       "exampleZh": "耳朵背。",
-      "id": "w468"
+      "id": "w468",
+      "level": "N5"
     },
     {
       "ja": "鼻",
@@ -5158,7 +5626,8 @@
       "cat": "身体",
       "example": "鼻が高いです。",
       "exampleZh": "鼻梁高。",
-      "id": "w469"
+      "id": "w469",
+      "level": "N5"
     },
     {
       "ja": "口",
@@ -5169,7 +5638,8 @@
       "cat": "身体",
       "example": "口を開けてください。",
       "exampleZh": "请张嘴。",
-      "id": "w470"
+      "id": "w470",
+      "level": "N5"
     },
     {
       "ja": "歯",
@@ -5180,7 +5650,8 @@
       "cat": "身体",
       "example": "歯が痛いです。",
       "exampleZh": "牙疼。",
-      "id": "w471"
+      "id": "w471",
+      "level": "N5"
     },
     {
       "ja": "手",
@@ -5191,7 +5662,8 @@
       "cat": "身体",
       "example": "手を上げてください。",
       "exampleZh": "请举手。",
-      "id": "w472"
+      "id": "w472",
+      "level": "N5"
     },
     {
       "ja": "足",
@@ -5202,7 +5674,8 @@
       "cat": "身体",
       "example": "足が長いです。",
       "exampleZh": "腿很长。",
-      "id": "w473"
+      "id": "w473",
+      "level": "N5"
     },
     {
       "ja": "指",
@@ -5213,7 +5686,8 @@
       "cat": "身体",
       "example": "指を切りました。",
       "exampleZh": "切到手指了。",
-      "id": "w474"
+      "id": "w474",
+      "level": "N5"
     },
     {
       "ja": "肩",
@@ -5224,7 +5698,8 @@
       "cat": "身体",
       "example": "肩が痛いです。",
       "exampleZh": "肩膀疼。",
-      "id": "w475"
+      "id": "w475",
+      "level": "N5"
     },
     {
       "ja": "背",
@@ -5235,7 +5710,8 @@
       "cat": "身体",
       "example": "背が高いです。",
       "exampleZh": "个子高。",
-      "id": "w476"
+      "id": "w476",
+      "level": "N5"
     },
     {
       "ja": "お腹",
@@ -5246,7 +5722,8 @@
       "cat": "身体",
       "example": "お腹が空きました。",
       "exampleZh": "肚子饿了。",
-      "id": "w477"
+      "id": "w477",
+      "level": "N5"
     },
     {
       "ja": "胸",
@@ -5257,7 +5734,8 @@
       "cat": "身体",
       "example": "胸がいっぱいです。",
       "exampleZh": "心满意足。",
-      "id": "w478"
+      "id": "w478",
+      "level": "N5"
     },
     {
       "ja": "体",
@@ -5268,7 +5746,8 @@
       "cat": "身体",
       "example": "体にいい食べ物です。",
       "exampleZh": "是对身体好的食物。",
-      "id": "w479"
+      "id": "w479",
+      "level": "N5"
     },
     {
       "ja": "熱",
@@ -5279,7 +5758,8 @@
       "cat": "身体",
       "example": "熱があります。",
       "exampleZh": "发烧了。",
-      "id": "w480"
+      "id": "w480",
+      "level": "N5"
     },
     {
       "ja": "風邪",
@@ -5290,7 +5770,8 @@
       "cat": "身体",
       "example": "風邪をひきました。",
       "exampleZh": "感冒了。",
-      "id": "w481"
+      "id": "w481",
+      "level": "N5"
     },
     {
       "ja": "薬",
@@ -5301,7 +5782,8 @@
       "cat": "身体",
       "example": "薬を飲みます。",
       "exampleZh": "吃药。",
-      "id": "w482"
+      "id": "w482",
+      "level": "N5"
     },
     {
       "ja": "病気",
@@ -5312,7 +5794,8 @@
       "cat": "身体",
       "example": "病気になりました。",
       "exampleZh": "生病了。",
-      "id": "w483"
+      "id": "w483",
+      "level": "N5"
     },
     {
       "ja": "遊ぶ",
@@ -5323,7 +5806,8 @@
       "cat": "动作",
       "example": "公園で遊びます。",
       "exampleZh": "在公园玩。",
-      "id": "w484"
+      "id": "w484",
+      "level": "N5"
     },
     {
       "ja": "遅刻する",
@@ -5334,7 +5818,8 @@
       "cat": "动作",
       "example": "電車が遅れて遅刻しました。",
       "exampleZh": "电车晚点迟到了。",
-      "id": "w485"
+      "id": "w485",
+      "level": "N5"
     },
     {
       "ja": "急ぐ",
@@ -5345,7 +5830,8 @@
       "cat": "动作",
       "example": "明日は早いので急ぎます。",
       "exampleZh": "明天要早起，得赶紧。",
-      "id": "w486"
+      "id": "w486",
+      "level": "N5"
     },
     {
       "ja": "運ぶ",
@@ -5356,7 +5842,8 @@
       "cat": "动作",
       "example": "荷物を運びます。",
       "exampleZh": "搬运行李。",
-      "id": "w487"
+      "id": "w487",
+      "level": "N5"
     },
     {
       "ja": "壊す",
@@ -5367,7 +5854,8 @@
       "cat": "动作",
       "example": "椅子を壊してしまいました。",
       "exampleZh": "不小心把椅子弄坏了。",
-      "id": "w488"
+      "id": "w488",
+      "level": "N5"
     },
     {
       "ja": "直す",
@@ -5378,7 +5866,8 @@
       "cat": "动作",
       "example": "車を直します。",
       "exampleZh": "修车。",
-      "id": "w489"
+      "id": "w489",
+      "level": "N5"
     },
     {
       "ja": "比べる",
@@ -5389,7 +5878,8 @@
       "cat": "动作",
       "example": "二つの店を比べます。",
       "exampleZh": "比较两家店。",
-      "id": "w490"
+      "id": "w490",
+      "level": "N5"
     },
     {
       "ja": "続ける",
@@ -5400,7 +5890,8 @@
       "cat": "动作",
       "example": "勉強を続けます。",
       "exampleZh": "继续学习。",
-      "id": "w491"
+      "id": "w491",
+      "level": "N5"
     },
     {
       "ja": "祝う",
@@ -5411,7 +5902,8 @@
       "cat": "动作",
       "example": "誕生日を祝います。",
       "exampleZh": "庆祝生日。",
-      "id": "w492"
+      "id": "w492",
+      "level": "N5"
     },
     {
       "ja": "大人",
@@ -5422,7 +5914,8 @@
       "cat": "人物",
       "example": "大人も楽しめます。",
       "exampleZh": "大人也能乐在其中。",
-      "id": "w493"
+      "id": "w493",
+      "level": "N5"
     },
     {
       "ja": "老人",
@@ -5433,7 +5926,8 @@
       "cat": "人物",
       "example": "老人に席を譲ります。",
       "exampleZh": "给老人让座。",
-      "id": "w494"
+      "id": "w494",
+      "level": "N5"
     },
     {
       "ja": "今度",
@@ -5444,7 +5938,8 @@
       "cat": "时间",
       "example": "今度の日曜に会いましょう。",
       "exampleZh": "这个星期天见吧。",
-      "id": "w495"
+      "id": "w495",
+      "level": "N5"
     },
     {
       "ja": "これから",
@@ -5455,7 +5950,8 @@
       "cat": "时间",
       "example": "これから出かけます。",
       "exampleZh": "现在出门。",
-      "id": "w496"
+      "id": "w496",
+      "level": "N5"
     },
     {
       "ja": "昔",
@@ -5466,7 +5962,8 @@
       "cat": "时间",
       "example": "昔ここに寺がありました。",
       "exampleZh": "从前这里有座寺庙。",
-      "id": "w497"
+      "id": "w497",
+      "level": "N5"
     },
     {
       "ja": "ぜひ",
@@ -5477,7 +5974,8 @@
       "cat": "副词",
       "example": "ぜひ一度来てください。",
       "exampleZh": "请务必来一次。",
-      "id": "w498"
+      "id": "w498",
+      "level": "N5"
     },
     {
       "ja": "もう一度",
@@ -5488,7 +5986,8 @@
       "cat": "副词",
       "example": "もう一度説明します。",
       "exampleZh": "再说明一次。",
-      "id": "w499"
+      "id": "w499",
+      "level": "N5"
     },
     {
       "ja": "豊か",
@@ -5499,7 +5998,8 @@
       "cat": "形容词",
       "example": "経験が豊かです。",
       "exampleZh": "经验丰富。",
-      "id": "w500"
+      "id": "w500",
+      "level": "N5"
     },
     {
       "ja": "すばらしい",
@@ -5510,7 +6010,8 @@
       "cat": "形容词",
       "example": "すばらしい景色でした。",
       "exampleZh": "是绝美的景色。",
-      "id": "w501"
+      "id": "w501",
+      "level": "N5"
     },
     {
       "ja": "正しい",
@@ -5521,7 +6022,8 @@
       "cat": "形容词",
       "example": "正しい答えを選びます。",
       "exampleZh": "选择正确答案。",
-      "id": "w502"
+      "id": "w502",
+      "level": "N5"
     },
     {
       "ja": "複雑",
@@ -5532,7 +6034,8 @@
       "cat": "形容词",
       "example": "この問題は複雑です。",
       "exampleZh": "这个问题很复杂。",
-      "id": "w503"
+      "id": "w503",
+      "level": "N5"
     },
     {
       "ja": "一緒",
@@ -5543,7 +6046,8 @@
       "cat": "形容词",
       "example": "一緒に行きましょう。",
       "exampleZh": "一起去吧。",
-      "id": "w504"
+      "id": "w504",
+      "level": "N5"
     }
   ]
 }

@@ -136,8 +136,8 @@ app/src/main/java/com/japanlearn/app/
 | 文件 | 内容 | 关键字段 |
 |---|---|---|
 | `kana.json` | 五十音 | `h / k / r / group` + 示例词 |
-| `words_n5.json` | N5 单词 | `ja / kana / romaji / zh / pos / cat / example` |
-| `grammar_n5.json` | N5 语法 | `title / meaning / connection / explanation / examples / exercises` |
+| `words.json` | 单词（N5/N4） | `ja / kana / romaji / zh / pos / cat / example / level` |
+| `grammar.json` | 语法（N5/N4） | `title / meaning / connection / explanation / examples / exercises / level` |
 | `sentences.json` | 每日一句 | `scene / ja / zh / breakdown[]` |
 
 ## 路线图

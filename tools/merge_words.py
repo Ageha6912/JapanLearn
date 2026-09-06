@@ -1,9 +1,9 @@
-"""合并批次词库到 words_n5.json：去重、分配 id、版本 +1，输出统计。"""
+"""合并批次词库到 words.json：去重、分配 id、版本 +1，输出统计。"""
 import json
 from pathlib import Path
 
 CONTENT = Path(__file__).resolve().parent.parent / "app" / "src" / "main" / "assets" / "content"
-MAIN = CONTENT / "words_n5.json"
+MAIN = CONTENT / "words.json"
 
 main = json.loads(MAIN.read_text(encoding="utf-8"))
 existing_ja = {w["ja"] for w in main["words"]}

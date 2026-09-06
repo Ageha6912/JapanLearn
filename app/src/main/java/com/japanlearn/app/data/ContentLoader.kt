@@ -25,8 +25,8 @@ class ContentLoader(private val context: Context, private val db: AppDatabase) {
 
     suspend fun seedIfNeeded() {
         val kana = ContentJson.decodeFromString<KanaFile>(readAsset("kana.json"))
-        val words = ContentJson.decodeFromString<WordsFile>(readAsset("words_n5.json"))
-        val grammar = ContentJson.decodeFromString<GrammarFile>(readAsset("grammar_n5.json"))
+        val words = ContentJson.decodeFromString<WordsFile>(readAsset("words.json"))
+        val grammar = ContentJson.decodeFromString<GrammarFile>(readAsset("grammar.json"))
         val sentences = ContentJson.decodeFromString<SentencesFile>(readAsset("sentences.json"))
         val totalVersion = kana.version + words.version + grammar.version + sentences.version
 
@@ -39,7 +39,8 @@ class ContentLoader(private val context: Context, private val db: AppDatabase) {
         db.wordDao().insertAll(words.words.mapIndexed { i, w ->
             WordEntity(
                 id = w.id, ja = w.ja, kana = w.kana, romaji = w.romaji, zh = w.zh,
-                pos = w.pos, cat = w.cat, example = w.example, exampleZh = w.exampleZh, order = i,
+                pos = w.pos, cat = w.cat, example = w.example, exampleZh = w.exampleZh,
+                level = w.level, order = i,
             )
         })
         db.grammarDao().insertAll(grammar.grammar.mapIndexed { i, g ->
@@ -48,7 +49,7 @@ class ContentLoader(private val context: Context, private val db: AppDatabase) {
                 explanation = g.explanation,
                 examplesJson = ContentJson.encodeToString(g.examples),
                 exercisesJson = ContentJson.encodeToString(g.exercises),
-                order = i,
+                level = g.level, order = i,
             )
         })
         db.sentenceDao().insertAll(sentences.sentences.mapIndexed { i, s ->

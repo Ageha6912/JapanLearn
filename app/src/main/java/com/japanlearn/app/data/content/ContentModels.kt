@@ -25,6 +25,7 @@ data class WordItem(
     val cat: String,
     val example: String,
     val exampleZh: String,
+    val level: String = "N5",
 )
 
 @Serializable
@@ -39,6 +40,7 @@ data class GrammarItem(
     val explanation: String,
     val examples: List<Example>,
     val exercises: List<Exercise>,
+    val level: String = "N5",
 )
 
 @Serializable

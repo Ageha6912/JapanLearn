@@ -1,9 +1,9 @@
-"""合并新语法到 grammar_n5.json：分配 id、版本 +1。"""
+"""合并新语法到 grammar.json：分配 id、版本 +1。"""
 import json
 from pathlib import Path
 
 CONTENT = Path(__file__).resolve().parent.parent / "app" / "src" / "main" / "assets" / "content"
-MAIN = CONTENT / "grammar_n5.json"
+MAIN = CONTENT / "grammar.json"
 BATCH = Path(__file__).resolve().parent / "new_grammar.json"
 
 main = json.loads(MAIN.read_text(encoding="utf-8"))
