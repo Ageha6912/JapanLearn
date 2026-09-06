@@ -106,6 +106,10 @@ fun ProfileScreen(nav: NavHostController) {
     val vm: ProfileViewModel = androidx.lifecycle.viewmodel.compose.viewModel { ProfileViewModel(app) }
     val state by vm.uiState.collectAsStateWithLifecycle()
     var showResetDialog by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+    val permissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission(),
+    ) { }
 
     if (showResetDialog) {
         AlertDialog(
@@ -217,39 +221,37 @@ fun ProfileScreen(nav: NavHostController) {
 
             StaggerIn(3) {
                 SectionCard(title = "提醒") {
-                val context = LocalContext.current
-                val permissionLauncher = rememberLauncherForActivityResult(
-                    ActivityResultContracts.RequestPermission(),
-                ) { }
-                Row(
-                    Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Column(Modifier.weight(1f)) {
-                        Text("每日复习提醒", style = MaterialTheme.typography.titleSmall)
-                        Text(
-                            "每天 20:00 检查一次，有到期内容时提醒",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    Row(
+                        Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Column(Modifier.weight(1f)) {
+                            Text("每日复习提醒", style = MaterialTheme.typography.titleSmall)
+                            Text(
+                                "每天 20:00 检查一次，有到期内容时提醒",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
+                        Switch(
+                            checked = state.reminderEnabled,
+                            onCheckedChange = { enabled ->
+                                if (enabled && Build.VERSION.SDK_INT >= 33 &&
+                                    ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) !=
+                                    PackageManager.PERMISSION_GRANTED
+                                ) {
+                                    permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                                }
+                                vm.setReminderEnabled(context, enabled)
+                            },
                         )
                     }
-                    Switch(
-                        checked = state.reminderEnabled,
-                        onCheckedChange = { enabled ->
-                            if (enabled && Build.VERSION.SDK_INT >= 33 &&
-                                ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) !=
-                                PackageManager.PERMISSION_GRANTED
-                            ) {
-                                permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-                            }
-                            vm.setReminderEnabled(context, enabled)
-                        },
-                    )
                 }
             }
 
-            SectionCard(title = "数据") {
+            StaggerIn(4) {
+                SectionCard(title = "数据") {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
