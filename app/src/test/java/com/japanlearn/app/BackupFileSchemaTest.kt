@@ -70,4 +70,25 @@ class BackupFileSchemaTest {
         assertNull(BackupFileSchema.parse("{ not a json "))
         assertNull(BackupFileSchema.parse(""))
     }
+
+    @Test
+    fun `导入归一化 清空自增主键避免与本地冲突`() {
+        val withIds = BackupFile(
+            schema = BackupFileSchema.CURRENT,
+            version = 1,
+            exportedAt = 0,
+            progress = listOf(progress.copy(rowId = 7)),
+            reviewRecords = listOf(
+                com.japanlearn.app.data.local.ReviewRecordEntity(
+                    id = 3, contentType = "word", contentId = "w001",
+                    correct = true, masteryAfter = 2, reviewedAt = 1L, nextDueAt = 2L,
+                ),
+            ),
+        )
+        val normalized = BackupFileSchema.normalizeForImport(withIds)
+        assertEquals(0, normalized.progress.single().rowId)
+        assertEquals(0, normalized.reviewRecords.single().id)
+        // 归一化不改动其余字段
+        assertEquals(progress.copy(rowId = 0), normalized.progress.single())
+    }
 }

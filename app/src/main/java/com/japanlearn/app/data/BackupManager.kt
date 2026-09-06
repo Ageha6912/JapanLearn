@@ -49,11 +49,21 @@ class BackupManager(private val db: AppDatabase) {
     )
 
     suspend fun import(file: BackupFile): BackupSummary {
-        file.progress.forEach { db.progressDao().upsert(it) }
-        file.wrongAnswers.forEach { db.wrongAnswerDao().upsert(it) }
-        file.dailyStudy.forEach { db.dailyStudyDao().upsert(it) }
-        file.reviewRecords.forEach { db.reviewRecordDao().insert(it) }
-        return BackupSummary(file.progress.size, file.wrongAnswers.size, file.dailyStudy.size, file.reviewRecords.size)
+        val normalized = BackupFileSchema.normalizeForImport(file)
+        normalized.progress.forEach {
+            // progress 的业务键是 (contentType, contentId)：沿用本地行主键做覆盖，避免 unique index 冲突
+            val local = db.progressDao().get(it.contentType, it.contentId)
+            db.progressDao().upsert(it.copy(rowId = local?.rowId ?: 0))
+        }
+        normalized.wrongAnswers.forEach { db.wrongAnswerDao().upsert(it) }
+        normalized.dailyStudy.forEach { db.dailyStudyDao().upsert(it) }
+        normalized.reviewRecords.forEach { db.reviewRecordDao().insert(it) }
+        return BackupSummary(
+            normalized.progress.size,
+            normalized.wrongAnswers.size,
+            normalized.dailyStudy.size,
+            normalized.reviewRecords.size,
+        )
     }
 }
 
@@ -71,6 +81,15 @@ object BackupFileSchema {
     } catch (_: Exception) {
         null
     }
+
+    /**
+     * 导入前的归一化：清掉备份中的自增主键（rowId / id 交由本地重新分配），
+     * 使同一份备份可重复导入、且不与本地已有记录的主键冲突。
+     */
+    fun normalizeForImport(file: BackupFile): BackupFile = file.copy(
+        progress = file.progress.map { it.copy(rowId = 0) },
+        reviewRecords = file.reviewRecords.map { it.copy(id = 0) },
+    )
 
     fun encode(file: BackupFile): String = json.encodeToString(file)
 }
