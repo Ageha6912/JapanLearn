@@ -45,6 +45,7 @@ import com.japanlearn.app.LocalAppContainer
 import com.japanlearn.app.Routes
 import com.japanlearn.app.data.local.WordEntity
 import com.japanlearn.app.domain.AudioQuizPolicy
+import com.japanlearn.app.domain.KanjiQuizPolicy
 import com.japanlearn.app.domain.Mastery
 import com.japanlearn.app.domain.Quiz
 import com.japanlearn.app.domain.QuizGenerator
@@ -208,13 +209,16 @@ class WordSessionViewModel(
         val word = current ?: return
         directionToggle = !directionToggle
         val direction = if (directionToggle) WordQuizDirection.JP_TO_CN else WordQuizDirection.CN_TO_JP
-        val audio = AudioQuizPolicy.shouldUseAudio(direction, kotlin.random.Random.nextDouble())
+        val target = QuizWord(word.id, word.ja, word.kana, word.zh)
+        val quiz = if (KanjiQuizPolicy.shouldUseKanji(word.ja, word.kana, kotlin.random.Random.nextDouble())) {
+            // 汉字变体：JP→CN 出看假名选汉字，CN→JP 出看汉字选读音
+            QuizGenerator.kanjiQuiz(target, pool, toKanji = direction == WordQuizDirection.JP_TO_CN)
+        } else {
+            val audio = AudioQuizPolicy.shouldUseAudio(direction, kotlin.random.Random.nextDouble())
+            QuizGenerator.wordQuiz(target, pool, direction, audio = audio)
+        }
         _state.update {
-            it.copy(
-                phase = SessionPhase.QUIZ,
-                quiz = QuizGenerator.wordQuiz(QuizWord(word.id, word.ja, word.kana, word.zh), pool, direction, audio = audio),
-                selected = null,
-            )
+            it.copy(phase = SessionPhase.QUIZ, quiz = quiz, selected = null)
         }
     }
 

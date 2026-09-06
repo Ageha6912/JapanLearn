@@ -49,6 +49,7 @@ import com.japanlearn.app.data.exercises
 import com.japanlearn.app.data.local.GrammarEntity
 import com.japanlearn.app.data.local.WordEntity
 import com.japanlearn.app.domain.AudioQuizPolicy
+import com.japanlearn.app.domain.KanjiQuizPolicy
 import com.japanlearn.app.domain.Mastery
 import com.japanlearn.app.domain.Quiz
 import com.japanlearn.app.domain.QuizGenerator
@@ -246,13 +247,13 @@ class ReviewSessionViewModel(private val app: AppContainer) : ViewModel() {
         is ReviewItem.WordItem -> {
             directionToggle = !directionToggle
             val direction = if (directionToggle) WordQuizDirection.JP_TO_CN else WordQuizDirection.CN_TO_JP
-            val audio = AudioQuizPolicy.shouldUseAudio(direction, kotlin.random.Random.nextDouble())
-            QuizGenerator.wordQuiz(
-                QuizWord(item.word.id, item.word.ja, item.word.kana, item.word.zh),
-                poolOf(item.word.id),
-                direction,
-                audio = audio,
-            )
+            val target = QuizWord(item.word.id, item.word.ja, item.word.kana, item.word.zh)
+            if (KanjiQuizPolicy.shouldUseKanji(item.word.ja, item.word.kana, kotlin.random.Random.nextDouble())) {
+                QuizGenerator.kanjiQuiz(target, poolOf(item.word.id), toKanji = direction == WordQuizDirection.JP_TO_CN)
+            } else {
+                val audio = AudioQuizPolicy.shouldUseAudio(direction, kotlin.random.Random.nextDouble())
+                QuizGenerator.wordQuiz(target, poolOf(item.word.id), direction, audio = audio)
+            }
         }
         is ReviewItem.GrammarItem -> {
             val ex = item.grammar.exercises().first()

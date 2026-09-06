@@ -133,4 +133,85 @@ class QuizGeneratorTest {
         assertFalse(AudioQuizPolicy.shouldUseAudio(WordQuizDirection.CN_TO_JP, roll = 0.0))
         assertTrue(AudioQuizPolicy.shouldUseAudio(WordQuizDirection.JP_TO_CN, roll = 0.05, chance = 0.5))
     }
+
+    // ---------------- 汉字题型（v0.3） ----------------
+
+    /** 汉字词池：ja 与 kana 不同形 */
+    private val kanjiPool = listOf(
+        QuizWord("w1", "食べる", "たべる", "吃"),
+        QuizWord("w2", "飲む", "のむ", "喝"),
+        QuizWord("w3", "見る", "みる", "看"),
+        QuizWord("w4", "買う", "かう", "买"),
+        QuizWord("w5", "行く", "いく", "去"),
+        QuizWord("w6", "来る", "くる", "来"),
+    )
+
+    @Test
+    fun `看假名选汉字 题干为假名 选项含正确汉字`() {
+        repeat(20) { seed ->
+            val quiz = QuizGenerator.kanjiQuiz(kanjiPool[0], kanjiPool, toKanji = true, random = Random(seed))
+            assertEquals(QuizKind.KANA_TO_KANJI, quiz.kind)
+            assertEquals(4, quiz.options.size)
+            assertEquals(quiz.options.size, quiz.options.toSet().size)
+            assertEquals("食べる", quiz.options[quiz.answerIndex])
+            assertTrue(quiz.question.contains("たべる"))
+            // 干扰项不与正确答案重复
+            val others = quiz.options.filterIndexed { i, _ -> i != quiz.answerIndex }
+            assertTrue(others.none { it == "食べる" })
+        }
+    }
+
+    @Test
+    fun `看汉字选读音 选项均为假名且含正确读音`() {
+        repeat(20) { seed ->
+            val quiz = QuizGenerator.kanjiQuiz(kanjiPool[0], kanjiPool, toKanji = false, random = Random(seed))
+            assertEquals(QuizKind.KANJI_TO_KANA, quiz.kind)
+            assertEquals(4, quiz.options.size)
+            assertEquals(quiz.options.size, quiz.options.toSet().size)
+            assertEquals("たべる", quiz.options[quiz.answerIndex])
+            assertTrue(quiz.question.contains("食べる"))
+            val kanaOnly = setOf("たべる", "のむ", "みる", "かう", "いく", "くる")
+            assertTrue(quiz.options.all { it in kanaOnly })
+        }
+    }
+
+    @Test
+    fun `汉字题池不足时退化为更少选项但答案仍在`() {
+        val small = kanjiPool.take(2)
+        val quiz = QuizGenerator.kanjiQuiz(small[0], small, toKanji = true, random = Random(3))
+        assertTrue(quiz.options.size in 2..4)
+        assertEquals("食べる", quiz.options[quiz.answerIndex])
+    }
+
+    @Test
+    fun `看假名选汉字 同音异形词不作干扰项`() {
+        val target = QuizWord("hashi1", "箸", "はし", "筷子")
+        val pool = listOf(
+            target,
+            QuizWord("hashi2", "橋", "はし", "桥"),
+            QuizWord("w2", "飲む", "のむ", "喝"),
+            QuizWord("w3", "見る", "みる", "看"),
+            QuizWord("w4", "買う", "かう", "买"),
+        )
+        repeat(20) { seed ->
+            val quiz = QuizGenerator.kanjiQuiz(target, pool, toKanji = true, random = Random(seed))
+            assertTrue(quiz.options.none { it == "橋" })
+        }
+    }
+
+    @Test
+    fun `汉字触发策略 无汉字形不触发`() {
+        assertFalse(KanjiQuizPolicy.hasKanjiForm("うれしい", "うれしい"))
+        assertFalse(KanjiQuizPolicy.shouldUseKanji("うれしい", "うれしい", 0.0))
+        // kana 与 ja 相同（写法一致）不触发
+        assertFalse(KanjiQuizPolicy.hasKanjiForm("キリン", "キリン"))
+    }
+
+    @Test
+    fun `汉字触发策略 有汉字形时按概率触发`() {
+        assertTrue(KanjiQuizPolicy.hasKanjiForm("食べる", "たべる"))
+        assertFalse(KanjiQuizPolicy.shouldUseKanji("食べる", "たべる", 0.25))
+        assertTrue(KanjiQuizPolicy.shouldUseKanji("食べる", "たべる", 0.24))
+        assertTrue(KanjiQuizPolicy.shouldUseKanji("食べる", "たべる", 0.9, chance = 0.95))
+    }
 }

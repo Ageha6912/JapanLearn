@@ -2,7 +2,7 @@ package com.japanlearn.app.domain
 
 import kotlin.random.Random
 
-enum class QuizKind { WORD_JP_TO_CN, AUDIO_WORD_JP_TO_CN, WORD_CN_TO_JP, KANA_TO_ROMAJI, GRAMMAR_FILL }
+enum class QuizKind { WORD_JP_TO_CN, AUDIO_WORD_JP_TO_CN, WORD_CN_TO_JP, KANA_TO_ROMAJI, GRAMMAR_FILL, KANA_TO_KANJI, KANJI_TO_KANA }
 
 /**
  * 一道选择题。练习题生成是纯函数，便于单元测试。
@@ -47,6 +47,16 @@ object AudioQuizPolicy {
 
     fun shouldUseAudio(direction: WordQuizDirection, roll: Double, chance: Double = DEFAULT_CHANCE): Boolean =
         direction == WordQuizDirection.JP_TO_CN && roll < chance
+}
+
+/** 汉字题触发判定（v0.3）：词带汉字写法（ja 与 kana 不同形）时以给定概率出「假名⇄汉字」变体。 */
+object KanjiQuizPolicy {
+    const val DEFAULT_CHANCE = 0.25
+
+    fun hasKanjiForm(ja: String, kana: String): Boolean = ja != kana && ja.any { it in '\u4E00'..'\u9FFF' }
+
+    fun shouldUseKanji(ja: String, kana: String, roll: Double, chance: Double = DEFAULT_CHANCE): Boolean =
+        hasKanjiForm(ja, kana) && roll < chance
 }
 
 /**
@@ -115,6 +125,54 @@ object QuizGenerator {
             options = options,
             answerIndex = options.indexOf(answerText),
         )
+    }
+
+    /**
+     * 汉字题（v0.3）：
+     * - toKanji = true：看假名选汉字写法，选项均为汉字词；干扰项不取与目标同读音的词（避免同音歧义）
+     * - toKanji = false：看汉字选读音，选项均为假名
+     * 目标词必须带汉字写法（hasKanjiForm），由调用方经 KanjiQuizPolicy 保证。
+     */
+    fun kanjiQuiz(target: QuizWord, pool: List<QuizWord>, toKanji: Boolean, random: Random = Random.Default): Quiz {
+        require(target.ja != target.kana) { "kanjiQuiz 需要汉字形目标词" }
+        return if (toKanji) {
+            val answerText = target.ja
+            val distractors = pool.asSequence()
+                .filter { it.id != target.id }
+                .filter { it.kana != target.kana }
+                .map { it.ja }
+                .filter { it != answerText }
+                .distinct()
+                .shuffled(random)
+                .take(OPTION_COUNT - 1)
+                .toList()
+            val options = (distractors + answerText).shuffled(random)
+            Quiz(
+                kind = QuizKind.KANA_TO_KANJI,
+                question = "「${target.kana}」的汉字写法是？",
+                subQuestion = "意思：${target.zh}",
+                options = options,
+                answerIndex = options.indexOf(answerText),
+            )
+        } else {
+            val answerText = target.kana
+            val distractors = pool.asSequence()
+                .filter { it.id != target.id }
+                .map { it.kana }
+                .filter { it != answerText }
+                .distinct()
+                .shuffled(random)
+                .take(OPTION_COUNT - 1)
+                .toList()
+            val options = (distractors + answerText).shuffled(random)
+            Quiz(
+                kind = QuizKind.KANJI_TO_KANA,
+                question = "「${target.ja}」的读音是？",
+                subQuestion = "意思：${target.zh}",
+                options = options,
+                answerIndex = options.indexOf(answerText),
+            )
+        }
     }
 
     fun kanaQuiz(target: QuizKana, pool: List<QuizKana>, random: Random = Random.Default): Quiz {
