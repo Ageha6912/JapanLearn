@@ -56,6 +56,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import com.japanlearn.app.AppContainer
 import com.japanlearn.app.LocalAppContainer
+import com.japanlearn.app.navigateToTab
 import com.japanlearn.app.Routes
 import com.japanlearn.app.data.ThemeMode
 import com.japanlearn.app.data.breakdown
@@ -431,7 +432,7 @@ fun HomeScreen(nav: NavHostController) {
             HorizontalDivider()
             TextButton(onClick = {
                 showSettings = false
-                nav.navigate(Routes.PROFILE)
+                nav.navigateToTab(Routes.PROFILE)
             }) { Text("全部设置") }
             Text(
                 "JapanLearn v" + com.japanlearn.app.BuildConfig.VERSION_NAME,

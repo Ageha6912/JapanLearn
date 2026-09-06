@@ -157,7 +157,7 @@ fun MainRoot(navTarget: String? = null) {
     // 通知深链：跳转到复习 Tab
     LaunchedEffect(navTarget) {
         if (navTarget == com.japanlearn.app.work.ReviewReminder.NAVIGATE_REVIEW) {
-            navController.navigate(Routes.REVIEW) { launchSingleTop = true }
+            navController.navigateToTab(Routes.REVIEW)
         }
     }
 
@@ -272,12 +272,8 @@ private fun JapanBottomBar(navController: NavHostController, currentRoute: Strin
                         verticalArrangement = Arrangement.spacedBy(2.dp),
                         modifier = Modifier
                             .clip(RoundedCornerShape(100))
-                            .clickableNoRipple { 
-                                navController.navigate(item.route) {
-                                    popUpTo(navController.graph.findStartDestination().id) { saveState = true }
-                                    launchSingleTop = true
-                                    restoreState = true
-                                }
+                            .clickableNoRipple {
+                                navController.navigateToTab(item.route)
                             }
                             .padding(horizontal = 12.dp, vertical = 8.dp),
                     ) {
@@ -319,4 +315,13 @@ private fun Modifier.clickableNoRipple(onClick: () -> Unit): Modifier = composed
         indication = null,
         onClick = onClick,
     )
+}
+
+/** Tab 间切换的唯一入口：清到起始目的地 + 单例 + 状态保存恢复，避免把 Tab 页压成返回栈层级。 */
+fun NavHostController.navigateToTab(route: String) {
+    navigate(route) {
+        popUpTo(graph.findStartDestination().id) { saveState = true }
+        launchSingleTop = true
+        restoreState = true
+    }
 }
