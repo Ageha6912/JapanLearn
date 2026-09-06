@@ -26,6 +26,10 @@ jobs:
       - name: Build debug APK
         run: ./gradlew :app:assembleDebug --console=plain
 
+      # 验证 R8 不破坏 release 构建（keystore 不上云，构建产物为未签名 APK）
+      - name: Build release APK (unsigned)
+        run: ./gradlew :app:assembleRelease --console=plain
+
       - name: Upload test reports on failure
         if: failure()
         uses: actions/upload-artifact@v4
