@@ -7,6 +7,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.animation.AnimatedVisibility
@@ -18,6 +19,7 @@ import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -67,6 +69,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.japanlearn.app.data.ThemeMode
 import com.japanlearn.app.ui.home.HomeScreen
 import com.japanlearn.app.ui.kana.KanaQuizScreen
 import com.japanlearn.app.ui.kana.KanaScreen
@@ -126,8 +129,15 @@ class MainActivity : ComponentActivity() {
         navigateTo.value = intent?.getStringExtra(ReviewReminder.EXTRA_NAVIGATE_TO)
         setContent {
             val container = (application as JapanLearnApp).container
+            val themeMode by container.settings.themeMode.collectAsStateWithLifecycle()
             CompositionLocalProvider(LocalAppContainer provides container) {
-                JapanLearnTheme {
+                JapanLearnTheme(
+                    darkTheme = when (themeMode) {
+                        ThemeMode.SYSTEM -> isSystemInDarkTheme()
+                        ThemeMode.LIGHT -> false
+                        ThemeMode.DARK -> true
+                    },
+                ) {
                     MainRoot(navTarget = navigateTo.value)
                 }
             }

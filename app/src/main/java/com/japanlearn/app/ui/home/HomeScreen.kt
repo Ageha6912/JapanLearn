@@ -1,5 +1,8 @@
 package com.japanlearn.app.ui.home
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -13,13 +16,20 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Switch
+import androidx.compose.material3.TextButton
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.MenuBook
+import androidx.compose.material.icons.automirrored.outlined.NavigateNext
 import androidx.compose.material.icons.filled.LocalFireDepartment
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.EditNote
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -29,10 +39,17 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.TransformOrigin
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
@@ -40,6 +57,8 @@ import androidx.navigation.NavHostController
 import com.japanlearn.app.AppContainer
 import com.japanlearn.app.LocalAppContainer
 import com.japanlearn.app.Routes
+import com.japanlearn.app.data.ThemeMode
+import com.japanlearn.app.data.breakdown
 import com.japanlearn.app.data.local.SentenceEntity
 import com.japanlearn.app.ui.components.AppButton
 import com.japanlearn.app.ui.components.SectionCard
@@ -51,6 +70,9 @@ import com.japanlearn.app.ui.motion.AnimatedProgressBar
 import com.japanlearn.app.ui.motion.ConfettiBurst
 import com.japanlearn.app.ui.motion.ProgressRing
 import com.japanlearn.app.ui.motion.StaggerIn
+import com.japanlearn.app.ui.motion.PopupAnchor
+import com.japanlearn.app.ui.motion.TransformCardPopup
+import com.japanlearn.app.ui.motion.popupBackgroundScale
 import com.japanlearn.app.ui.motion.pressScale
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -133,8 +155,20 @@ fun HomeScreen(nav: NavHostController) {
     val canStartWords = wordsRemaining > 0
     val canStartReview = dueToday > 0
 
+    var showSettings by remember { mutableStateOf(false) }
+    var showSentence by remember { mutableStateOf(false) }
+    val popupVisible = showSettings || showSentence
+    val bgScale = popupBackgroundScale(popupVisible)
+    val bgOrigin = if (showSettings) TransformOrigin(1f, 0f) else TransformOrigin(0.5f, 1f)
+
     Box(Modifier.fillMaxSize()) {
-        Scaffold { padding ->
+        Scaffold(
+            modifier = Modifier.graphicsLayer {
+                scaleX = bgScale
+                scaleY = bgScale
+                transformOrigin = bgOrigin
+            },
+        ) { padding ->
             Column(
                 Modifier
                     .padding(padding)
@@ -177,6 +211,20 @@ fun HomeScreen(nav: NavHostController) {
                                         )
                                     }
                                 }
+                            }
+                            Spacer(Modifier.width(10.dp))
+                            Surface(
+                                onClick = { showSettings = true },
+                                shape = CircleShape,
+                                color = MaterialTheme.colorScheme.surfaceContainerHigh,
+                                border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+                            ) {
+                                Icon(
+                                    Icons.Filled.Settings,
+                                    contentDescription = "设置",
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    modifier = Modifier.padding(10.dp).size(20.dp),
+                                )
                             }
                         }
                     }
@@ -279,26 +327,44 @@ fun HomeScreen(nav: NavHostController) {
                     }
                 }
 
-                // 今日一句
+                // 今日一句：底部横条按钮，点击弹出完整卡片（容器变换）
                 val sentence = state.sentence
                 if (sentence != null) {
                     StaggerIn(4) {
-                        val interaction = remember { MutableInteractionSource() }
-                        SectionCard(title = "今日一句 · ${sentence.scene}", onClick = { nav.navigate(Routes.sentence(state.sentenceIndex)) }) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Column(Modifier.weight(1f)) {
-                                    Text(
-                                        sentence.ja,
-                                        style = MaterialTheme.typography.titleLarge,
-                                    )
-                                    Spacer(Modifier.height(4.dp))
-                                    Text(
-                                        sentence.zh,
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    )
-                                }
-                                TtsButton(sentence.ja, onSpeak = { vm.speak(it) })
+                        Surface(
+                            onClick = { showSentence = true },
+                            shape = CircleShape,
+                            color = MaterialTheme.colorScheme.surfaceContainerHigh,
+                            border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+                            modifier = Modifier.fillMaxWidth(),
+                        ) {
+                            Row(
+                                Modifier.padding(horizontal = 18.dp, vertical = 14.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                            ) {
+                                Icon(
+                                    Icons.AutoMirrored.Filled.MenuBook,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.secondary,
+                                    modifier = Modifier.size(20.dp),
+                                )
+                                Text("今日一句", style = MaterialTheme.typography.titleSmall)
+                                Spacer(Modifier.weight(1f))
+                                Text(
+                                    sentence.ja,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                    modifier = Modifier.weight(1.4f),
+                                )
+                                Icon(
+                                    Icons.AutoMirrored.Outlined.NavigateNext,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    modifier = Modifier.size(18.dp),
+                                )
                             }
                         }
                     }
@@ -310,6 +376,102 @@ fun HomeScreen(nav: NavHostController) {
 
         // 今日任务全部完成时撒彩带
         ConfettiBurst(trigger = if (allDone && todayDone > 0) 1 else 0)
+
+        // 设置卡片：从右上角按钮生长弹出
+        TransformCardPopup(visible = showSettings, anchor = PopupAnchor.TopEnd, onDismiss = { showSettings = false }) {
+            val context = LocalContext.current
+            val themeMode by app.settings.themeMode.collectAsStateWithLifecycle()
+            val reminderEnabled by app.settings.reminderEnabled.collectAsStateWithLifecycle()
+            val permissionLauncher = androidx.activity.compose.rememberLauncherForActivityResult(
+                androidx.activity.result.contract.ActivityResultContracts.RequestPermission(),
+            ) { }
+            Text("设置", style = MaterialTheme.typography.titleLarge)
+            Text("外观", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                listOf(
+                    ThemeMode.SYSTEM to "跟随系统",
+                    ThemeMode.LIGHT to "浅色",
+                    ThemeMode.DARK to "深色",
+                ).forEach { (mode, label) ->
+                    FilterChip(
+                        selected = themeMode == mode,
+                        onClick = { app.settings.setThemeMode(mode) },
+                        label = { Text(label) },
+                    )
+                }
+            }
+            HorizontalDivider()
+            Row(
+                Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Column {
+                    Text("每日复习提醒", style = MaterialTheme.typography.titleSmall)
+                    Text(
+                        "每天 20:00 检查到期内容",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+                Switch(
+                    checked = reminderEnabled,
+                    onCheckedChange = { enabled ->
+                        if (enabled && Build.VERSION.SDK_INT >= 33 &&
+                            ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) !=
+                            PackageManager.PERMISSION_GRANTED
+                        ) {
+                            permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                        }
+                        app.settings.setReminderEnabled(enabled)
+                        com.japanlearn.app.work.ReviewReminder.schedule(context, enabled)
+                    },
+                )
+            }
+            HorizontalDivider()
+            TextButton(onClick = {
+                showSettings = false
+                nav.navigate(Routes.PROFILE)
+            }) { Text("全部设置") }
+            Text(
+                "JapanLearn v" + com.japanlearn.app.BuildConfig.VERSION_NAME,
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+
+        // 今日一句卡片：从底部横条生长弹出
+        TransformCardPopup(visible = showSentence, anchor = PopupAnchor.BottomCenter, onDismiss = { showSentence = false }) {
+            state.sentence?.let { s2 ->
+                Surface(shape = MaterialTheme.shapes.small, color = MaterialTheme.colorScheme.secondaryContainer) {
+                    Text(
+                        "今日一句 · " + s2.scene,
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSecondaryContainer,
+                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+                    )
+                }
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Text(s2.ja, style = MaterialTheme.typography.headlineSmall, modifier = Modifier.weight(1f))
+                    TtsButton(s2.ja, onSpeak = { vm.speak(it) })
+                }
+                Text(s2.zh, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                HorizontalDivider()
+                Text("词汇拆解", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    s2.breakdown().forEach { b ->
+                        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            Text(b.t, style = MaterialTheme.typography.titleSmall)
+                            Text(
+                                b.zh,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 

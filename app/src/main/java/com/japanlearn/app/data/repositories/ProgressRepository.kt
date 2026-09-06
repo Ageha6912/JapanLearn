@@ -19,6 +19,18 @@ import java.time.ZoneId
 
 // ---------------- 学习目标 / 设置 ----------------
 
+/** 主题模式：跟随系统 / 浅色 / 深色。 */
+enum class ThemeMode {
+    SYSTEM,
+    LIGHT,
+    DARK;
+
+    companion object {
+        /** 非法或缺失值回退 SYSTEM（持久化解析的纯函数，便于测试）。 */
+        fun fromRaw(raw: String?): ThemeMode = entries.firstOrNull { it.name == raw } ?: SYSTEM
+    }
+}
+
 class SettingsRepository(context: Context) {
     private val prefs = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
 
@@ -27,6 +39,12 @@ class SettingsRepository(context: Context) {
     val dailyReviewCap = MutableStateFlow(prefs.getInt(KEY_REVIEW_CAP, DEFAULT_REVIEW_CAP))
     val reminderEnabled = MutableStateFlow(prefs.getBoolean(KEY_REMINDER, false))
     val studyLevel = MutableStateFlow(prefs.getString(KEY_STUDY_LEVEL, DEFAULT_STUDY_LEVEL) ?: DEFAULT_STUDY_LEVEL)
+    val themeMode = MutableStateFlow(ThemeMode.fromRaw(prefs.getString(KEY_THEME, null)))
+
+    fun setThemeMode(value: ThemeMode) {
+        prefs.edit().putString(KEY_THEME, value.name).apply()
+        themeMode.value = value
+    }
 
     fun setStudyLevel(value: String) {
         prefs.edit().putString(KEY_STUDY_LEVEL, value).apply()
@@ -62,6 +80,7 @@ class SettingsRepository(context: Context) {
         private const val KEY_REVIEW_CAP = "daily_review_cap"
         private const val KEY_REMINDER = "reminder_enabled"
         private const val KEY_STUDY_LEVEL = "study_level"
+        private const val KEY_THEME = "theme_mode"
         const val DEFAULT_STUDY_LEVEL = "N5"
         val STUDY_LEVELS = listOf("N5", "N4")
     }
