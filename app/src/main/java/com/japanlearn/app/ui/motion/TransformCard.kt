@@ -1,7 +1,7 @@
 package com.japanlearn.app.ui.motion
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -46,9 +46,8 @@ private fun PopupAnchor.alignment() = when (this) {
 }
 
 /**
- * 容器变换弹出卡片（视频同款动效）：
- * 打开时从触发角一边放大一边到位，spring 带过冲（冲过头一点点再收回）；
- * 关闭时原路缩回触发点。背景由调用方经 [popupBackgroundScale] 做轻微缩退。
+ * 容器变换弹出卡片：打开时从触发角一边放大一边到位，spring 带一次轻微过冲；
+ * 关闭时原路缩回触发点。背景仅加遮罩变暗，尺寸保持不变。
  * 系统开启「减弱动画」时退化为快速淡入淡出。
  */
 @Composable
@@ -75,32 +74,37 @@ fun TransformCardPopup(
         )
     }
 
-    // 卡片：贴着触发角对齐，从 0 放大到 1（spring 过冲回弹）
+    // 卡片：贴着触发角对齐，从 0 放大到 1
+    // 弹出节奏与视频一致：约 600ms 从容到位，带一次轻微过冲（冲过头一点点再收回）
     Box(
         modifier = modifier
             .fillMaxSize()
-            .padding(horizontal = 24.dp, vertical = 48.dp),
+            .padding(horizontal = 40.dp, vertical = 52.dp),
         contentAlignment = anchor.alignment(),
     ) {
         AnimatedVisibility(
             visible = visible,
             enter = scaleIn(
-                animationSpec = if (reduce) tween(150) else MotionTokens.springBouncy(),
+                animationSpec = if (reduce) {
+                    tween(150)
+                } else {
+                    spring(dampingRatio = 0.72f, stiffness = 260f)
+                },
                 initialScale = 0f,
                 transformOrigin = origin,
-            ) + fadeIn(tween(160)),
+            ) + fadeIn(tween(220)),
             exit = scaleOut(
-                animationSpec = if (reduce) tween(150) else tween(220, easing = MotionTokens.Emphasized),
+                animationSpec = if (reduce) tween(150) else tween(240, easing = MotionTokens.Emphasized),
                 targetScale = 0f,
                 transformOrigin = origin,
-            ) + fadeOut(tween(160)),
+            ) + fadeOut(tween(180)),
         ) {
             Surface(
                 shape = MaterialTheme.shapes.extraLarge,
                 color = MaterialTheme.colorScheme.surfaceContainerHigh,
                 tonalElevation = 3.dp,
                 shadowElevation = 16.dp,
-                modifier = Modifier.widthIn(max = 360.dp),
+                modifier = Modifier.widthIn(max = 320.dp),
             ) {
                 Column(
                     Modifier.padding(20.dp),
@@ -111,12 +115,3 @@ fun TransformCardPopup(
         }
     }
 }
-
-/** 弹窗打开时宿主页面的缩退系数（1 → 0.96），配合遮罩营造「退后」层次。 */
-@Composable
-fun popupBackgroundScale(visible: Boolean, reduceMotion: Boolean = rememberReducedMotion()): Float =
-    animateFloatAsState(
-        targetValue = if (visible) 0.96f else 1f,
-        animationSpec = if (reduceMotion) tween(0) else MotionTokens.springSnappy(),
-        label = "popupBgScale",
-    ).value

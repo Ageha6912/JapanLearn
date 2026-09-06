@@ -44,8 +44,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.TransformOrigin
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -73,7 +71,6 @@ import com.japanlearn.app.ui.motion.ProgressRing
 import com.japanlearn.app.ui.motion.StaggerIn
 import com.japanlearn.app.ui.motion.PopupAnchor
 import com.japanlearn.app.ui.motion.TransformCardPopup
-import com.japanlearn.app.ui.motion.popupBackgroundScale
 import com.japanlearn.app.ui.motion.pressScale
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -158,18 +155,9 @@ fun HomeScreen(nav: NavHostController) {
 
     var showSettings by remember { mutableStateOf(false) }
     var showSentence by remember { mutableStateOf(false) }
-    val popupVisible = showSettings || showSentence
-    val bgScale = popupBackgroundScale(popupVisible)
-    val bgOrigin = if (showSettings) TransformOrigin(1f, 0f) else TransformOrigin(0.5f, 1f)
 
     Box(Modifier.fillMaxSize()) {
-        Scaffold(
-            modifier = Modifier.graphicsLayer {
-                scaleX = bgScale
-                scaleY = bgScale
-                transformOrigin = bgOrigin
-            },
-        ) { padding ->
+        Scaffold { padding ->
             Column(
                 Modifier
                     .padding(padding)
