@@ -209,13 +209,26 @@ fun StatTile(
 fun TtsButton(text: String, onSpeak: (String) -> Unit, modifier: Modifier = Modifier) {
     val interaction = remember { MutableInteractionSource() }
     val app = com.japanlearn.app.LocalAppContainer.current
-    var showVoiceGuide by remember { mutableStateOf(false) }
-    if (showVoiceGuide) {
-        VoiceDataGuideDialog(onDismiss = { showVoiceGuide = false })
+    val context = androidx.compose.ui.platform.LocalContext.current
+    var guideKind by remember { mutableStateOf<com.japanlearn.app.util.JapaneseTts.Action?>(null) }
+    guideKind?.let { kind ->
+        VoiceGuideDialog(kind = kind, onDismiss = { guideKind = null })
     }
     FilledTonalIconButton(
         onClick = {
-            if (app.tts.needsVoiceData()) showVoiceGuide = true else onSpeak(text)
+            val state = app.tts.currentState()
+            val hasJa = app.tts.hasJapanese()
+            android.util.Log.i("JapaneseTts", "speak tapped: state=$state hasJapanese=$hasJa")
+            when (com.japanlearn.app.util.JapaneseTts.decideAction(state, hasJa)) {
+                com.japanlearn.app.util.JapaneseTts.Action.SPEAK -> onSpeak(text)
+                com.japanlearn.app.util.JapaneseTts.Action.GUIDE_VOICE_DATA ->
+                    guideKind = com.japanlearn.app.util.JapaneseTts.Action.GUIDE_VOICE_DATA
+                com.japanlearn.app.util.JapaneseTts.Action.GUIDE_ENGINE -> {
+                    // 引导安装引擎的同时重试一次初始化：引擎慢启动的设备关掉对话框再点即可发音
+                    app.tts.retryInit(context)
+                    guideKind = com.japanlearn.app.util.JapaneseTts.Action.GUIDE_ENGINE
+                }
+            }
         },
         interactionSource = interaction,
         modifier = modifier.pressScale(interaction, 0.9f),
@@ -229,36 +242,73 @@ fun TtsButton(text: String, onSpeak: (String) -> Unit, modifier: Modifier = Modi
 }
 
 /** 发音占位骨架 */
-/** 日语语音数据缺失时的下载引导（v0.3.1）：优先拉起系统语音数据安装页，无引擎时退回 TTS 设置。 */
+/** 发音不可用时的引导：缺语音数据 → 系统语音数据安装页；无语音引擎 → 引导安装 Google TTS。 */
 @Composable
-private fun VoiceDataGuideDialog(onDismiss: () -> Unit) {
+private fun VoiceGuideDialog(
+    kind: com.japanlearn.app.util.JapaneseTts.Action,
+    onDismiss: () -> Unit,
+) {
     val context = androidx.compose.ui.platform.LocalContext.current
+    val newTask = android.content.Intent.FLAG_ACTIVITY_NEW_TASK
+    val openTtsSettings: () -> Unit = {
+        try {
+            context.startActivity(android.content.Intent("com.android.settings.TTS_SETTINGS").addFlags(newTask))
+        } catch (_: Exception) {
+            android.widget.Toast.makeText(
+                context,
+                "当前设备没有可用的语音引擎设置项",
+                android.widget.Toast.LENGTH_LONG,
+            ).show()
+        }
+    }
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("缺少日语语音包") },
+        title = {
+            Text(
+                if (kind == com.japanlearn.app.util.JapaneseTts.Action.GUIDE_ENGINE) "缺少语音引擎" else "缺少日语语音包",
+            )
+        },
         text = {
-            Text("设备还没有安装日语发音数据，下载后即可离线发音（通常只需几 MB）。下载完成后回到 App 再点一次喇叭即可。")
+            Text(
+                if (kind == com.japanlearn.app.util.JapaneseTts.Action.GUIDE_ENGINE) {
+                    "设备上没有可用的文字转语音引擎。安装「Google 文字转语音」并下载日语语音后，即可离线发音。"
+                } else {
+                    "设备还没有安装日语发音数据，下载后即可离线发音（通常只需几 MB）。下载完成后回到 App 再点一次喇叭即可。"
+                },
+            )
         },
         confirmButton = {
             TextButton(onClick = {
                 onDismiss()
-                val newTask = android.content.Intent.FLAG_ACTIVITY_NEW_TASK
-                try {
-                    context.startActivity(
-                        android.content.Intent("android.speech.tts.engine.INSTALL_TTS_DATA").addFlags(newTask),
-                    )
-                } catch (_: android.content.ActivityNotFoundException) {
+                if (kind == com.japanlearn.app.util.JapaneseTts.Action.GUIDE_ENGINE) {
+                    // 先尝试应用商店的 Google TTS 详情页，失败退回 TTS 设置页
                     try {
-                        context.startActivity(android.content.Intent("com.android.settings.TTS_SETTINGS").addFlags(newTask))
-                    } catch (_: Exception) {
-                        android.widget.Toast.makeText(
-                            context,
-                            "当前设备没有可用的语音引擎，无法下载日语语音",
-                            android.widget.Toast.LENGTH_LONG,
-                        ).show()
+                        context.startActivity(
+                            android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse("market://details?id=com.google.android.tts")).addFlags(newTask),
+                        )
+                    } catch (_: android.content.ActivityNotFoundException) {
+                        try {
+                            context.startActivity(
+                                android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse("https://play.google.com/store/apps/details?id=com.google.android.tts")).addFlags(newTask),
+                            )
+                        } catch (_: Exception) {
+                            openTtsSettings()
+                        }
+                    }
+                } else {
+                    try {
+                        context.startActivity(
+                            android.content.Intent("android.speech.tts.engine.INSTALL_TTS_DATA").addFlags(newTask),
+                        )
+                    } catch (_: android.content.ActivityNotFoundException) {
+                        openTtsSettings()
                     }
                 }
-            }) { Text("去下载语音数据") }
+            }) {
+                Text(
+                    if (kind == com.japanlearn.app.util.JapaneseTts.Action.GUIDE_ENGINE) "安装语音引擎" else "去下载语音数据",
+                )
+            }
         },
         dismissButton = { TextButton(onClick = onDismiss) { Text("取消") } },
     )
