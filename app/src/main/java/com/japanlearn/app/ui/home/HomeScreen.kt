@@ -122,11 +122,16 @@ class HomeViewModel(private val app: AppContainer) : ViewModel() {
         }
         collect(app.settings.dailyNewWords) { s, v -> s.copy(targetNewWords = v) }
         collect(app.settings.dailyNewGrammar) { s, v -> s.copy(targetNewGrammar = v) }
+        // 今日一句：收集 Room Flow 而非一次性读取——首次启动时内容装载（seed）可能晚于
+        // 首页打开，一次性读到空表会把句子永久置空，横条从此消失
         viewModelScope.launch {
-            val list = app.content.sentencesAll().first()
-            val idx = app.stats.sentenceIndexForToday(list.size)
-            val sentence = list.getOrNull(idx)
-            _state.update { it.copy(sentence = sentence, sentenceIndex = idx) }
+            app.content.sentencesAll().collect { list ->
+                if (list.isNotEmpty()) {
+                    val idx = app.stats.sentenceIndexForToday(list.size)
+                    val sentence = list.getOrNull(idx)
+                    _state.update { it.copy(sentence = sentence, sentenceIndex = idx) }
+                }
+            }
         }
     }
 
