@@ -70,6 +70,7 @@ import com.japanlearn.app.ui.motion.rememberReducedMotion
 import com.japanlearn.app.ui.motion.shake
 import com.japanlearn.app.ui.motion.shimmerBrush
 import com.japanlearn.app.ui.theme.japanColors
+import kotlinx.coroutines.delay
 
 /** 学习会话的阶段，单词/语法/复习会话共用。 */
 enum class SessionPhase { LOADING, CARD, QUIZ, DONE }
@@ -211,6 +212,24 @@ fun TtsButton(text: String, onSpeak: (String) -> Unit, modifier: Modifier = Modi
     val app = com.japanlearn.app.LocalAppContainer.current
     val context = androidx.compose.ui.platform.LocalContext.current
     var guideKind by remember { mutableStateOf<com.japanlearn.app.util.JapaneseTts.Action?>(null) }
+    var waitingForTtsCheck by remember { mutableStateOf(false) }
+    LaunchedEffect(waitingForTtsCheck) {
+        if (!waitingForTtsCheck) return@LaunchedEffect
+        delay(com.japanlearn.app.util.JapaneseTts.INIT_TIMEOUT_MS + 100L)
+        val latestState = app.tts.currentState()
+        if (latestState == com.japanlearn.app.util.JapaneseTts.State.READY) {
+            app.tts.refreshJapaneseStatus()
+        }
+        val latestAction = com.japanlearn.app.util.JapaneseTts.decideAction(
+            latestState,
+            app.tts.japaneseUsable(),
+            app.tts.japaneseMissingData(),
+        )
+        if (latestAction != com.japanlearn.app.util.JapaneseTts.Action.SPEAK) {
+            guideKind = latestAction
+        }
+        waitingForTtsCheck = false
+    }
     guideKind?.let { kind ->
         VoiceGuideDialog(kind = kind, onDismiss = { guideKind = null })
     }
@@ -225,7 +244,12 @@ fun TtsButton(text: String, onSpeak: (String) -> Unit, modifier: Modifier = Modi
             )
             android.util.Log.i("JapaneseTts", "speak tapped: state=$state action=$action")
             when (action) {
-                com.japanlearn.app.util.JapaneseTts.Action.SPEAK -> onSpeak(text)
+                com.japanlearn.app.util.JapaneseTts.Action.SPEAK -> {
+                    onSpeak(text)
+                    if (state == com.japanlearn.app.util.JapaneseTts.State.WAITING) {
+                        waitingForTtsCheck = true
+                    }
+                }
                 com.japanlearn.app.util.JapaneseTts.Action.GUIDE_VOICE_DATA ->
                     guideKind = com.japanlearn.app.util.JapaneseTts.Action.GUIDE_VOICE_DATA
                 com.japanlearn.app.util.JapaneseTts.Action.GUIDE_ENGINE -> {

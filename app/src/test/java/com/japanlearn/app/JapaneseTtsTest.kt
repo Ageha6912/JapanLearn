@@ -29,6 +29,22 @@ class JapaneseTtsTest {
     }
 
     @Test
+    fun `引擎谎报 setLanguage 可用但没有日语 voice 时必须视为不可用`() {
+        assertEquals(
+            langNotSupported,
+            JapaneseTts.verifiedJapaneseStatus(langAvailable, hasJapaneseVoice = false),
+        )
+        assertEquals(
+            langAvailable,
+            JapaneseTts.verifiedJapaneseStatus(langAvailable, hasJapaneseVoice = true),
+        )
+        assertEquals(
+            langMissingData,
+            JapaneseTts.verifiedJapaneseStatus(langMissingData, hasJapaneseVoice = false),
+        )
+    }
+
+    @Test
     fun `发音点击决策 五种场景`() {
         // 初始化中：先照常暂存（就绪后自动播放）
         assertEquals(Action.SPEAK, JapaneseTts.decideAction(State.WAITING, false, false))

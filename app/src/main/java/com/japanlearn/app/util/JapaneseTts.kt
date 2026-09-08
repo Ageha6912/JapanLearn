@@ -26,6 +26,7 @@ class JapaneseTts(private val context: Context) {
 
     private var tts: TextToSpeech? = null
     private var pending: String? = null
+    private var japaneseVoice: android.speech.tts.Voice? = null
 
     @Volatile
     private var state = State.WAITING
@@ -91,7 +92,21 @@ class JapaneseTts(private val context: Context) {
     }
 
     private fun applyJapaneseLanguage() {
-        japaneseStatus = tts?.setLanguage(Locale.JAPAN) ?: TextToSpeech.LANG_NOT_SUPPORTED
+        val engine = tts ?: run {
+            japaneseVoice = null
+            japaneseStatus = TextToSpeech.LANG_NOT_SUPPORTED
+            return
+        }
+        val languageStatus = engine.setLanguage(Locale.JAPAN)
+        japaneseVoice = engine.voices
+            .orEmpty()
+            .firstOrNull { it.locale.language == Locale.JAPANESE.language }
+        japaneseStatus = verifiedJapaneseStatus(languageStatus, japaneseVoice != null)
+        japaneseVoice?.let { engine.voice = it }
+        Log.i(
+            TAG,
+            "Japanese language check: setLanguage=$languageStatus voice=${japaneseVoice?.name ?: "none"} verified=$japaneseStatus",
+        )
     }
 
     fun speak(text: String) {
@@ -125,6 +140,16 @@ class JapaneseTts(private val context: Context) {
         const val INIT_TIMEOUT_MS = 1500L
         const val GOOGLE_TTS = "com.google.android.tts"
         private const val TAG = "JapaneseTts"
+
+        /**
+         * Some engines report Locale.JAPAN as available while exposing no Japanese voice
+         * (for example a Chinese engine that only reads the kanji in a sentence).
+         */
+        fun verifiedJapaneseStatus(languageStatus: Int, hasJapaneseVoice: Boolean): Int = when {
+            languageStatus == TextToSpeech.LANG_MISSING_DATA -> TextToSpeech.LANG_MISSING_DATA
+            languageStatus >= TextToSpeech.LANG_AVAILABLE && hasJapaneseVoice -> languageStatus
+            else -> TextToSpeech.LANG_NOT_SUPPORTED
+        }
 
         /** 发音点击的决策（纯函数）：正常发音 / 引导下载数据 / 引导安装引擎。 */
         fun decideAction(state: State, japaneseUsable: Boolean, japaneseMissingData: Boolean): Action = when {
