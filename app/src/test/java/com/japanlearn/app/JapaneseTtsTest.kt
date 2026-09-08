@@ -9,31 +9,36 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.util.Locale
 
-/** 日语语音可用性判定与发音引导决策（v0.3.1 / v0.4.1）。 */
+/** 日语 TTS 可用性判定与发音引导决策（v0.4.3 实测 setLanguage 结果）。 */
 class JapaneseTtsTest {
 
+    private val langAvailable = android.speech.tts.TextToSpeech.LANG_COUNTRY_AVAILABLE
+    private val langMissingData = android.speech.tts.TextToSpeech.LANG_MISSING_DATA
+    private val langNotSupported = android.speech.tts.TextToSpeech.LANG_NOT_SUPPORTED
+
     @Test
-    fun `任一日语语音即可含不同地区`() {
-        assertTrue(JapaneseTts.japaneseAvailableIn(setOf(Locale.JAPAN)))
-        assertTrue(JapaneseTts.japaneseAvailableIn(setOf(Locale("ja", "US"))))
-        assertTrue(JapaneseTts.japaneseAvailableIn(setOf(Locale.US, Locale.JAPANESE)))
+    fun `日语可用性判定 setLanguage 结果语义`() {
+        // 与 JapaneseTts.japaneseUsable / japaneseMissingData 同一规则
+        fun usable(status: Int) = status >= android.speech.tts.TextToSpeech.LANG_AVAILABLE
+        fun missingData(status: Int) = status == langMissingData
+        assertTrue(usable(langAvailable))
+        assertFalse(usable(langMissingData))
+        assertFalse(usable(langNotSupported))
+        assertTrue(missingData(langMissingData))
+        assertFalse(missingData(langNotSupported))
     }
 
     @Test
-    fun `非日语语音不判定为可用`() {
-        assertFalse(JapaneseTts.japaneseAvailableIn(setOf(Locale.US, Locale.SIMPLIFIED_CHINESE)))
-        assertFalse(JapaneseTts.japaneseAvailableIn(emptySet()))
-    }
-
-    @Test
-    fun `发音点击决策 四种状态`() {
+    fun `发音点击决策 五种场景`() {
         // 初始化中：先照常暂存（就绪后自动播放）
-        assertEquals(Action.SPEAK, JapaneseTts.decideAction(State.WAITING, hasJapanese = false))
-        // 就绪且有日语：直接发音
-        assertEquals(Action.SPEAK, JapaneseTts.decideAction(State.READY, hasJapanese = true))
-        // 就绪但缺日语语音包：引导下载数据
-        assertEquals(Action.GUIDE_VOICE_DATA, JapaneseTts.decideAction(State.READY, hasJapanese = false))
-        // 初始化失败（无引擎）：引导安装引擎
-        assertEquals(Action.GUIDE_ENGINE, JapaneseTts.decideAction(State.FAILED, hasJapanese = false))
+        assertEquals(Action.SPEAK, JapaneseTts.decideAction(State.WAITING, false, false))
+        // 引擎正常且日语可用：直接发音
+        assertEquals(Action.SPEAK, JapaneseTts.decideAction(State.READY, true, false))
+        // 引擎正常但缺日语语音数据：引导下载数据
+        assertEquals(Action.GUIDE_VOICE_DATA, JapaneseTts.decideAction(State.READY, false, true))
+        // 引擎正常但不支持日语（如中文引擎，读日文只读汉字跳过假名）：引导安装引擎
+        assertEquals(Action.GUIDE_ENGINE, JapaneseTts.decideAction(State.READY, false, false))
+        // 初始化失败 / 超时：引导安装引擎
+        assertEquals(Action.GUIDE_ENGINE, JapaneseTts.decideAction(State.FAILED, false, false))
     }
 }

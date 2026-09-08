@@ -3,6 +3,11 @@
 
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
+    <!-- 查询 Google TTS 是否已安装（显式选用引擎），Android 11+ 包可见性要求 -->
+    <queries>
+        <package android:name="com.google.android.tts" />
+    </queries>
+
     <application
         android:name=".JapanLearnApp"
         android:allowBackup="true"

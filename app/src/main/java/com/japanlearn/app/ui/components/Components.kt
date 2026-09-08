@@ -217,15 +217,20 @@ fun TtsButton(text: String, onSpeak: (String) -> Unit, modifier: Modifier = Modi
     FilledTonalIconButton(
         onClick = {
             val state = app.tts.currentState()
-            val hasJa = app.tts.hasJapanese()
-            android.util.Log.i("JapaneseTts", "speak tapped: state=$state hasJapanese=$hasJa")
-            when (com.japanlearn.app.util.JapaneseTts.decideAction(state, hasJa)) {
+            if (state == com.japanlearn.app.util.JapaneseTts.State.READY) app.tts.refreshJapaneseStatus()
+            val action = com.japanlearn.app.util.JapaneseTts.decideAction(
+                state,
+                app.tts.japaneseUsable(),
+                app.tts.japaneseMissingData(),
+            )
+            android.util.Log.i("JapaneseTts", "speak tapped: state=$state action=$action")
+            when (action) {
                 com.japanlearn.app.util.JapaneseTts.Action.SPEAK -> onSpeak(text)
                 com.japanlearn.app.util.JapaneseTts.Action.GUIDE_VOICE_DATA ->
                     guideKind = com.japanlearn.app.util.JapaneseTts.Action.GUIDE_VOICE_DATA
                 com.japanlearn.app.util.JapaneseTts.Action.GUIDE_ENGINE -> {
-                    // 引导安装引擎的同时重试一次初始化：引擎慢启动的设备关掉对话框再点即可发音
-                    app.tts.retryInit(context)
+                    // 引导安装引擎的同时重试一次初始化：刚装好引擎的设备关掉对话框再点即可发音
+                    app.tts.retryInit()
                     guideKind = com.japanlearn.app.util.JapaneseTts.Action.GUIDE_ENGINE
                 }
             }
