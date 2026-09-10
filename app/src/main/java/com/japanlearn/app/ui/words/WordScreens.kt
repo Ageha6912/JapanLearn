@@ -53,14 +53,17 @@ import com.japanlearn.app.AppContainer
 import com.japanlearn.app.LocalAppContainer
 import com.japanlearn.app.Routes
 import com.japanlearn.app.data.local.WordEntity
-import com.japanlearn.app.domain.AudioQuizPolicy
 import com.japanlearn.app.domain.KanjiQuizPolicy
 import com.japanlearn.app.domain.Mastery
 import com.japanlearn.app.domain.Quiz
-import com.japanlearn.app.domain.WordListFilter
 import com.japanlearn.app.domain.QuizGenerator
+import com.japanlearn.app.domain.QuizVariantPicker
 import com.japanlearn.app.domain.QuizWord
+import com.japanlearn.app.domain.TypeAnswerNormalizer
+import com.japanlearn.app.domain.TypeAnswerScoring
+import com.japanlearn.app.domain.WordListFilter
 import com.japanlearn.app.domain.WordQuizDirection
+import com.japanlearn.app.domain.WordQuizVariant
 import com.japanlearn.app.ui.components.AppButton
 import com.japanlearn.app.ui.components.AppTopBar
 import com.japanlearn.app.ui.components.EmptyState
@@ -232,6 +235,8 @@ data class WordSessionUiState(
     val quizTotal: Int = 0,
     val canLearnGrammar: Boolean = false,
     val canReview: Boolean = false,
+    val typedDraft: String = "",
+    val typedResult: Boolean? = null,
 )
 
 class WordSessionViewModel(
@@ -267,7 +272,7 @@ class WordSessionViewModel(
                 retries++
                 words = app.content.nextNewWords(effective, level)
             }
-            pool = app.content.wordsAll().first().map { QuizWord(it.id, it.ja, it.kana, it.zh) }
+            pool = app.content.wordsAll().first().map { it.toQuizWord() }
             startedAt = System.currentTimeMillis()
             _state.update {
                 it.copy(phase = SessionPhase.CARD, queue = words, index = 0)
@@ -285,29 +290,56 @@ class WordSessionViewModel(
         val word = current ?: return
         directionToggle = !directionToggle
         val direction = if (directionToggle) WordQuizDirection.JP_TO_CN else WordQuizDirection.CN_TO_JP
-        val target = QuizWord(word.id, word.ja, word.kana, word.zh)
-        val quiz = if (KanjiQuizPolicy.shouldUseKanji(word.ja, word.kana, kotlin.random.Random.nextDouble())) {
-            // 汉字变体：JP→CN 出看假名选汉字，CN→JP 出看汉字选读音
-            QuizGenerator.kanjiQuiz(target, pool, toKanji = direction == WordQuizDirection.JP_TO_CN)
-        } else {
-            val audio = AudioQuizPolicy.shouldUseAudio(direction, kotlin.random.Random.nextDouble())
-            QuizGenerator.wordQuiz(target, pool, direction, audio = audio)
+        val target = word.toQuizWord()
+        val hasKanji = KanjiQuizPolicy.hasKanjiForm(word.ja, word.kana)
+        val variant = QuizVariantPicker.pick(
+            direction,
+            hasKanji,
+            kotlin.random.Random.nextDouble(),
+            kotlin.random.Random.nextDouble(),
+            kotlin.random.Random.nextDouble(),
+        )
+        val quiz = when (variant) {
+            WordQuizVariant.KANJI ->
+                QuizGenerator.kanjiQuiz(target, pool, toKanji = direction == WordQuizDirection.JP_TO_CN)
+            WordQuizVariant.AUDIO -> QuizGenerator.wordQuiz(target, pool, direction, audio = true)
+            WordQuizVariant.TYPE_KANA -> QuizGenerator.typeKanaQuiz(target)
+            WordQuizVariant.MCQ -> QuizGenerator.wordQuiz(target, pool, direction)
         }
         _state.update {
-            it.copy(phase = SessionPhase.QUIZ, quiz = quiz, selected = null)
+            it.copy(phase = SessionPhase.QUIZ, quiz = quiz, selected = null, typedDraft = "", typedResult = null)
         }
     }
 
     fun onSelect(index: Int) {
         val s = _state.value
+        val quiz = s.quiz ?: return
+        if (quiz.isTypeAnswer) return
         if (s.selected != null) return
-        val correct = s.quiz?.answerIndex == index
+        val correct = quiz.answerIndex == index
         _state.update {
             it.copy(
                 selected = index,
                 quizTotal = it.quizTotal + 1,
                 quizCorrect = it.quizCorrect + if (correct) 1 else 0,
             )
+        }
+    }
+
+    fun onTypedDraftChange(value: String) {
+        if (_state.value.typedResult != null) return
+        _state.update { it.copy(typedDraft = value) }
+    }
+
+    fun submitTyped() {
+        val s = _state.value
+        val quiz = s.quiz ?: return
+        if (!quiz.isTypeAnswer) return
+        if (s.typedResult != null) return
+        val ok = TypeAnswerNormalizer.matches(s.typedDraft, quiz.acceptedAnswers)
+        val scored = TypeAnswerScoring.afterSubmit(ok, s.quizTotal, s.quizCorrect)
+        _state.update {
+            it.copy(typedResult = ok, quizTotal = scored.total, quizCorrect = scored.correct)
         }
     }
 
@@ -329,7 +361,10 @@ class WordSessionViewModel(
                         distinctLearned = learnedIds.size,
                     )
                 } else {
-                    s.copy(queue = newQueue, index = nextIndex, phase = SessionPhase.CARD, quiz = null, selected = null)
+                    s.copy(
+                        queue = newQueue, index = nextIndex, phase = SessionPhase.CARD,
+                        quiz = null, selected = null, typedDraft = "", typedResult = null,
+                    )
                 }
             }
             if (_state.value.phase == SessionPhase.DONE) {
@@ -354,6 +389,9 @@ class WordSessionViewModel(
 
     fun speak(text: String) = app.tts.speak(text)
 }
+
+private fun WordEntity.toQuizWord() =
+    QuizWord(id, ja, kana, zh, pos, cat, romaji)
 
 @Composable
 fun WordSessionScreen(nav: NavHostController, count: Int) {
@@ -399,9 +437,17 @@ fun WordSessionScreen(nav: NavHostController, count: Int) {
 
                         SessionPhase.QUIZ -> {
                             state.quiz?.let { quiz ->
-                                QuizView(quiz, state.selected, onSelect = { vm.onSelect(it) }, onSpeak = { vm.speak(it) })
-                                if (state.selected != null) {
-                                    val correct = state.selected == quiz.answerIndex
+                                QuizView(
+                                    quiz, state.selected, onSelect = { vm.onSelect(it) },
+                                    typedDraft = state.typedDraft,
+                                    typedResult = state.typedResult,
+                                    onSpeak = { vm.speak(it) },
+                                    onTypedDraftChange = { vm.onTypedDraftChange(it) },
+                                    onTypeSubmit = { vm.submitTyped() },
+                                )
+                                val answered = if (quiz.isTypeAnswer) state.typedResult != null else state.selected != null
+                                if (answered) {
+                                    val correct = if (quiz.isTypeAnswer) state.typedResult == true else state.selected == quiz.answerIndex
                                     com.japanlearn.app.ui.review.FeedbackText(correct = correct, answerText = quiz.answerText)
                                     Text(
                                         "这个单词你掌握了吗？",

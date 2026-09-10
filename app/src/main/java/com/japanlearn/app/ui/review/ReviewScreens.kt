@@ -48,14 +48,17 @@ import com.japanlearn.app.data.examples
 import com.japanlearn.app.data.exercises
 import com.japanlearn.app.data.local.GrammarEntity
 import com.japanlearn.app.data.local.WordEntity
-import com.japanlearn.app.domain.AudioQuizPolicy
 import com.japanlearn.app.domain.KanjiQuizPolicy
 import com.japanlearn.app.domain.Mastery
 import com.japanlearn.app.domain.Quiz
 import com.japanlearn.app.domain.QuizGenerator
+import com.japanlearn.app.domain.QuizVariantPicker
 import com.japanlearn.app.domain.QuizWord
 import com.japanlearn.app.domain.ReviewPlanner
+import com.japanlearn.app.domain.TypeAnswerNormalizer
+import com.japanlearn.app.domain.TypeAnswerScoring
 import com.japanlearn.app.domain.WordQuizDirection
+import com.japanlearn.app.domain.WordQuizVariant
 import com.japanlearn.app.ui.components.AppButton
 import com.japanlearn.app.ui.components.AppTopBar
 import com.japanlearn.app.ui.components.EmptyState
@@ -210,6 +213,8 @@ data class ReviewSessionUiState(
     val selected: Int? = null,
     val ratedCount: Int = 0,
     val correctCount: Int = 0,
+    val typedDraft: String = "",
+    val typedResult: Boolean? = null,
 )
 
 class ReviewSessionViewModel(private val app: AppContainer) : ViewModel() {
@@ -224,7 +229,7 @@ class ReviewSessionViewModel(private val app: AppContainer) : ViewModel() {
             val cap = app.settings.dailyReviewCap.value
             val done = app.progress.reviewsDoneToday()
             val remaining = ReviewPlanner.remainingToday(done, cap)
-            listPool = app.content.wordsAll().first().map { QuizWord(it.id, it.ja, it.kana, it.zh) }
+            listPool = app.content.wordsAll().first().map { it.toQuizWord() }
             if (remaining == 0) {
                 _state.update { it.copy(phase = SessionPhase.DONE) }
                 return@launch
@@ -247,12 +252,22 @@ class ReviewSessionViewModel(private val app: AppContainer) : ViewModel() {
         is ReviewItem.WordItem -> {
             directionToggle = !directionToggle
             val direction = if (directionToggle) WordQuizDirection.JP_TO_CN else WordQuizDirection.CN_TO_JP
-            val target = QuizWord(item.word.id, item.word.ja, item.word.kana, item.word.zh)
-            if (KanjiQuizPolicy.shouldUseKanji(item.word.ja, item.word.kana, kotlin.random.Random.nextDouble())) {
-                QuizGenerator.kanjiQuiz(target, poolOf(item.word.id), toKanji = direction == WordQuizDirection.JP_TO_CN)
-            } else {
-                val audio = AudioQuizPolicy.shouldUseAudio(direction, kotlin.random.Random.nextDouble())
-                QuizGenerator.wordQuiz(target, poolOf(item.word.id), direction, audio = audio)
+            val target = item.word.toQuizWord()
+            val hasKanji = KanjiQuizPolicy.hasKanjiForm(item.word.ja, item.word.kana)
+            val variant = QuizVariantPicker.pick(
+                direction,
+                hasKanji,
+                kotlin.random.Random.nextDouble(),
+                kotlin.random.Random.nextDouble(),
+                kotlin.random.Random.nextDouble(),
+            )
+            val pool = poolOf(item.word.id)
+            when (variant) {
+                WordQuizVariant.KANJI ->
+                    QuizGenerator.kanjiQuiz(target, pool, toKanji = direction == WordQuizDirection.JP_TO_CN)
+                WordQuizVariant.AUDIO -> QuizGenerator.wordQuiz(target, pool, direction, audio = true)
+                WordQuizVariant.TYPE_KANA -> QuizGenerator.typeKanaQuiz(target)
+                WordQuizVariant.MCQ -> QuizGenerator.wordQuiz(target, pool, direction)
             }
         }
         is ReviewItem.GrammarItem -> {
@@ -265,7 +280,7 @@ class ReviewSessionViewModel(private val app: AppContainer) : ViewModel() {
         val s = _state.value
         return s.items.mapNotNull { item ->
             when (item) {
-                is ReviewItem.WordItem -> QuizWord(item.word.id, item.word.ja, item.word.kana, item.word.zh)
+                is ReviewItem.WordItem -> item.word.toQuizWord()
                 is ReviewItem.GrammarItem -> null
             }
         } + listPool.filter { it.id != excludeId }
@@ -277,14 +292,33 @@ class ReviewSessionViewModel(private val app: AppContainer) : ViewModel() {
 
     fun onSelect(index: Int) {
         val s = _state.value
+        val quiz = s.quiz ?: return
+        if (quiz.isTypeAnswer) return
         if (s.selected != null) return
-        val correct = s.quiz?.answerIndex == index
+        val correct = quiz.answerIndex == index
         _state.update {
             it.copy(
                 selected = index,
                 ratedCount = it.ratedCount + 1,
                 correctCount = it.correctCount + if (correct) 1 else 0,
             )
+        }
+    }
+
+    fun onTypedDraftChange(value: String) {
+        if (_state.value.typedResult != null) return
+        _state.update { it.copy(typedDraft = value) }
+    }
+
+    fun submitTyped() {
+        val s = _state.value
+        val quiz = s.quiz ?: return
+        if (!quiz.isTypeAnswer) return
+        if (s.typedResult != null) return
+        val ok = TypeAnswerNormalizer.matches(s.typedDraft, quiz.acceptedAnswers)
+        val scored = TypeAnswerScoring.afterSubmit(ok, s.ratedCount, s.correctCount)
+        _state.update {
+            it.copy(typedResult = ok, ratedCount = scored.total, correctCount = scored.correct)
         }
     }
 
@@ -302,7 +336,10 @@ class ReviewSessionViewModel(private val app: AppContainer) : ViewModel() {
                 if (nextIndex >= newItems.size) {
                     s.copy(items = newItems, index = nextIndex, phase = SessionPhase.DONE)
                 } else {
-                    s.copy(items = newItems, index = nextIndex, quiz = makeQuiz(newItems[nextIndex]), selected = null)
+                    s.copy(
+                        items = newItems, index = nextIndex, quiz = makeQuiz(newItems[nextIndex]),
+                        selected = null, typedDraft = "", typedResult = null,
+                    )
                 }
             }
             if (_state.value.phase == SessionPhase.DONE) {
@@ -314,6 +351,9 @@ class ReviewSessionViewModel(private val app: AppContainer) : ViewModel() {
 
     fun speak(text: String) = app.tts.speak(text)
 }
+
+private fun WordEntity.toQuizWord() =
+    QuizWord(id, ja, kana, zh, pos, cat, romaji)
 
 @Composable
 fun ReviewSessionScreen(nav: NavHostController) {
@@ -360,9 +400,17 @@ fun ReviewSessionScreen(nav: NavHostController) {
                             if (quiz == null) {
                                 LoadingPlaceholder()
                             } else {
-                                QuizView(quiz, state.selected, onSelect = { vm.onSelect(it) }, onSpeak = { vm.speak(it) })
-                                if (state.selected != null) {
-                                    val correct = state.selected == quiz.answerIndex
+                                QuizView(
+                                    quiz, state.selected, onSelect = { vm.onSelect(it) },
+                                    typedDraft = state.typedDraft,
+                                    typedResult = state.typedResult,
+                                    onSpeak = { vm.speak(it) },
+                                    onTypedDraftChange = { vm.onTypedDraftChange(it) },
+                                    onTypeSubmit = { vm.submitTyped() },
+                                )
+                                val answered = if (quiz.isTypeAnswer) state.typedResult != null else state.selected != null
+                                if (answered) {
+                                    val correct = if (quiz.isTypeAnswer) state.typedResult == true else state.selected == quiz.answerIndex
                                     FeedbackText(correct = correct, answerText = quiz.answerText)
                                     Text(
                                         "现在感觉掌握了吗？",

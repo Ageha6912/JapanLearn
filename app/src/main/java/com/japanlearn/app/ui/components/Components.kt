@@ -37,6 +37,7 @@ import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.Text
@@ -434,12 +435,16 @@ fun QuizView(
     selected: Int?,
     onSelect: (Int) -> Unit,
     modifier: Modifier = Modifier,
+    typedDraft: String = "",
+    typedResult: Boolean? = null,
     onSpeak: ((String) -> Unit)? = null,
+    onTypedDraftChange: (String) -> Unit = {},
+    onTypeSubmit: () -> Unit = {},
 ) {
     val jc = japanColors()
     var shakeTrigger by remember { mutableIntStateOf(0) }
     LaunchedEffect(selected) {
-        if (selected != null && selected != quiz.answerIndex) shakeTrigger++
+        if (!quiz.isTypeAnswer && selected != null && selected != quiz.answerIndex) shakeTrigger++
     }
     // 听音题：出现时自动朗读一次
     LaunchedEffect(quiz) {
@@ -467,6 +472,22 @@ fun QuizView(
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
+        }
+        if (quiz.isTypeAnswer) {
+            OutlinedTextField(
+                value = typedDraft,
+                onValueChange = { if (typedResult == null) onTypedDraftChange(it) },
+                modifier = Modifier.fillMaxWidth(),
+                enabled = typedResult == null,
+                singleLine = true,
+                placeholder = { Text(quiz.inputPrompt ?: "用假名或罗马音作答") },
+            )
+            AppButton(
+                text = "确认",
+                enabled = typedResult == null && typedDraft.isNotBlank(),
+                onClick = onTypeSubmit,
+            )
+            return@Column
         }
         quiz.options.forEachIndexed { index, option ->
             val answered = selected != null

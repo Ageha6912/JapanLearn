@@ -222,5 +222,62 @@ class QuizGeneratorTest {
         assertFalse(KanjiQuizPolicy.shouldUseKanji("食べる", "たべる", 0.25))
         assertTrue(KanjiQuizPolicy.shouldUseKanji("食べる", "たべる", 0.24))
         assertTrue(KanjiQuizPolicy.shouldUseKanji("食べる", "たべる", 0.9, chance = 0.95))
+        assertTrue(KanjiQuizPolicy.shouldUseKanji(hasKanji = true, roll = 0.0))
+        assertFalse(KanjiQuizPolicy.shouldUseKanji(hasKanji = false, roll = 0.0))
+    }
+
+    @Test
+    fun `同词性干扰项优先耗尽`() {
+        val target = QuizWord("t", "食べる", "たべる", "吃", pos = "动词", cat = "动作")
+        val mixed = listOf(
+            target,
+            QuizWord("a", "飲む", "のむ", "喝", pos = "动词", cat = "动作"),
+            QuizWord("b", "見る", "みる", "看", pos = "动词", cat = "动作"),
+            QuizWord("c", "買う", "かう", "买", pos = "动词", cat = "动作"),
+            QuizWord("d", "猫", "ねこ", "猫", pos = "名词", cat = "人物"),
+            QuizWord("e", "犬", "いぬ", "狗", pos = "名词", cat = "人物"),
+        )
+        val verbs = setOf("喝", "看", "买")
+        repeat(20) { seed ->
+            val picked = DistractorSelector.pick(
+                target, mixed, { it.zh }, 3, Random(seed), excludeSameKana = false,
+            )
+            assertTrue(picked.take(2).all { it in verbs })
+        }
+    }
+
+    @Test
+    fun `变体选择 hasKanji 且 kanjiRoll 为零则汉字题`() {
+        assertEquals(
+            WordQuizVariant.KANJI,
+            QuizVariantPicker.pick(WordQuizDirection.JP_TO_CN, hasKanji = true, 0.0, 0.0, 0.0),
+        )
+        assertNotEquals(
+            WordQuizVariant.KANJI,
+            QuizVariantPicker.pick(WordQuizDirection.JP_TO_CN, hasKanji = false, 0.0, 0.99, 0.99),
+        )
+        assertNotEquals(
+            WordQuizVariant.AUDIO,
+            QuizVariantPicker.pick(WordQuizDirection.CN_TO_JP, hasKanji = false, 0.9, 0.0, 0.9),
+        )
+        assertEquals(
+            WordQuizVariant.TYPE_KANA,
+            QuizVariantPicker.pick(WordQuizDirection.CN_TO_JP, hasKanji = false, 0.9, 0.0, 0.0),
+        )
+    }
+
+    @Test
+    fun `打假名题 不暴露假名答案 且接受假名与罗马音`() {
+        val target = QuizWord("w1", "食べる", "たべる", "吃", romaji = "taberu")
+        val quiz = QuizGenerator.typeKanaQuiz(target)
+        assertEquals(QuizKind.WORD_TYPE_KANA, quiz.kind)
+        assertTrue(quiz.isTypeAnswer)
+        assertEquals(-1, quiz.answerIndex)
+        assertTrue(quiz.options.isEmpty())
+        assertTrue(quiz.acceptedAnswers.contains("たべる"))
+        assertTrue(quiz.acceptedAnswers.contains("taberu"))
+        assertFalse(quiz.question.contains("たべる"))
+        assertEquals("食べる", quiz.subQuestion)
+        assertEquals("たべる", quiz.answerText)
     }
 }

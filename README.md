@@ -6,7 +6,7 @@
   <img src="https://img.shields.io/badge/platform-Android%208.0%2B-1B3A5C?logo=android&logoColor=white" alt="Android 8.0 及以上">
   <img src="https://img.shields.io/badge/Kotlin-2.0-7F52FF?logo=kotlin&logoColor=white" alt="Kotlin 2.0">
   <img src="https://img.shields.io/badge/Jetpack%20Compose-Material%203-4285F4?logo=jetpackcompose&logoColor=white" alt="Jetpack Compose Material 3">
-  <img src="https://img.shields.io/badge/tests-110%20passing-4E7D5B" alt="110 项单元测试通过">
+  <img src="https://img.shields.io/badge/tests-117%20passing-4E7D5B" alt="117 项单元测试通过">
   <a href="./LICENSE"><img src="https://img.shields.io/badge/license-MIT-C75B5B" alt="MIT 许可证"></a>
 </p>
 
@@ -53,6 +53,7 @@ JapanLearn 是一个**完全离线、无需账号**的日语入门 App，为日�
 | ✍️ N5/N4 语法 | 87 条（N5 50 + N4 37）：接续方式、说明、例句、配套选择题 |
 | 🔁 SRS 复习 | 到期自动出队，混合单词与语法，限流顺延 |
 | 🔊 听音选词 | 练习中按 30% 概率升级为听音变体（TTS 播放选释义） |
+| ⌨️ 打假名 | 中→日约 20% 改为看中文写读音（假名或罗马音） |
 | 🔔 复习提醒 | 每天 20:00 检查到期内容，有任务才提醒，可开关 |
 | 📝 错题本 | 答错自动收录（含五十音），复习答对自动移除 |
 | 📊 学习统计 | 连击、累计时长、近 7 日柱状图、内容进度 |
@@ -67,7 +68,7 @@ JapanLearn 是一个**完全离线、无需账号**的日语入门 App，为日�
 git clone https://github.com/Ageha6912/JapanLearn.git
 cd JapanLearn
 ./gradlew :app:assembleDebug     # 产出 app/build/outputs/apk/debug/app-debug.apk
-./gradlew :app:testDebugUnitTest # 运行单元测试（当前 110 项）
+./gradlew :app:testDebugUnitTest # 运行单元测试（当前 117 项）
 python tools/validate_content.py # 改内容后必须通过
 ```
 
@@ -119,7 +120,7 @@ app/src/main/java/com/japanlearn/app/
 
 ## 测试
 
-110 项单元测试全绿（PRD §17.8 强制要求）。改内容须另跑 `python tools/validate_content.py`（CI 已接入）：
+117 项单元测试全绿（PRD §17.8 强制要求）。改内容须另跑 `python tools/validate_content.py`（CI 已接入）：
 
 - `SrsSchedulerTest`：四级掌握度的间隔/到期时间、间隔递增与 60 天上限、掌握判定
 - `QuizGeneratorTest`：选项数量、含正确答案、不重复、双向词卡、种子可复现、小内容池退化、听音/汉字变体
@@ -154,6 +155,7 @@ app/src/main/java/com/japanlearn/app/
 - [x] N4 首批内容、汉字题、备份恢复、桌面小组件（v0.3）
 - [x] N4 语法补 7 条、每日一句 120（见 [OPTIMIZATION.md](OPTIMIZATION.md)）
 - [x] v0.5.0 装载事务、COUNT、搜索筛选、提醒时刻、五十音横幅、N4 语法与每日一句
+- [x] v0.6.1 打假名题 + 按词性干扰项
 - [ ] 登录与多设备同步（可选，非默认路径）
 - [ ] SRS 升级为 FSRS 算法（v0.7）
 - [ ] AI 日语助手（翻译 / 语法解释 / 纠错，走自建后端）

@@ -2,10 +2,14 @@ package com.japanlearn.app.domain
 
 import kotlin.random.Random
 
-enum class QuizKind { WORD_JP_TO_CN, AUDIO_WORD_JP_TO_CN, WORD_CN_TO_JP, KANA_TO_ROMAJI, GRAMMAR_FILL, KANA_TO_KANJI, KANJI_TO_KANA }
+enum class QuizKind {
+    WORD_JP_TO_CN, AUDIO_WORD_JP_TO_CN, WORD_CN_TO_JP,
+    KANA_TO_ROMAJI, GRAMMAR_FILL, KANA_TO_KANJI, KANJI_TO_KANA,
+    WORD_TYPE_KANA,
+}
 
 /**
- * 一道选择题。练习题生成是纯函数，便于单元测试。
+ * 一道练习题。选择题用 [options] / [answerIndex]；打字题用 [acceptedAnswers]。
  */
 data class Quiz(
     val kind: QuizKind,
@@ -15,11 +19,25 @@ data class Quiz(
     val answerIndex: Int,
     /** 听音题需要朗读的文本（kind = AUDIO_WORD_JP_TO_CN 时非空）。 */
     val audioText: String? = null,
+    val acceptedAnswers: List<String> = emptyList(),
+    val inputPrompt: String? = null,
 ) {
-    val answerText: String get() = options[answerIndex]
+    val isTypeAnswer: Boolean get() = kind == QuizKind.WORD_TYPE_KANA
+    val answerText: String get() {
+        check(!isTypeAnswer || acceptedAnswers.isNotEmpty()) { "WORD_TYPE_KANA requires acceptedAnswers" }
+        return if (isTypeAnswer) acceptedAnswers.first() else options[answerIndex]
+    }
 }
 
-data class QuizWord(val id: String, val ja: String, val kana: String, val zh: String)
+data class QuizWord(
+    val id: String,
+    val ja: String,
+    val kana: String,
+    val zh: String,
+    val pos: String = "",
+    val cat: String = "",
+    val romaji: String = "",
+)
 data class QuizKana(val id: String, val hiragana: String, val katakana: String, val romaji: String, val group: String = "seion")
 
 /** 五十音分组（PRD v0.2：清音/浊音/拗音）。 */
@@ -57,6 +75,9 @@ object KanjiQuizPolicy {
 
     fun shouldUseKanji(ja: String, kana: String, roll: Double, chance: Double = DEFAULT_CHANCE): Boolean =
         hasKanjiForm(ja, kana) && roll < chance
+
+    fun shouldUseKanji(hasKanji: Boolean, roll: Double, chance: Double = DEFAULT_CHANCE): Boolean =
+        hasKanji && roll < chance
 }
 
 /**
@@ -77,14 +98,10 @@ object QuizGenerator {
         audio: Boolean = false,
     ): Quiz {
         if (audio && direction == WordQuizDirection.JP_TO_CN) {
-            val distractors = pool.asSequence()
-                .filter { it.id != target.id }
-                .map { it.zh }
-                .filter { it != target.zh }
-                .distinct()
-                .shuffled(random)
-                .take(OPTION_COUNT - 1)
-                .toList()
+            val distractors = DistractorSelector.pick(
+                target, pool, { it.zh }, OPTION_COUNT - 1, random,
+                excludeSameKana = false,
+            )
             val options = (distractors + target.zh).shuffled(random)
             return Quiz(
                 kind = QuizKind.AUDIO_WORD_JP_TO_CN,
@@ -95,28 +112,25 @@ object QuizGenerator {
                 audioText = target.ja,
             )
         }
-        val (question, subQuestion, answerText, distractorOf) = when (direction) {
+        val (question, subQuestion, answerText, distractorOf, excludeSameKana) = when (direction) {
             WordQuizDirection.JP_TO_CN -> QuizSpec(
                 question = "「${target.ja}」是什么意思？",
                 subQuestion = target.kana.takeIf { it != target.ja },
                 answerText = target.zh,
                 distractorOf = { it.zh },
+                excludeSameKana = false,
             )
             WordQuizDirection.CN_TO_JP -> QuizSpec(
                 question = "“${target.zh}”对应哪个词？",
                 subQuestion = null,
                 answerText = displayWord(target),
                 distractorOf = { displayWord(it) },
+                excludeSameKana = true,
             )
         }
-        val distractors = pool.asSequence()
-            .filter { it.id != target.id }
-            .map(distractorOf)
-            .filter { it != answerText }
-            .distinct()
-            .shuffled(random)
-            .take(OPTION_COUNT - 1)
-            .toList()
+        val distractors = DistractorSelector.pick(
+            target, pool, distractorOf, OPTION_COUNT - 1, random, excludeSameKana,
+        )
         val options = (distractors + answerText).shuffled(random)
         return Quiz(
             kind = if (direction == WordQuizDirection.JP_TO_CN) QuizKind.WORD_JP_TO_CN else QuizKind.WORD_CN_TO_JP,
@@ -124,6 +138,22 @@ object QuizGenerator {
             subQuestion = subQuestion,
             options = options,
             answerIndex = options.indexOf(answerText),
+        )
+    }
+
+    fun typeKanaQuiz(target: QuizWord): Quiz {
+        val accepted = listOf(target.kana, target.romaji.lowercase())
+            .map { it.trim() }
+            .filter { it.isNotEmpty() }
+            .distinct()
+        return Quiz(
+            kind = QuizKind.WORD_TYPE_KANA,
+            question = "“${target.zh}”的读音怎么写？",
+            subQuestion = target.ja.takeIf { it != target.kana },
+            options = emptyList(),
+            answerIndex = -1,
+            acceptedAnswers = accepted,
+            inputPrompt = "用假名或罗马音作答",
         )
     }
 
@@ -137,16 +167,11 @@ object QuizGenerator {
         require(target.ja != target.kana) { "kanjiQuiz 需要汉字形目标词" }
         return if (toKanji) {
             val answerText = target.ja
-            val distractors = pool.asSequence()
-                .filter { it.id != target.id }
-                .filter { it.kana != target.kana }
-                .filter { KanjiQuizPolicy.hasKanjiForm(it.ja, it.kana) }
-                .map { it.ja }
-                .filter { it != answerText }
-                .distinct()
-                .shuffled(random)
-                .take(OPTION_COUNT - 1)
-                .toList()
+            val distractors = DistractorSelector.pick(
+                target, pool, { it.ja }, OPTION_COUNT - 1, random,
+                excludeSameKana = true,
+                eligible = { KanjiQuizPolicy.hasKanjiForm(it.ja, it.kana) },
+            )
             val options = (distractors + answerText).shuffled(random)
             Quiz(
                 kind = QuizKind.KANA_TO_KANJI,
@@ -157,14 +182,10 @@ object QuizGenerator {
             )
         } else {
             val answerText = target.kana
-            val distractors = pool.asSequence()
-                .filter { it.id != target.id }
-                .map { it.kana }
-                .filter { it != answerText }
-                .distinct()
-                .shuffled(random)
-                .take(OPTION_COUNT - 1)
-                .toList()
+            val distractors = DistractorSelector.pick(
+                target, pool, { it.kana }, OPTION_COUNT - 1, random,
+                excludeSameKana = true,
+            )
             val options = (distractors + answerText).shuffled(random)
             Quiz(
                 kind = QuizKind.KANJI_TO_KANA,
@@ -217,5 +238,6 @@ object QuizGenerator {
         val subQuestion: String?,
         val answerText: String,
         val distractorOf: (QuizWord) -> String,
+        val excludeSameKana: Boolean,
     )
 }

@@ -10,7 +10,7 @@
 - 需求文档：`PRD.md`（§17 为 v0.1 评审决策记录，**§18 为 v0.2 决策记录**，与正文冲突时以 §17/§18 为准）
 - 优化方案：`OPTIMIZATION.md`（**Accepted**，用户 2026-09-09 确认 Q1–Q3 推荐项；确认后可写入 PRD §19，尚未改 PRD）
 - Git 身份（仓库级已配置）：`Ageha <ageha6912@gmail.com>`，勿用其他身份提交
-- 已发布：**v0.5.0**（tag + GitHub Release，正式签名 APK）。`versionName = "0.5.0"` / `versionCode` 11
+- 已发布：**v0.6.1**（tag + GitHub Release，正式签名 APK）。`versionName = "0.6.1"` / `versionCode` 12
 
 ## 2. 环境速查
 
@@ -28,7 +28,7 @@
 ```bash
 ./gradlew :app:assembleDebug        # debug APK
 ./gradlew :app:assembleRelease      # 正式签名 APK（keystore 已配置，见第 6 节坑 9）
-./gradlew :app:testDebugUnitTest    # 单元测试（当前 110 项），必须全绿才能交付
+./gradlew :app:testDebugUnitTest    # 单元测试（当前 117 项），必须全绿才能交付
 python tools/validate_content.py    # 内容校验，必须通过才能改内容；CI 已跑
 ```
 
@@ -44,18 +44,16 @@ python tools/validate_content.py    # 内容校验，必须通过才能改内容
 - **发布工程**：R8 minify + 资源收缩（APK 1.5MB）、正式签名接入（keystore）、GitHub Actions 门禁 CI（`.github/workflows/ci.yml`：55 测试 + assembleDebug）
 - 55 项单元测试全绿；PRD §18 决策记录；README 数字已同步
 
-## 4. 当前任务：v0.5.0 已发布（2026-09-10）
+## 4. 当前任务：v0.6.1 已发布（2026-09-10）
 
-按 `OPTIMIZATION.md` 已交付并发布（tag v0.5.0 + GitHub Release，正式签名 APK）：
+v0.5.0 已发布。本题型版本 tag v0.6.1 / versionCode 12（0.5.1 与 0.6.0 未单独发版，内容已打进 0.5.0）。
 
-- **装载**：`ContentSeedPlanner` 按文件比版本；`ContentLoader` `withTransaction` + 差集删除；双写旧 `content_version` 不删除；seed `try/catch Log.e`。进度表不级联删。
-- **计数**：首页/统计/我的/学习 Tab 用 COUNT Flow；已学/到期/掌握 `INNER JOIN` 内容表。
-- **工程**：Room `exportSchema` + `app/schemas/.../3.json`；`AppMigrations`；CI `validate_content.py`。
-- **UX**：单词列表搜索+分类/掌握度筛选；提醒 Chip 18–22 点（文案「大约」）；首页五十音横幅可跳过。
-- **内容**：N4 语法 +7（80→87，含 ～んです / ～について）；每日一句 60→120。
-- 110 项单元测试全绿；versionName 0.5.0 / versionCode 11。
+- **干扰项**：同词性优先、再同分类；汉字题排除同音与纯假名形。
+- **打假名**：中→日约 20% 出 `WORD_TYPE_KANA`；假名/片假名/罗马音均可。`TypeAnswerPolicy.DEFAULT_CHANCE = 0` 可关闭。
+- **变体选择**：`QuizVariantPicker`；汉字题不再因假 ja/kana 静默消失。
+- 117 项单元测试全绿。
 
-下一步：v0.6.1 题型（干扰项 / 打字题），或 **PR-R51** 停写旧 `content_version`（必须在 0.5.0 已对外发布之后）。
+下一步：FSRS（v0.7）或 **PR-R51** 停写旧 `content_version`。
 
 v0.4.3（中文引擎修复）：用户真机「只读汉字跳过假名 + 不弹引导」——默认引擎是中文引擎，init 成功且 availableLanguages 谎报日语。重构 JapaneseTts：装有 Google TTS（com.google.android.tts）时显式按包名初始化不走默认；可用性用 setLanguage(JAPAN) 返回值实测（MISSING_DATA→数据引导 / NOT_SUPPORTED→引擎引导）；manifest 加 <queries>（Android 11+ 包可见性，漏加会查不到 Google TTS）；点击时 refreshJapaneseStatus 保证下载后立即生效。
 
