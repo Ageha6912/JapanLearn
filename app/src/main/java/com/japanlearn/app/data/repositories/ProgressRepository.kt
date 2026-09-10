@@ -8,6 +8,7 @@ import com.japanlearn.app.data.local.UserProgressEntity
 import com.japanlearn.app.data.local.WordEntity
 import com.japanlearn.app.data.local.WrongAnswerEntity
 import com.japanlearn.app.domain.Mastery
+import com.japanlearn.app.domain.Scheduler
 import com.japanlearn.app.domain.SrsScheduler
 import com.japanlearn.app.domain.SrsState
 import com.japanlearn.app.domain.StreakCalculator
@@ -142,6 +143,7 @@ class ContentRepository(private val db: AppDatabase) {
 class ProgressRepository(
     private val db: AppDatabase,
     private val dates: DateProvider,
+    private val scheduler: Scheduler = SrsScheduler,
 ) {
     /**
      * 学习/复习一项内容后推进 SRS；“不认识”同时记入错题本，答对（模糊及以上）则从错题本移除。
@@ -150,9 +152,19 @@ class ProgressRepository(
         val now = dates.nowMillis()
         val existing = db.progressDao().get(contentType, contentId)
         val previous = existing?.let {
-            SrsState(it.mastery, it.intervalDays, it.reviewCount, it.dueAt)
+            SrsState(
+                mastery = it.mastery,
+                intervalDays = it.intervalDays,
+                reviewCount = it.reviewCount,
+                dueAt = it.dueAt,
+                stability = it.stability,
+                difficulty = it.difficulty,
+                lapses = it.lapses,
+                fsrsState = it.fsrsState,
+                lastReviewedAt = it.lastReviewedAt,
+            )
         } ?: SrsState.INITIAL
-        val next = SrsScheduler.next(previous, mastery, now)
+        val next = scheduler.next(previous, mastery, now)
         db.progressDao().upsert(
             UserProgressEntity(
                 rowId = existing?.rowId ?: 0,
@@ -162,9 +174,13 @@ class ProgressRepository(
                 intervalDays = next.intervalDays,
                 reviewCount = next.reviewCount,
                 dueAt = next.dueAt,
-                status = if (SrsScheduler.isMastered(next)) "mastered" else "learning",
+                status = if (scheduler.isMastered(next)) "mastered" else "learning",
                 learnedAt = existing?.learnedAt ?: now,
                 lastReviewedAt = now,
+                stability = next.stability,
+                difficulty = next.difficulty,
+                lapses = next.lapses,
+                fsrsState = next.fsrsState,
             )
         )
         db.reviewRecordDao().insert(

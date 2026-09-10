@@ -17,7 +17,7 @@ import androidx.room.RoomDatabase
         WrongAnswerEntity::class,
         MetaEntity::class,
     ],
-    version = 3,
+    version = 4,
     exportSchema = true,
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -34,7 +34,11 @@ abstract class AppDatabase : RoomDatabase() {
     companion object {
         fun build(context: Context): AppDatabase =
             Room.databaseBuilder(context, AppDatabase::class.java, "japanlearn.db")
-                .addMigrations(AppMigrations.MIGRATION_1_2, AppMigrations.MIGRATION_2_3)
+                .addMigrations(
+                    AppMigrations.MIGRATION_1_2,
+                    AppMigrations.MIGRATION_2_3,
+                    AppMigrations.MIGRATION_3_4,
+                )
                 .build()
     }
 }

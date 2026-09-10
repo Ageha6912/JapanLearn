@@ -179,7 +179,7 @@ interface ProgressDao {
     @Query(
         "SELECT COUNT(*) FROM user_progress p " +
             "INNER JOIN words w ON w.id = p.contentId " +
-            "WHERE p.contentType = 'word' AND p.intervalDays >= :threshold",
+            "WHERE p.contentType = 'word' AND p.stability >= :threshold",
     )
     fun masteredWordCount(threshold: Int): Flow<Int>
 

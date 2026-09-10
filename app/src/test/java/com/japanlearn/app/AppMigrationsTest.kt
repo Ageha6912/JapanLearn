@@ -19,14 +19,27 @@ class AppMigrationsTest {
     }
 
     @Test
+    fun `3到4 给进度表加 FSRS 列`() {
+        assertTrue(AppMigrations.SQL_3_4_STABILITY.contains("ALTER TABLE user_progress ADD COLUMN stability"))
+        assertTrue(AppMigrations.SQL_3_4_FSRS_STATE.contains("fsrsState"))
+        assertTrue(AppMigrations.SQL_3_4_SEED.contains("intervalDays > 0"))
+    }
+
+    @Test
     fun `Room schema v3 快照已入库`() {
+        assertTrue(schemaExists("3.json"))
+    }
+
+    @Test
+    fun `Room schema v4 快照已入库`() {
+        assertTrue(schemaExists("4.json"))
+    }
+
+    private fun schemaExists(name: String): Boolean {
         val candidates = listOf(
-            File("schemas/com.japanlearn.app.data.local.AppDatabase/3.json"),
-            File("app/schemas/com.japanlearn.app.data.local.AppDatabase/3.json"),
+            File("schemas/com.japanlearn.app.data.local.AppDatabase", name),
+            File("app/schemas/com.japanlearn.app.data.local.AppDatabase", name),
         )
-        assertTrue(
-            "expected AppDatabase/3.json under app/schemas; cwd=${File(".").canonicalPath}",
-            candidates.any { it.isFile },
-        )
+        return candidates.any { it.isFile }
     }
 }

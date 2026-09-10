@@ -72,6 +72,23 @@ class BackupFileSchemaTest {
     }
 
     @Test
+    fun `旧备份缺 FSRS 字段仍能解析`() {
+        val text = """
+            {"schema":"japanlearn-backup","version":1,"exportedAt":1700000000000,
+             "progress":[{"rowId":0,"contentType":"word","contentId":"w001","mastery":2,
+             "intervalDays":8,"reviewCount":1,"dueAt":1,"status":"learning","learnedAt":1}]}
+        """.trimIndent()
+        val parsed = BackupFileSchema.parse(text)
+        assertNotNull(parsed)
+        val row = parsed!!.progress.single()
+        assertEquals(0.0, row.stability, 0.0)
+        assertEquals("New", row.fsrsState)
+        val normalized = BackupFileSchema.normalizeForImport(parsed)
+        assertEquals(8.0, normalized.progress.single().stability, 0.0)
+        assertEquals("Review", normalized.progress.single().fsrsState)
+    }
+
+    @Test
     fun `导入归一化 清空自增主键避免与本地冲突`() {
         val withIds = BackupFile(
             schema = BackupFileSchema.CURRENT,
@@ -88,7 +105,7 @@ class BackupFileSchemaTest {
         val normalized = BackupFileSchema.normalizeForImport(withIds)
         assertEquals(0, normalized.progress.single().rowId)
         assertEquals(0, normalized.reviewRecords.single().id)
-        // 归一化不改动其余字段
-        assertEquals(progress.copy(rowId = 0), normalized.progress.single())
+        val seeded = progress.copy(rowId = 0, stability = 3.0, fsrsState = "Review")
+        assertEquals(seeded, normalized.progress.single())
     }
 }

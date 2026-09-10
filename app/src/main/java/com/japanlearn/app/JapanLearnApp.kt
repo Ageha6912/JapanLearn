@@ -9,6 +9,7 @@ import com.japanlearn.app.data.ProgressRepository
 import com.japanlearn.app.data.SettingsRepository
 import com.japanlearn.app.data.StatsRepository
 import com.japanlearn.app.data.local.AppDatabase
+import com.japanlearn.app.domain.FsrsScheduler
 import com.japanlearn.app.util.DateProvider
 import com.japanlearn.app.util.JapaneseTts
 import com.japanlearn.app.util.SystemDateProvider
@@ -23,7 +24,7 @@ class AppContainer(context: Application) {
     val settings = SettingsRepository(context)
     private val db: AppDatabase = AppDatabase.build(context)
     val content = ContentRepository(db)
-    val progress = ProgressRepository(db, dateProvider)
+    val progress = ProgressRepository(db, dateProvider, FsrsScheduler)
     val stats = StatsRepository(db, dateProvider)
     val backup = BackupManager(db)
     private val loader = ContentLoader(context, db)

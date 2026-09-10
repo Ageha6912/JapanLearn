@@ -27,4 +27,25 @@ object AppMigrations {
             db.execSQL(SQL_2_3_GRAMMAR_LEVEL)
         }
     }
+
+    const val SQL_3_4_STABILITY =
+        "ALTER TABLE user_progress ADD COLUMN stability REAL NOT NULL DEFAULT 0"
+    const val SQL_3_4_DIFFICULTY =
+        "ALTER TABLE user_progress ADD COLUMN difficulty REAL NOT NULL DEFAULT 0"
+    const val SQL_3_4_LAPSES =
+        "ALTER TABLE user_progress ADD COLUMN lapses INTEGER NOT NULL DEFAULT 0"
+    const val SQL_3_4_FSRS_STATE =
+        "ALTER TABLE user_progress ADD COLUMN fsrsState TEXT NOT NULL DEFAULT 'New'"
+    const val SQL_3_4_SEED =
+        "UPDATE user_progress SET stability = CAST(intervalDays AS REAL), difficulty = 5.0, fsrsState = 'Review' WHERE intervalDays > 0"
+
+    val MIGRATION_3_4 = object : Migration(3, 4) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL(SQL_3_4_STABILITY)
+            db.execSQL(SQL_3_4_DIFFICULTY)
+            db.execSQL(SQL_3_4_LAPSES)
+            db.execSQL(SQL_3_4_FSRS_STATE)
+            db.execSQL(SQL_3_4_SEED)
+        }
+    }
 }

@@ -73,6 +73,10 @@ data class UserProgressEntity(
     val status: String,
     val learnedAt: Long,
     val lastReviewedAt: Long? = null,
+    val stability: Double = 0.0,
+    val difficulty: Double = 0.0,
+    val lapses: Int = 0,
+    val fsrsState: String = "New",
 )
 
 @Serializable

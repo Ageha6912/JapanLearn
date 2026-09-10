@@ -77,6 +77,26 @@ class SrsSchedulerTest {
     }
 
     @Test
+    fun `熟悉后仍保留 FSRS 种子字段`() {
+        val prev = SrsState(
+            mastery = Mastery.KNOWN.level,
+            intervalDays = 8,
+            reviewCount = 3,
+            dueAt = now,
+            stability = 8.0,
+            difficulty = 5.0,
+            lapses = 1,
+            fsrsState = "Review",
+        )
+        val next = SrsScheduler.next(prev, Mastery.KNOWN, now)
+        assertEquals(8.0, next.stability, 0.0)
+        assertEquals(5.0, next.difficulty, 0.0)
+        assertEquals(1, next.lapses)
+        assertEquals("Review", next.fsrsState)
+        assertEquals(12, next.intervalDays)
+    }
+
+    @Test
     fun `熟练且间隔达到 21 天视为已掌握`() {
         val mastered = SrsState(Mastery.MASTERED.level, intervalDays = SrsScheduler.MASTERED_INTERVAL_DAYS, reviewCount = 5, dueAt = now)
         val notYet = SrsState(Mastery.MASTERED.level, intervalDays = 7, reviewCount = 1, dueAt = now)

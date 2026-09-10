@@ -20,8 +20,18 @@ data class SrsState(
     val intervalDays: Int,
     val reviewCount: Int,
     val dueAt: Long,
+    val stability: Double = 0.0,
+    val difficulty: Double = 0.0,
+    val lapses: Int = 0,
+    val fsrsState: String = "New",
+    val lastReviewedAt: Long? = null,
 ) {
     companion object {
         val INITIAL = SrsState(mastery = 0, intervalDays = 0, reviewCount = 0, dueAt = 0L)
     }
+}
+
+interface Scheduler {
+    fun next(state: SrsState, mastery: Mastery, nowMillis: Long): SrsState
+    fun isMastered(state: SrsState): Boolean
 }

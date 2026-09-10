@@ -70,7 +70,7 @@ class BackupManager(private val db: AppDatabase) {
 /** 备份文件的解析与校验（纯逻辑，便于单元测试）。 */
 object BackupFileSchema {
     const val CURRENT = "japanlearn-backup"
-    const val VERSION = 1
+    const val VERSION = 2
 
     private val json = Json { ignoreUnknownKeys = true }
 
@@ -87,7 +87,18 @@ object BackupFileSchema {
      * 使同一份备份可重复导入、且不与本地已有记录的主键冲突。
      */
     fun normalizeForImport(file: BackupFile): BackupFile = file.copy(
-        progress = file.progress.map { it.copy(rowId = 0) },
+        progress = file.progress.map {
+            val seeded = if (it.stability == 0.0 && it.intervalDays > 0) {
+                it.copy(
+                    rowId = 0,
+                    stability = it.intervalDays.toDouble(),
+                    fsrsState = if (it.fsrsState == "New") "Review" else it.fsrsState,
+                )
+            } else {
+                it.copy(rowId = 0)
+            }
+            seeded
+        },
         reviewRecords = file.reviewRecords.map { it.copy(id = 0) },
     )
 

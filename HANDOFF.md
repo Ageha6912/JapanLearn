@@ -10,7 +10,7 @@
 - 需求文档：`PRD.md`（§17 为 v0.1 评审决策记录，**§18 为 v0.2 决策记录**，与正文冲突时以 §17/§18 为准）
 - 优化方案：`OPTIMIZATION.md`（**Accepted**，用户 2026-09-09 确认 Q1–Q3 推荐项；确认后可写入 PRD §19，尚未改 PRD）
 - Git 身份（仓库级已配置）：`Ageha <ageha6912@gmail.com>`，勿用其他身份提交
-- 已发布：**v0.6.1**（tag + GitHub Release，正式签名 APK）。`versionName = "0.6.1"` / `versionCode` 12
+- 已发布：**v0.7.0**（tag + GitHub Release，正式签名 APK）。`versionName = "0.7.0"` / `versionCode` 13
 
 ## 2. 环境速查
 
@@ -28,7 +28,7 @@
 ```bash
 ./gradlew :app:assembleDebug        # debug APK
 ./gradlew :app:assembleRelease      # 正式签名 APK（keystore 已配置，见第 6 节坑 9）
-./gradlew :app:testDebugUnitTest    # 单元测试（当前 117 项），必须全绿才能交付
+./gradlew :app:testDebugUnitTest    # 单元测试（当前 125 项），必须全绿才能交付
 python tools/validate_content.py    # 内容校验，必须通过才能改内容；CI 已跑
 ```
 
@@ -44,16 +44,17 @@ python tools/validate_content.py    # 内容校验，必须通过才能改内容
 - **发布工程**：R8 minify + 资源收缩（APK 1.5MB）、正式签名接入（keystore）、GitHub Actions 门禁 CI（`.github/workflows/ci.yml`：55 测试 + assembleDebug）
 - 55 项单元测试全绿；PRD §18 决策记录；README 数字已同步
 
-## 4. 当前任务：v0.6.1 已发布（2026-09-10）
+## 4. 当前任务：v0.7.0 已发布（2026-09-10）
 
-v0.5.0 已发布。本题型版本 tag v0.6.1 / versionCode 12（0.5.1 与 0.6.0 未单独发版，内容已打进 0.5.0）。
+v0.6.1 已发布。本题型之后接入 FSRS：tag v0.7.0 / versionCode 13。
 
-- **干扰项**：同词性优先、再同分类；汉字题排除同音与纯假名形。
-- **打假名**：中→日约 20% 出 `WORD_TYPE_KANA`；假名/片假名/罗马音均可。`TypeAnswerPolicy.DEFAULT_CHANCE = 0` 可关闭。
-- **变体选择**：`QuizVariantPicker`；汉字题不再因假 ja/kana 静默消失。
-- 117 项单元测试全绿。
+- Room v4：`user_progress` 增 `stability` / `difficulty` / `lapses` / `fsrsState`
+- 默认 `FsrsScheduler`（ts-fsrs v5.4.2 long-term，`enable_short_term=false`；Again 仍 `dueAt=now`）
+- 自评按钮文案不变；已掌握改为 `stability >= 21`
+- 回滚：`AppContainer` 改回 `SrsScheduler`，勿删 `MIGRATION_3_4`
+- 125 项单元测试全绿
 
-下一步：FSRS（v0.7）或 **PR-R51** 停写旧 `content_version`。
+下一步：**PR-R51** 停写旧 `content_version`，或预生成音频（默认不做）。
 
 v0.4.3（中文引擎修复）：用户真机「只读汉字跳过假名 + 不弹引导」——默认引擎是中文引擎，init 成功且 availableLanguages 谎报日语。重构 JapaneseTts：装有 Google TTS（com.google.android.tts）时显式按包名初始化不走默认；可用性用 setLanguage(JAPAN) 返回值实测（MISSING_DATA→数据引导 / NOT_SUPPORTED→引擎引导）；manifest 加 <queries>（Android 11+ 包可见性，漏加会查不到 Google TTS）；点击时 refreshJapaneseStatus 保证下载后立即生效。
 
