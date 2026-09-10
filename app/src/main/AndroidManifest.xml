@@ -3,9 +3,21 @@
 
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
-    <!-- 查询 Google TTS 是否已安装（显式选用引擎），Android 11+ 包可见性要求 -->
+    <!-- 查询 Google TTS / 系统 TTS 服务与安装页（Android 11+ 包可见性） -->
     <queries>
         <package android:name="com.google.android.tts" />
+        <intent>
+            <action android:name="android.intent.action.TTS_SERVICE" />
+        </intent>
+        <intent>
+            <action android:name="android.speech.tts.engine.INSTALL_TTS_DATA" />
+        </intent>
+        <intent>
+            <action android:name="android.speech.tts.engine.CHECK_TTS_DATA" />
+        </intent>
+        <intent>
+            <action android:name="com.android.settings.TTS_SETTINGS" />
+        </intent>
     </queries>
 
     <application

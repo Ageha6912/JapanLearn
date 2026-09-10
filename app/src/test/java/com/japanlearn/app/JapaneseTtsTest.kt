@@ -3,11 +3,11 @@ package com.japanlearn.app
 import com.japanlearn.app.util.JapaneseTts
 import com.japanlearn.app.util.JapaneseTts.Action
 import com.japanlearn.app.util.JapaneseTts.State
+import com.japanlearn.app.util.JapaneseTts.VoiceProbe
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
-import java.util.Locale
 
 /** 日语 TTS 可用性判定与发音引导决策（v0.4.3 实测 setLanguage 结果）。 */
 class JapaneseTtsTest {
@@ -32,15 +32,116 @@ class JapaneseTtsTest {
     fun `引擎谎报 setLanguage 可用但没有日语 voice 时必须视为不可用`() {
         assertEquals(
             langNotSupported,
-            JapaneseTts.verifiedJapaneseStatus(langAvailable, hasJapaneseVoice = false),
+            JapaneseTts.verifiedJapaneseStatus(langAvailable, VoiceProbe.NONE),
         )
         assertEquals(
             langAvailable,
-            JapaneseTts.verifiedJapaneseStatus(langAvailable, hasJapaneseVoice = true),
+            JapaneseTts.verifiedJapaneseStatus(langAvailable, VoiceProbe.INSTALLED),
         )
         assertEquals(
             langMissingData,
-            JapaneseTts.verifiedJapaneseStatus(langMissingData, hasJapaneseVoice = false),
+            JapaneseTts.verifiedJapaneseStatus(langMissingData, VoiceProbe.NONE),
+        )
+    }
+
+    @Test
+    fun `voice 列表为空时信任 setLanguage 不误判为不支持`() {
+        assertEquals(
+            langAvailable,
+            JapaneseTts.verifiedJapaneseStatus(langAvailable, VoiceProbe.UNKNOWN),
+        )
+        assertEquals(
+            langNotSupported,
+            JapaneseTts.verifiedJapaneseStatus(langNotSupported, VoiceProbe.UNKNOWN),
+        )
+    }
+
+    @Test
+    fun `日语 voice 全是未安装时引导下载数据而不是安装引擎`() {
+        assertEquals(
+            langMissingData,
+            JapaneseTts.verifiedJapaneseStatus(langAvailable, VoiceProbe.MISSING_DATA),
+        )
+        assertEquals(
+            Action.GUIDE_VOICE_DATA,
+            JapaneseTts.decideAction(State.READY, japaneseUsable = false, japaneseMissingData = true),
+        )
+    }
+
+    @Test
+    fun `已安装日语 voice 时即使 setLanguage 失败也视为可用`() {
+        assertEquals(
+            android.speech.tts.TextToSpeech.LANG_AVAILABLE,
+            JapaneseTts.verifiedJapaneseStatus(langNotSupported, VoiceProbe.INSTALLED),
+        )
+    }
+
+    @Test
+    fun `日语 locale 识别 ja 与 jpn`() {
+        assertTrue(JapaneseTts.isJapaneseLocale("ja"))
+        assertTrue(JapaneseTts.isJapaneseLocale("JA", "jpn"))
+        assertTrue(JapaneseTts.isJapaneseLocale("", "jpn"))
+        assertFalse(JapaneseTts.isJapaneseLocale("zh"))
+        assertFalse(JapaneseTts.isJapaneseLocale("en", "eng"))
+        assertTrue(JapaneseTts.isJapaneseCountry("JP"))
+        assertTrue(JapaneseTts.isJapaneseCountry("jpn"))
+        assertFalse(JapaneseTts.isJapaneseCountry("CN"))
+    }
+
+    @Test
+    fun `选 voice 优先已安装的 ja-JP 本地语音`() {
+        val chineseFake = JapaneseTts.VoiceCandidate(language = "zh", country = "CN", quality = 500, name = "zh-cn")
+        val netJa = JapaneseTts.VoiceCandidate(
+            language = "ja", country = "JP", quality = 400, networkRequired = true, name = "ja-jp-net",
+        )
+        val localJa = JapaneseTts.VoiceCandidate(
+            language = "ja", country = "JP", quality = 300, name = "ja-JP-local",
+        )
+        val notInstalled = JapaneseTts.VoiceCandidate(
+            language = "ja", country = "JP", quality = 500, notInstalled = true, name = "ja-missing",
+        )
+        val picked = JapaneseTts.pickBestJapaneseVoice(listOf(chineseFake, netJa, notInstalled, localJa))
+        assertEquals("ja-JP-local", picked?.name)
+    }
+
+    @Test
+    fun `没有本地日语 voice 时才退到网络 voice`() {
+        val netJa = JapaneseTts.VoiceCandidate(
+            language = "ja", country = "JP", quality = 400, networkRequired = true, name = "ja-net",
+        )
+        assertEquals("ja-net", JapaneseTts.pickBestJapaneseVoice(listOf(netJa))?.name)
+        assertEquals(null, JapaneseTts.pickBestJapaneseVoice(emptyList()))
+    }
+
+    @Test
+    fun `voice 探测 空列表 仅中文 未下载日语 已安装`() {
+        assertEquals(VoiceProbe.UNKNOWN, JapaneseTts.classifyJapaneseVoices(emptyList()))
+        assertEquals(
+            VoiceProbe.NONE,
+            JapaneseTts.classifyJapaneseVoices(
+                listOf(JapaneseTts.VoiceCandidate(language = "zh", country = "CN", name = "zh-cn")),
+            ),
+        )
+        assertEquals(
+            VoiceProbe.MISSING_DATA,
+            JapaneseTts.classifyJapaneseVoices(
+                listOf(
+                    JapaneseTts.VoiceCandidate(
+                        language = "ja", country = "JP", notInstalled = true, name = "ja-missing",
+                    ),
+                ),
+            ),
+        )
+        assertEquals(
+            VoiceProbe.INSTALLED,
+            JapaneseTts.classifyJapaneseVoices(
+                listOf(
+                    JapaneseTts.VoiceCandidate(
+                        language = "ja", country = "JP", notInstalled = true, name = "ja-missing",
+                    ),
+                    JapaneseTts.VoiceCandidate(language = "ja", country = "JP", name = "ja-local"),
+                ),
+            ),
         )
     }
 

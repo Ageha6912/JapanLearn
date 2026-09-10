@@ -249,6 +249,15 @@ fun TtsButton(text: String, onSpeak: (String) -> Unit, modifier: Modifier = Modi
                     onSpeak(text)
                     if (state == com.japanlearn.app.util.JapaneseTts.State.WAITING) {
                         waitingForTtsCheck = true
+                    } else if (!app.tts.japaneseUsable()) {
+                        val after = com.japanlearn.app.util.JapaneseTts.decideAction(
+                            app.tts.currentState(),
+                            app.tts.japaneseUsable(),
+                            app.tts.japaneseMissingData(),
+                        )
+                        if (after != com.japanlearn.app.util.JapaneseTts.Action.SPEAK) {
+                            guideKind = after
+                        }
                     }
                 }
                 com.japanlearn.app.util.JapaneseTts.Action.GUIDE_VOICE_DATA ->

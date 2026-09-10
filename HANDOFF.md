@@ -28,7 +28,7 @@
 ```bash
 ./gradlew :app:assembleDebug        # debug APK
 ./gradlew :app:assembleRelease      # 正式签名 APK（keystore 已配置，见第 6 节坑 9）
-./gradlew :app:testDebugUnitTest    # 单元测试（当前 125 项），必须全绿才能交付
+./gradlew :app:testDebugUnitTest    # 单元测试（当前 132 项），必须全绿才能交付
 python tools/validate_content.py    # 内容校验，必须通过才能改内容；CI 已跑
 ```
 
@@ -52,7 +52,14 @@ v0.6.1 已发布。本题型之后接入 FSRS：tag v0.7.0 / versionCode 13。
 - 默认 `FsrsScheduler`（ts-fsrs v5.4.2 long-term，`enable_short_term=false`；Again 仍 `dueAt=now`）
 - 自评按钮文案不变；已掌握改为 `stability >= 21`
 - 回滚：`AppContainer` 改回 `SrsScheduler`，勿删 `MIGRATION_3_4`
-- 125 项单元测试全绿
+- 当时 125 项单元测试全绿
+
+v0.7.0 之后（已合入 main，尚未单独发版）：点击发音 TTS
+- 每次 `speak` 重套日语；优先已安装的 `ja-JP` 本地 voice
+- voice 列表为空时不误判为不支持；日语 voice 全未下载走「下载语音数据」而不是再装引擎
+- 走媒体音轨（`USAGE_MEDIA` / `STREAM_MUSIC`）+ 短暂音频焦点，避开中文 ROM 静音的无障碍音轨
+- manifest 补 `TTS_SERVICE` / `INSTALL_TTS_DATA` / `TTS_SETTINGS` 的 `<queries>`
+- 132 项单元测试全绿。真机诊断仍先抓 `logcat -s JapaneseTts`
 
 下一步：**PR-R51** 停写旧 `content_version`，或预生成音频（默认不做）。
 
