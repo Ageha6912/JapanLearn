@@ -5,6 +5,7 @@ import android.content.pm.PackageManager
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -61,6 +62,7 @@ data class ProfileUiState(
     val dailyNewGrammar: Int = 3,
     val dailyReviewCap: Int = 30,
     val reminderEnabled: Boolean = false,
+    val reminderHour: Int = 20,
     val streak: Int = 0,
     val learnedWords: Int = 0,
     val masteredWords: Int = 0,
@@ -79,10 +81,11 @@ class ProfileViewModel(private val app: AppContainer) : ViewModel() {
         collect(app.settings.dailyNewGrammar) { s, v -> s.copy(dailyNewGrammar = v) }
         collect(app.settings.dailyReviewCap) { s, v -> s.copy(dailyReviewCap = v) }
         collect(app.settings.reminderEnabled) { s, v -> s.copy(reminderEnabled = v) }
+        collect(app.settings.reminderHour) { s, v -> s.copy(reminderHour = v) }
         collect(app.stats.weekly()) { s, v -> s.copy(streak = v.streak) }
         collect(app.progress.learnedWordCount()) { s, v -> s.copy(learnedWords = v) }
         collect(app.progress.masteredWordCount()) { s, v -> s.copy(masteredWords = v) }
-        collect(app.content.wordsAll()) { s, v -> s.copy(totalWords = v.size) }
+        collect(app.content.wordCount()) { s, v -> s.copy(totalWords = v) }
     }
 
     fun setDailyNewWords(v: Int) = app.settings.setDailyNewWords(v)
@@ -91,7 +94,18 @@ class ProfileViewModel(private val app: AppContainer) : ViewModel() {
 
     fun setReminderEnabled(context: android.content.Context, v: Boolean) {
         app.settings.setReminderEnabled(v)
-        com.japanlearn.app.work.ReviewReminder.schedule(context, v)
+        com.japanlearn.app.work.ReviewReminder.schedule(
+            context, v, app.settings.reminderHour.value, app.settings.reminderMinute.value,
+        )
+    }
+
+    fun setReminderHour(context: android.content.Context, hour: Int) {
+        app.settings.setReminderHour(hour)
+        if (app.settings.reminderEnabled.value) {
+            com.japanlearn.app.work.ReviewReminder.schedule(
+                context, true, hour, app.settings.reminderMinute.value,
+            )
+        }
     }
 
     fun resetAll() {
@@ -285,7 +299,7 @@ fun ProfileScreen(nav: NavHostController) {
                         Column(Modifier.weight(1f)) {
                             Text("每日复习提醒", style = MaterialTheme.typography.titleSmall)
                             Text(
-                                "每天 20:00 检查一次，有到期内容时提醒",
+                                "大约在所选整点检查一次，有到期内容时提醒",
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
@@ -303,6 +317,12 @@ fun ProfileScreen(nav: NavHostController) {
                             },
                         )
                     }
+                    ChipRow(
+                        options = com.japanlearn.app.util.ReminderScheduler.HOUR_PRESETS,
+                        selected = state.reminderHour,
+                        onSelect = { vm.setReminderHour(context, it) },
+                        label = { "%02d:00".format(it) },
+                    )
                 }
             }
 
@@ -382,13 +402,21 @@ fun ProfileScreen(nav: NavHostController) {
 }
 
 @Composable
-private fun ChipRow(options: List<Int>, selected: Int, onSelect: (Int) -> Unit) {
-    Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.padding(bottom = 6.dp)) {
+private fun ChipRow(
+    options: List<Int>,
+    selected: Int,
+    onSelect: (Int) -> Unit,
+    label: (Int) -> String = { "$it" },
+) {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(bottom = 6.dp),
+    ) {
         options.forEach { option ->
             FilterChip(
                 selected = selected == option,
                 onClick = { onSelect(option) },
-                label = { Text("$option") },
+                label = { Text(label(option)) },
             )
         }
     }

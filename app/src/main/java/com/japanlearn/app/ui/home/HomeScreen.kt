@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.FilterChip
@@ -59,6 +60,7 @@ import com.japanlearn.app.Routes
 import com.japanlearn.app.data.ThemeMode
 import com.japanlearn.app.data.breakdown
 import com.japanlearn.app.data.local.SentenceEntity
+import com.japanlearn.app.domain.HomeKanaIntro
 import com.japanlearn.app.ui.components.AppButton
 import com.japanlearn.app.ui.components.SectionCard
 import com.japanlearn.app.ui.components.StatTile
@@ -94,6 +96,7 @@ data class HomeUiState(
     val todayReviews: Int = 0,
     val sentence: SentenceEntity? = null,
     val sentenceIndex: Int = 0,
+    val kanaIntroDismissed: Boolean = false,
 )
 
 class HomeViewModel(private val app: AppContainer) : ViewModel() {
@@ -105,8 +108,8 @@ class HomeViewModel(private val app: AppContainer) : ViewModel() {
         fun <T> collect(flow: kotlinx.coroutines.flow.Flow<T>, update: (HomeUiState, T) -> HomeUiState) {
             viewModelScope.launch { flow.collect { _state.update { s -> update(s, it) } } }
         }
-        collect(app.content.wordsAll()) { s, v -> s.copy(totalWords = v.size) }
-        collect(app.content.grammarAll()) { s, v -> s.copy(totalGrammar = v.size) }
+        collect(app.content.wordCount()) { s, v -> s.copy(totalWords = v) }
+        collect(app.content.grammarCount()) { s, v -> s.copy(totalGrammar = v) }
         collect(app.progress.learnedWordCount()) { s, v -> s.copy(learnedWords = v) }
         collect(app.progress.learnedGrammarCount()) { s, v -> s.copy(learnedGrammar = v) }
         collect(app.progress.masteredWordCount()) { s, v -> s.copy(masteredWords = v) }
@@ -122,6 +125,7 @@ class HomeViewModel(private val app: AppContainer) : ViewModel() {
         }
         collect(app.settings.dailyNewWords) { s, v -> s.copy(targetNewWords = v) }
         collect(app.settings.dailyNewGrammar) { s, v -> s.copy(targetNewGrammar = v) }
+        collect(app.settings.kanaIntroDismissed) { s, v -> s.copy(kanaIntroDismissed = v) }
         // 今日一句：收集 Room Flow 而非一次性读取——首次启动时内容装载（seed）可能晚于
         // 首页打开，一次性读到空表会把句子永久置空，横条从此消失
         viewModelScope.launch {
@@ -136,6 +140,8 @@ class HomeViewModel(private val app: AppContainer) : ViewModel() {
     }
 
     fun speak(text: String) = app.tts.speak(text)
+
+    fun dismissKanaIntro() = app.settings.setKanaIntroDismissed(true)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -232,8 +238,22 @@ fun HomeScreen(nav: NavHostController) {
                         .padding(horizontal = 20.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                 ) {
+                if (HomeKanaIntro.shouldShow(state.kanaIntroDismissed)) {
+                    StaggerIn(1) {
+                        SectionCard {
+                            Text("还不会五十音？", style = MaterialTheme.typography.titleMedium)
+                            Text(
+                                "先花 10 分钟认平假名",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                            AppButton("去学五十音") { nav.navigate(Routes.KANA) }
+                            TextButton(onClick = { vm.dismissKanaIntro() }) { Text("暂时跳过") }
+                        }
+                    }
+                }
                 // 今日学习主卡：进度环 + 任务清单
-                StaggerIn(1) {
+                StaggerIn(2) {
                     SectionCard {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
@@ -376,6 +396,7 @@ fun HomeScreen(nav: NavHostController) {
             val context = LocalContext.current
             val themeMode by app.settings.themeMode.collectAsStateWithLifecycle()
             val reminderEnabled by app.settings.reminderEnabled.collectAsStateWithLifecycle()
+            val reminderHour by app.settings.reminderHour.collectAsStateWithLifecycle()
             val permissionLauncher = androidx.activity.compose.rememberLauncherForActivityResult(
                 androidx.activity.result.contract.ActivityResultContracts.RequestPermission(),
             ) { }
@@ -403,7 +424,7 @@ fun HomeScreen(nav: NavHostController) {
                 Column {
                     Text("每日复习提醒", style = MaterialTheme.typography.titleSmall)
                     Text(
-                        "每天 20:00 检查到期内容",
+                        "大约在所选整点检查到期内容",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -418,9 +439,30 @@ fun HomeScreen(nav: NavHostController) {
                             permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
                         }
                         app.settings.setReminderEnabled(enabled)
-                        com.japanlearn.app.work.ReviewReminder.schedule(context, enabled)
+                        com.japanlearn.app.work.ReviewReminder.schedule(
+                            context, enabled, reminderHour, app.settings.reminderMinute.value,
+                        )
                     },
                 )
+            }
+            Row(
+                Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                com.japanlearn.app.util.ReminderScheduler.HOUR_PRESETS.forEach { hour ->
+                    FilterChip(
+                        selected = reminderHour == hour,
+                        onClick = {
+                            app.settings.setReminderHour(hour)
+                            if (reminderEnabled) {
+                                com.japanlearn.app.work.ReviewReminder.schedule(
+                                    context, true, hour, app.settings.reminderMinute.value,
+                                )
+                            }
+                        },
+                        label = { Text("%02d:00".format(hour)) },
+                    )
+                }
             }
             HorizontalDivider()
             TextButton(onClick = {

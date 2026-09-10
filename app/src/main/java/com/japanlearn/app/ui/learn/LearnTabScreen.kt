@@ -66,15 +66,31 @@ class LearnViewModel(private val app: AppContainer) : ViewModel() {
         fun <T> collect(flow: kotlinx.coroutines.flow.Flow<T>, reducer: (LearnUiState, T) -> LearnUiState) {
             viewModelScope.launch { flow.collect { v -> _state.update { cur -> reducer(cur, v) } } }
         }
-        collect(app.content.kanaAll()) { s, v -> s.copy(totalKana = v.size) }
+        collect(app.content.kanaCount()) { s, v -> s.copy(totalKana = v) }
         collect(
-            kotlinx.coroutines.flow.combine(app.content.wordsAll(), app.progress.wordMasteryMap()) { words, mastery ->
-                words.groupBy { it.level }.mapValues { (_, ws) -> ws.size to ws.count { it.id in mastery } }
+            kotlinx.coroutines.flow.combine(
+                app.content.wordCountByLevel("N5"),
+                app.content.learnedWordCountByLevel("N5"),
+                app.content.wordCountByLevel("N4"),
+                app.content.learnedWordCountByLevel("N4"),
+            ) { n5Total, n5Learned, n4Total, n4Learned ->
+                mapOf(
+                    "N5" to (n5Total to n5Learned),
+                    "N4" to (n4Total to n4Learned),
+                )
             },
         ) { s, v -> s.copy(wordStats = v) }
         collect(
-            kotlinx.coroutines.flow.combine(app.content.grammarAll(), app.progress.learnedIds("grammar")) { gs, ids ->
-                gs.groupBy { it.level }.mapValues { (_, list) -> list.size to list.count { it.id in ids } }
+            kotlinx.coroutines.flow.combine(
+                app.content.grammarCountByLevel("N5"),
+                app.content.learnedGrammarCountByLevel("N5"),
+                app.content.grammarCountByLevel("N4"),
+                app.content.learnedGrammarCountByLevel("N4"),
+            ) { n5Total, n5Learned, n4Total, n4Learned ->
+                mapOf(
+                    "N5" to (n5Total to n5Learned),
+                    "N4" to (n4Total to n4Learned),
+                )
             },
         ) { s, v -> s.copy(grammarStats = v) }
         collect(app.progress.learnedWordCount()) { s, v -> s.copy(learnedWords = v) }

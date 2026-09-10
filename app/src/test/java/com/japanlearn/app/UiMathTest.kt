@@ -29,6 +29,21 @@ class UiMathTest {
         assertEquals(0f, UiMath.dailyProgress(-2, 10), 1e-6f)
     }
 
+    @Test
+    fun visibleLearned_excludesOrphanProgressIds() {
+        val progress = setOf("w001", "w002", "gone")
+        val content = setOf("w001", "w002", "w003")
+        assertEquals(2, UiMath.visibleLearned(progress, content))
+    }
+
+    @Test
+    fun visibleLearned_allPresentCountsFully() {
+        val ids = setOf("g01", "g02")
+        assertEquals(2, UiMath.visibleLearned(ids, ids))
+        assertEquals(0, UiMath.visibleLearned(setOf("orphan"), setOf("g01")))
+        assertEquals(0, UiMath.visibleLearned(emptySet(), setOf("g01")))
+    }
+
     // ---------- barFraction ----------
 
     @Test

@@ -42,6 +42,20 @@ class ReminderSchedulerTest {
     }
 
     @Test
+    fun `自定义 21 点 当天尚未到达则当天触发`() {
+        val now = millis(2026, 9, 6, 10, 0)
+        val delay = ReminderScheduler.nextTriggerDelayMillis(now, hour = 21, zone = zone)
+        assertEquals(millis(2026, 9, 6, 21, 0) - now, delay)
+    }
+
+    @Test
+    fun `小时被钳制在 0 到 23`() {
+        assertEquals(0, ReminderScheduler.coerceHour(-1))
+        assertEquals(23, ReminderScheduler.coerceHour(24))
+        assertEquals(21, ReminderScheduler.coerceHour(21))
+    }
+
+    @Test
     fun `延迟始终为正且不超过 24 小时`() {
         val morning = ReminderScheduler.nextTriggerDelayMillis(millis(2026, 9, 6, 0, 1), zone = zone)
         val night = ReminderScheduler.nextTriggerDelayMillis(millis(2026, 9, 6, 23, 59), zone = zone)

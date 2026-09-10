@@ -41,14 +41,23 @@ object ReviewReminder {
         manager.createNotificationChannel(channel)
     }
 
-    /** 按开关调度或取消每日 20:00 的周期任务。 */
-    fun schedule(context: Context, enabled: Boolean) {
+    /** 按开关调度或取消每日提醒。时刻受 WorkManager flex 约束，大约在所选整点，不是精确闹钟。 */
+    fun schedule(
+        context: Context,
+        enabled: Boolean,
+        hour: Int = ReminderScheduler.DEFAULT_HOUR,
+        minute: Int = ReminderScheduler.DEFAULT_MINUTE,
+    ) {
         val wm = WorkManager.getInstance(context)
         if (!enabled) {
             wm.cancelUniqueWork(WORK_NAME)
             return
         }
-        val delay = ReminderScheduler.nextTriggerDelayMillis(System.currentTimeMillis())
+        val delay = ReminderScheduler.nextTriggerDelayMillis(
+            System.currentTimeMillis(),
+            hour = ReminderScheduler.coerceHour(hour),
+            minute = ReminderScheduler.coerceMinute(minute),
+        )
         val request = PeriodicWorkRequestBuilder<ReviewReminderWorker>(1, TimeUnit.DAYS)
             .setInitialDelay(delay, TimeUnit.MILLISECONDS)
             .build()

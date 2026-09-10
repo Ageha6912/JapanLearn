@@ -12,6 +12,10 @@ object ReminderScheduler {
     const val DEFAULT_HOUR = 20
     const val DEFAULT_MINUTE = 0
     const val DAY_LIMIT_MILLIS = 24 * 60 * 60 * 1000L
+    val HOUR_PRESETS = listOf(18, 19, 20, 21, 22)
+
+    fun coerceHour(hour: Int): Int = hour.coerceIn(0, 23)
+    fun coerceMinute(minute: Int): Int = minute.coerceIn(0, 59)
 
     /** 距下一次触发时刻的延迟毫秒数（触发时刻已过今天则顺延到明天）。 */
     fun nextTriggerDelayMillis(

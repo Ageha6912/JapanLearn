@@ -12,6 +12,7 @@ import com.japanlearn.app.domain.SrsScheduler
 import com.japanlearn.app.domain.SrsState
 import com.japanlearn.app.domain.StreakCalculator
 import com.japanlearn.app.util.DateProvider
+import com.japanlearn.app.util.ReminderScheduler
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
@@ -38,6 +39,13 @@ class SettingsRepository(context: Context) {
     val dailyNewGrammar = MutableStateFlow(prefs.getInt(KEY_NEW_GRAMMAR, DEFAULT_NEW_GRAMMAR))
     val dailyReviewCap = MutableStateFlow(prefs.getInt(KEY_REVIEW_CAP, DEFAULT_REVIEW_CAP))
     val reminderEnabled = MutableStateFlow(prefs.getBoolean(KEY_REMINDER, false))
+    val reminderHour = MutableStateFlow(
+        ReminderScheduler.coerceHour(prefs.getInt(KEY_REMINDER_HOUR, ReminderScheduler.DEFAULT_HOUR)),
+    )
+    val reminderMinute = MutableStateFlow(
+        ReminderScheduler.coerceMinute(prefs.getInt(KEY_REMINDER_MINUTE, ReminderScheduler.DEFAULT_MINUTE)),
+    )
+    val kanaIntroDismissed = MutableStateFlow(prefs.getBoolean(KEY_KANA_INTRO_DISMISSED, false))
     val studyLevel = MutableStateFlow(prefs.getString(KEY_STUDY_LEVEL, DEFAULT_STUDY_LEVEL) ?: DEFAULT_STUDY_LEVEL)
     val themeMode = MutableStateFlow(ThemeMode.fromRaw(prefs.getString(KEY_THEME, null)))
 
@@ -54,6 +62,23 @@ class SettingsRepository(context: Context) {
     fun setReminderEnabled(value: Boolean) {
         prefs.edit().putBoolean(KEY_REMINDER, value).apply()
         reminderEnabled.value = value
+    }
+
+    fun setReminderHour(value: Int) {
+        val hour = ReminderScheduler.coerceHour(value)
+        prefs.edit().putInt(KEY_REMINDER_HOUR, hour).apply()
+        reminderHour.value = hour
+    }
+
+    fun setReminderMinute(value: Int) {
+        val minute = ReminderScheduler.coerceMinute(value)
+        prefs.edit().putInt(KEY_REMINDER_MINUTE, minute).apply()
+        reminderMinute.value = minute
+    }
+
+    fun setKanaIntroDismissed(value: Boolean) {
+        prefs.edit().putBoolean(KEY_KANA_INTRO_DISMISSED, value).apply()
+        kanaIntroDismissed.value = value
     }
 
     fun setDailyNewWords(value: Int) {
@@ -79,6 +104,9 @@ class SettingsRepository(context: Context) {
         private const val KEY_NEW_GRAMMAR = "daily_new_grammar"
         private const val KEY_REVIEW_CAP = "daily_review_cap"
         private const val KEY_REMINDER = "reminder_enabled"
+        private const val KEY_REMINDER_HOUR = "reminder_hour"
+        private const val KEY_REMINDER_MINUTE = "reminder_minute"
+        private const val KEY_KANA_INTRO_DISMISSED = "kana_intro_dismissed"
         private const val KEY_STUDY_LEVEL = "study_level"
         private const val KEY_THEME = "theme_mode"
         const val DEFAULT_STUDY_LEVEL = "N5"
@@ -93,6 +121,14 @@ class ContentRepository(private val db: AppDatabase) {
     fun wordsAll() = db.wordDao().all()
     fun grammarAll() = db.grammarDao().all()
     fun sentencesAll() = db.sentenceDao().all()
+
+    fun wordCount() = db.wordDao().countFlow()
+    fun grammarCount() = db.grammarDao().countFlow()
+    fun kanaCount() = db.kanaDao().countFlow()
+    fun wordCountByLevel(level: String) = db.wordDao().countByLevelFlow(level)
+    fun grammarCountByLevel(level: String) = db.grammarDao().countByLevelFlow(level)
+    fun learnedWordCountByLevel(level: String) = db.wordDao().learnedCountByLevelFlow(level)
+    fun learnedGrammarCountByLevel(level: String) = db.grammarDao().learnedCountByLevelFlow(level)
 
     suspend fun wordById(id: String): WordEntity? = db.wordDao().byId(id)
     suspend fun grammarById(id: String) = db.grammarDao().byId(id)

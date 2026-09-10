@@ -21,8 +21,24 @@ interface WordDao {
     @Query("SELECT COUNT(*) FROM words")
     suspend fun count(): Int
 
+    @Query("SELECT COUNT(*) FROM words")
+    fun countFlow(): Flow<Int>
+
+    @Query("SELECT COUNT(*) FROM words WHERE level = :level")
+    fun countByLevelFlow(level: String): Flow<Int>
+
+    @Query(
+        "SELECT COUNT(*) FROM words w " +
+            "INNER JOIN user_progress p ON p.contentId = w.id AND p.contentType = 'word' " +
+            "WHERE w.level = :level",
+    )
+    fun learnedCountByLevelFlow(level: String): Flow<Int>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(items: List<WordEntity>)
+
+    @Query("DELETE FROM words WHERE id IN (:ids)")
+    suspend fun deleteByIds(ids: List<String>)
 
     /** 尚未开始学习的单词（新词队列），按学习级别过滤 */
     @Query(
@@ -53,8 +69,24 @@ interface GrammarDao {
     @Query("SELECT COUNT(*) FROM grammar")
     suspend fun count(): Int
 
+    @Query("SELECT COUNT(*) FROM grammar")
+    fun countFlow(): Flow<Int>
+
+    @Query("SELECT COUNT(*) FROM grammar WHERE level = :level")
+    fun countByLevelFlow(level: String): Flow<Int>
+
+    @Query(
+        "SELECT COUNT(*) FROM grammar g " +
+            "INNER JOIN user_progress p ON p.contentId = g.id AND p.contentType = 'grammar' " +
+            "WHERE g.level = :level",
+    )
+    fun learnedCountByLevelFlow(level: String): Flow<Int>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(items: List<GrammarEntity>)
+
+    @Query("DELETE FROM grammar WHERE id IN (:ids)")
+    suspend fun deleteByIds(ids: List<String>)
 
     @Query(
         "SELECT * FROM grammar WHERE level = :level AND id NOT IN " +
@@ -81,8 +113,14 @@ interface KanaDao {
     @Query("SELECT COUNT(*) FROM kana")
     suspend fun count(): Int
 
+    @Query("SELECT COUNT(*) FROM kana")
+    fun countFlow(): Flow<Int>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(items: List<KanaEntity>)
+
+    @Query("DELETE FROM kana WHERE id IN (:ids)")
+    suspend fun deleteByIds(ids: List<String>)
 }
 
 @Dao
@@ -98,6 +136,9 @@ interface SentenceDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(items: List<SentenceEntity>)
+
+    @Query("DELETE FROM sentences WHERE id IN (:ids)")
+    suspend fun deleteByIds(ids: List<String>)
 }
 
 @Dao
@@ -121,19 +162,39 @@ interface ProgressDao {
     @Query("SELECT * FROM user_progress")
     suspend fun allOnce(): List<UserProgressEntity>
 
-    @Query("SELECT COUNT(*) FROM user_progress WHERE contentType = 'word' AND dueAt <= :now")
+    @Query(
+        "SELECT COUNT(*) FROM user_progress p " +
+            "INNER JOIN words w ON w.id = p.contentId " +
+            "WHERE p.contentType = 'word' AND p.dueAt <= :now",
+    )
     fun dueWordCount(now: Long): Flow<Int>
 
-    @Query("SELECT COUNT(*) FROM user_progress WHERE contentType = 'grammar' AND dueAt <= :now")
+    @Query(
+        "SELECT COUNT(*) FROM user_progress p " +
+            "INNER JOIN grammar g ON g.id = p.contentId " +
+            "WHERE p.contentType = 'grammar' AND p.dueAt <= :now",
+    )
     fun dueGrammarCount(now: Long): Flow<Int>
 
-    @Query("SELECT COUNT(*) FROM user_progress WHERE contentType = 'word' AND intervalDays >= :threshold")
+    @Query(
+        "SELECT COUNT(*) FROM user_progress p " +
+            "INNER JOIN words w ON w.id = p.contentId " +
+            "WHERE p.contentType = 'word' AND p.intervalDays >= :threshold",
+    )
     fun masteredWordCount(threshold: Int): Flow<Int>
 
-    @Query("SELECT COUNT(*) FROM user_progress WHERE contentType = 'word'")
+    @Query(
+        "SELECT COUNT(*) FROM user_progress p " +
+            "INNER JOIN words w ON w.id = p.contentId " +
+            "WHERE p.contentType = 'word'",
+    )
     fun countWordFlow(): Flow<Int>
 
-    @Query("SELECT COUNT(*) FROM user_progress WHERE contentType = 'grammar'")
+    @Query(
+        "SELECT COUNT(*) FROM user_progress p " +
+            "INNER JOIN grammar g ON g.id = p.contentId " +
+            "WHERE p.contentType = 'grammar'",
+    )
     fun countGrammarFlow(): Flow<Int>
 }
 

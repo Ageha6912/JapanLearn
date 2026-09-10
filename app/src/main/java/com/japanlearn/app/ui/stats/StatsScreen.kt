@@ -77,8 +77,8 @@ class StatsViewModel(private val app: AppContainer) : ViewModel() {
         collect(app.progress.learnedWordCount()) { s, v -> s.copy(learnedWords = v) }
         collect(app.progress.masteredWordCount()) { s, v -> s.copy(masteredWords = v) }
         collect(app.progress.learnedGrammarCount()) { s, v -> s.copy(learnedGrammar = v) }
-        collect(app.content.wordsAll()) { s, v -> s.copy(totalWords = v.size) }
-        collect(app.content.grammarAll()) { s, v -> s.copy(totalGrammar = v.size) }
+        collect(app.content.wordCount()) { s, v -> s.copy(totalWords = v) }
+        collect(app.content.grammarCount()) { s, v -> s.copy(totalGrammar = v) }
     }
 
     fun speak(text: String) = app.tts.speak(text)

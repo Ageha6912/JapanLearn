@@ -8,8 +8,9 @@
 
 - 仓库：https://github.com/Ageha6912/JapanLearn（公开，远端 origin 已配置）
 - 需求文档：`PRD.md`（§17 为 v0.1 评审决策记录，**§18 为 v0.2 决策记录**，与正文冲突时以 §17/§18 为准）
+- 优化方案：`OPTIMIZATION.md`（**Accepted**，用户 2026-09-09 确认 Q1–Q3 推荐项；确认后可写入 PRD §19，尚未改 PRD）
 - Git 身份（仓库级已配置）：`Ageha <ageha6912@gmail.com>`，勿用其他身份提交
-- 当前版本：**v0.4.1 已发布**（tag + GitHub Release，正式签名 APK），main 干净点 `757d80e`
+- 已发布：**v0.5.0**（tag + GitHub Release，正式签名 APK）。`versionName = "0.5.0"` / `versionCode` 11
 
 ## 2. 环境速查
 
@@ -27,8 +28,8 @@
 ```bash
 ./gradlew :app:assembleDebug        # debug APK
 ./gradlew :app:assembleRelease      # 正式签名 APK（keystore 已配置，见第 6 节坑 9）
-./gradlew :app:testDebugUnitTest    # 77 项单元测试，必须全绿才能交付
-python tools/validate_content.py    # 内容校验，必须通过才能改内容
+./gradlew :app:testDebugUnitTest    # 单元测试（当前 110 项），必须全绿才能交付
+python tools/validate_content.py    # 内容校验，必须通过才能改内容；CI 已跑
 ```
 
 ## 3. 已完成
@@ -43,9 +44,24 @@ python tools/validate_content.py    # 内容校验，必须通过才能改内容
 - **发布工程**：R8 minify + 资源收缩（APK 1.5MB）、正式签名接入（keystore）、GitHub Actions 门禁 CI（`.github/workflows/ci.yml`：55 测试 + assembleDebug）
 - 55 项单元测试全绿；PRD §18 决策记录；README 数字已同步
 
-## 4. 当前任务：v0.4.0 已发布（2026-09-06），无进行中任务
+## 4. 当前任务：v0.5.0 已发布（2026-09-10）
+
+按 `OPTIMIZATION.md` 已交付并发布（tag v0.5.0 + GitHub Release，正式签名 APK）：
+
+- **装载**：`ContentSeedPlanner` 按文件比版本；`ContentLoader` `withTransaction` + 差集删除；双写旧 `content_version` 不删除；seed `try/catch Log.e`。进度表不级联删。
+- **计数**：首页/统计/我的/学习 Tab 用 COUNT Flow；已学/到期/掌握 `INNER JOIN` 内容表。
+- **工程**：Room `exportSchema` + `app/schemas/.../3.json`；`AppMigrations`；CI `validate_content.py`。
+- **UX**：单词列表搜索+分类/掌握度筛选；提醒 Chip 18–22 点（文案「大约」）；首页五十音横幅可跳过。
+- **内容**：N4 语法 +7（80→87，含 ～んです / ～について）；每日一句 60→120。
+- 110 项单元测试全绿；versionName 0.5.0 / versionCode 11。
+
+下一步：v0.6.1 题型（干扰项 / 打字题），或 **PR-R51** 停写旧 `content_version`（必须在 0.5.0 已对外发布之后）。
+
+v0.4.3（中文引擎修复）：用户真机「只读汉字跳过假名 + 不弹引导」——默认引擎是中文引擎，init 成功且 availableLanguages 谎报日语。重构 JapaneseTts：装有 Google TTS（com.google.android.tts）时显式按包名初始化不走默认；可用性用 setLanguage(JAPAN) 返回值实测（MISSING_DATA→数据引导 / NOT_SUPPORTED→引擎引导）；manifest 加 <queries>（Android 11+ 包可见性，漏加会查不到 Google TTS）；点击时 refreshJapaneseStatus 保证下载后立即生效。
 
 v0.3.1（小版本）：日语语音包缺失引导——TtsButton 点击时检测（`JapaneseTts.needsVoiceData()` 实时查 availableLanguages），缺失弹对话框 → `INSTALL_TTS_DATA` → 兜底 TTS 设置页 → 都没有则 Toast。模拟器上 INSTALL_TTS_DATA 解析不到（Android 15 AVD），兜底路径已实测；多数真机 Google TTS 支持该 action。74 项测试全绿。
+
+v0.4.2（横条消失修复）：用户真机报首页今日一句横条不见——根因是 HomeViewModel 用 sentencesAll().first() 一次性读句子，全新安装时 seed 晚于首页打开则读到空表、句子永久置空。改为收集 Room Flow（空列表不覆盖）。覆盖安装用户不受影响，**任何一次性读取 assets-seeded 表的地方都要警惕这个竞态**。
 
 v0.4.1（发音引导修复）：用户真机报「点发音无声且无引导」——根因是无 TTS 引擎的设备 TextToSpeech 初始化失败/永不回调，旧引导只覆盖「引擎正常但缺日语数据」。现在 JapaneseTts 三态（WAITING/READY/FAILED）+ 1.5s 超时兜底 + retryInit（慢启动可恢复）；点击决策纯函数 decideAction（SPEAK/GUIDE_VOICE_DATA/GUIDE_ENGINE）；无引擎引导走应用商店 Google TTS → Play 网页 → TTS 设置 → Toast；诊断日志 logcat -s JapaneseTts。**诊断真机发音问题先抓这个 tag**。
 
@@ -60,13 +76,13 @@ v0.3.0 已按方案全部交付并发布（tag v0.3.0 + GitHub Release，正式�
 - **工程**：Room v2→v3（words/grammar 加 level 列）；CI 加 assembleRelease；版本 0.3.0 / versionCode 4
 - 回归发现并修复：备份导入自增主键冲突（commit 342bf2f）；汉字题纯假名干扰项（afcafa2 内已含修复）
 
-后续候选（未排期，等真实使用数据）：FSRS、登录同步、AI 助手、N4 内容扩充二批、语法「～んです / ～について」等 7 条 N4 语法补充、复习提醒时间自定义、**预生成音频打包**（方案 B，APK +10~25MB 彻底解决发音离线，PRD §17.4 原方向）、**全球真人发音**（需后端 + UGC，Forvo API 或自建，与当前纯本地架构冲突，v1.0+ 再议）。
+后续路线以 `OPTIMIZATION.md` 为准（已确认：orphan 进度保留、v0.5–v0.6 继续系统 TTS、FSRS 不改自评文案）。登录同步 / AI / 真人发音仍非默认路径。
 
 ## 5. 关键架构事实（改代码前必读）
 
 - 手工依赖注入：`AppContainer`（`JapanLearnApp.container`），Compose 侧经 `LocalAppContainer` 获取；无 Hilt
-- 内容流：`assets/content/*.json`（带 `version` 字段）→ `ContentLoader.seedIfNeeded()` 按版本重装入 Room（进度表不受影响）→ Repository → ViewModel → Compose
-- Room 当前 **version 2**（v1→v2 迁移 = kana 表加 `groupName` 列，见 `AppDatabase.MIGRATION_1_2`）；v0.3 加 level 需写 v2→v3
+- 内容流：`assets/content/*.json`（每文件 `version`）→ `ContentSeedPlanner` 决定重装哪些表 → `ContentLoader.seedIfNeeded()` 一次 `withTransaction` 写入 Room（进度表不级联删）。0.5.0 双写旧加总 key `content_version`，不删除。首页/统计计数用 COUNT Flow，已学/到期 JOIN 内容表。
+- Room 当前 **version 3**（`exportSchema = true`，快照 `app/schemas/com.japanlearn.app.data.local.AppDatabase/3.json`）。v1→v2 = kana.`groupName`；v2→v3 = words/grammar.`level`。SQL 在 `AppMigrations.kt`。
 - SRS 调度 `domain/SrsScheduler.kt`（纯函数）；练习生成 `domain/QuizGenerator.kt`（纯函数，含听音变体 `AudioQuizPolicy`）；连击 `StreakCalculator`；限流 `ReviewPlanner`——这些都有单元测试，**改动必须同步补测试**（全局规则：每次改动必须有测试且全绿才能交付）
 - 统计逐题实时落库（每评一题 `stats.addStudy`），不要改回"会话结束才落库"
 - 设计系统：和色（藍 #1B3A5C × 桜 #C75B5B × 和纸 #F7F5F0）+ Manrope 字体 + `ui/motion/Motion.kt` 动效令牌（`StaggerIn`/`AnimatedCounterText` 等，尊重系统减弱动画）

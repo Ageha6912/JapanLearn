@@ -14,4 +14,11 @@ object UiMath {
     /** 入场级联延迟毫秒：按序号递增并封顶，避免长列表尾部等待。 */
     fun staggerDelayMs(index: Int, stepMs: Long, maxSteps: Int): Long =
         index.coerceIn(0, maxSteps) * stepMs
+
+    /**
+     * JOIN 内容表后的可见已学数：进度里指向已删除内容的 orphan id 不计。
+     * 对应 ProgressDao.countWordFlow 的 INNER JOIN 语义。
+     */
+    fun visibleLearned(progressIds: Set<String>, contentIds: Set<String>): Int =
+        progressIds.intersect(contentIds).size
 }

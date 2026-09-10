@@ -20,6 +20,9 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
+      - name: Validate content JSON
+        run: python3 tools/validate_content.py
+
       - name: Run unit tests
         run: ./gradlew :app:testDebugUnitTest --console=plain
 

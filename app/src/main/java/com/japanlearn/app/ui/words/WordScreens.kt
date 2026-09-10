@@ -9,6 +9,7 @@ import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -27,12 +28,20 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.SearchOff
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -48,11 +57,13 @@ import com.japanlearn.app.domain.AudioQuizPolicy
 import com.japanlearn.app.domain.KanjiQuizPolicy
 import com.japanlearn.app.domain.Mastery
 import com.japanlearn.app.domain.Quiz
+import com.japanlearn.app.domain.WordListFilter
 import com.japanlearn.app.domain.QuizGenerator
 import com.japanlearn.app.domain.QuizWord
 import com.japanlearn.app.domain.WordQuizDirection
 import com.japanlearn.app.ui.components.AppButton
 import com.japanlearn.app.ui.components.AppTopBar
+import com.japanlearn.app.ui.components.EmptyState
 import com.japanlearn.app.ui.components.LevelSwitchRow
 import com.japanlearn.app.ui.components.MasteryRow
 import com.japanlearn.app.ui.components.QuizView
@@ -71,6 +82,7 @@ import kotlinx.coroutines.launch
 
 // ---------------- 单词列表 ----------------
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WordListScreen(nav: NavHostController) {
     val app = LocalAppContainer.current
@@ -80,6 +92,14 @@ fun WordListScreen(nav: NavHostController) {
     val dailyTarget by app.settings.dailyNewWords.collectAsStateWithLifecycle()
     val words = wordsAll.filter { it.level == level }
     val learned = words.count { it.id in masteryMap }
+
+    var query by remember { mutableStateOf("") }
+    var catFilter by remember { mutableStateOf(WordListFilter.CAT_ALL) }
+    var masteryFilter by remember { mutableStateOf<Int?>(null) }
+    val categories = remember(words) { listOf(WordListFilter.CAT_ALL) + words.map { it.cat }.distinct() }
+    val filtered = words.filter { w ->
+        WordListFilter.matches(w, query, catFilter, masteryMap[w.id], masteryFilter)
+    }
 
     Scaffold(
         topBar = { AppTopBar("单词") { nav.popBackStack() } },
@@ -93,46 +113,102 @@ fun WordListScreen(nav: NavHostController) {
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
+                    OutlinedTextField(
+                        value = query,
+                        onValueChange = { query = it },
+                        modifier = Modifier.fillMaxWidth(),
+                        singleLine = true,
+                        placeholder = { Text("搜日语 / 假名 / 罗马音 / 中文") },
+                    )
+                    Row(
+                        Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        categories.forEach { cat ->
+                            FilterChip(
+                                selected = catFilter == cat,
+                                onClick = { catFilter = cat },
+                                label = { Text(cat) },
+                            )
+                        }
+                    }
+                    Row(
+                        Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        FilterChip(
+                            selected = masteryFilter == null,
+                            onClick = { masteryFilter = null },
+                            label = { Text("全部掌握度") },
+                        )
+                        FilterChip(
+                            selected = masteryFilter == WordListFilter.MASTERY_UNLEARNED,
+                            onClick = { masteryFilter = WordListFilter.MASTERY_UNLEARNED },
+                            label = { Text("未学") },
+                        )
+                        Mastery.entries.forEach { m ->
+                            FilterChip(
+                                selected = masteryFilter == m.level,
+                                onClick = { masteryFilter = m.level },
+                                label = { Text(m.label) },
+                            )
+                        }
+                    }
+                    Text(
+                        "显示 ${filtered.size} 个",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
                     AppButton("开始学习新词（$dailyTarget 个）") {
                         nav.navigate(Routes.wordSession(dailyTarget))
                     }
                 }
             }
-            val grouped = words.groupBy { it.cat }
-            grouped.forEach { (cat, list) ->
-                item(key = "header_$cat") {
-                    Text(
-                        cat,
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.padding(top = 14.dp, bottom = 6.dp),
+            if (filtered.isEmpty()) {
+                item {
+                    EmptyState(
+                        icon = Icons.Outlined.SearchOff,
+                        title = "没有匹配的单词",
+                        body = "试试别的关键词，或把分类、掌握度调回全部",
                     )
                 }
-                items(list, key = { it.id }) { w ->
-                    Surface(
-                        shape = MaterialTheme.shapes.large,
-                        color = MaterialTheme.colorScheme.surface,
-                        border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
-                        modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
-                    ) {
-                        Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
-                            MasteryDot(masteryMap[w.id])
-                            Spacer(Modifier.width(10.dp))
-                            Column(Modifier.weight(1f)) {
-                                Text(w.ja, style = MaterialTheme.typography.titleLarge)
-                                Text(
-                                    w.kana,
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                )
-                            }
-                            Column(horizontalAlignment = Alignment.End) {
-                                Text(w.zh, style = MaterialTheme.typography.bodyLarge)
-                                Text(
-                                    w.pos,
-                                    style = MaterialTheme.typography.labelSmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                )
+            } else {
+                val grouped = filtered.groupBy { it.cat }
+                grouped.forEach { (cat, list) ->
+                    item(key = "header_$cat") {
+                        Text(
+                            cat,
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.padding(top = 14.dp, bottom = 6.dp),
+                        )
+                    }
+                    items(list, key = { it.id }) { w ->
+                        Surface(
+                            shape = MaterialTheme.shapes.large,
+                            color = MaterialTheme.colorScheme.surface,
+                            border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+                            modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
+                        ) {
+                            Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
+                                MasteryDot(masteryMap[w.id])
+                                Spacer(Modifier.width(10.dp))
+                                Column(Modifier.weight(1f)) {
+                                    Text(w.ja, style = MaterialTheme.typography.titleLarge)
+                                    Text(
+                                        w.kana,
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    )
+                                }
+                                Column(horizontalAlignment = Alignment.End) {
+                                    Text(w.zh, style = MaterialTheme.typography.bodyLarge)
+                                    Text(
+                                        w.pos,
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    )
+                                }
                             }
                         }
                     }
