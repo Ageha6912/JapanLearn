@@ -10,7 +10,7 @@
 - 需求文档：`PRD.md`（§17 为 v0.1 评审决策记录，**§18 为 v0.2 决策记录**，与正文冲突时以 §17/§18 为准）
 - 优化方案：`OPTIMIZATION.md`（**Accepted**，用户 2026-09-09 确认 Q1–Q3 推荐项；确认后可写入 PRD §19，尚未改 PRD）
 - Git 身份（仓库级已配置）：`Ageha <ageha6912@gmail.com>`，勿用其他身份提交
-- 已发布：**v0.7.0**（tag + GitHub Release，正式签名 APK）。`versionName = "0.7.0"` / `versionCode` 13
+- 已发布：**v0.7.1**（tag + GitHub Release，正式签名 APK）。`versionName = "0.7.1"` / `versionCode` 14
 
 ## 2. 环境速查
 
@@ -44,22 +44,17 @@ python tools/validate_content.py    # 内容校验，必须通过才能改内容
 - **发布工程**：R8 minify + 资源收缩（APK 1.5MB）、正式签名接入（keystore）、GitHub Actions 门禁 CI（`.github/workflows/ci.yml`：55 测试 + assembleDebug）
 - 55 项单元测试全绿；PRD §18 决策记录；README 数字已同步
 
-## 4. 当前任务：v0.7.0 已发布（2026-09-10）
+## 4. 当前任务：v0.7.1 已发布（2026-09-10）
 
-v0.6.1 已发布。本题型之后接入 FSRS：tag v0.7.0 / versionCode 13。
+v0.7.0 已发布（FSRS）。本题为点击发音 TTS 修复：tag v0.7.1 / versionCode 14。
 
-- Room v4：`user_progress` 增 `stability` / `difficulty` / `lapses` / `fsrsState`
-- 默认 `FsrsScheduler`（ts-fsrs v5.4.2 long-term，`enable_short_term=false`；Again 仍 `dueAt=now`）
-- 自评按钮文案不变；已掌握改为 `stability >= 21`
-- 回滚：`AppContainer` 改回 `SrsScheduler`，勿删 `MIGRATION_3_4`
-- 当时 125 项单元测试全绿
-
-v0.7.0 之后（已合入 main，尚未单独发版）：点击发音 TTS
 - 每次 `speak` 重套日语；优先已安装的 `ja-JP` 本地 voice
 - voice 列表为空时不误判为不支持；日语 voice 全未下载走「下载语音数据」而不是再装引擎
 - 走媒体音轨（`USAGE_MEDIA` / `STREAM_MUSIC`）+ 短暂音频焦点，避开中文 ROM 静音的无障碍音轨
 - manifest 补 `TTS_SERVICE` / `INSTALL_TTS_DATA` / `TTS_SETTINGS` 的 `<queries>`
 - 132 项单元测试全绿。真机诊断仍先抓 `logcat -s JapaneseTts`
+
+v0.7.0：Room v4 FSRS 字段；默认 `FsrsScheduler`（ts-fsrs v5.4.2 long-term，`enable_short_term=false`；Again 仍 `dueAt=now`）；自评文案不变；已掌握 `stability >= 21`。回滚：`AppContainer` 改回 `SrsScheduler`，勿删 `MIGRATION_3_4`。
 
 下一步：**PR-R51** 停写旧 `content_version`，或预生成音频（默认不做）。
 
