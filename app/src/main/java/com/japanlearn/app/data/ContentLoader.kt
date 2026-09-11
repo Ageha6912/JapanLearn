@@ -26,7 +26,8 @@ import kotlinx.serialization.encodeToString
  * 内容装载（PRD §17.6 / OPTIMIZATION D2/D11）：
  * 按文件独立版本重装 assets JSON；一次启动包在一个事务里。
  * 学习进度表不受内容重装影响（不级联删除）。
- * 0.5.0 双写旧加总 key，不删除，便于回滚 0.4.4 APK。
+ * 0.5.0 双写旧加总 key；0.7.5（PR-R51）起停写并删除旧 key。
+ * 仍读取旧 key：仅当四把新 key 全缺时判定 0.4.x 升级并强制全量重装。
  */
 class ContentLoader(
     private val readAsset: (String) -> String,
@@ -57,19 +58,22 @@ class ContentLoader(
                 sentences = db.metaDao().get(ContentVersions.KEY_SENTENCES)?.toIntOrNull() ?: 0,
             )
             val kinds = ContentSeedPlanner.kindsToReload(installed, incoming, hasLegacyTotalOnly)
-            if (kinds.isEmpty()) return@withTransaction
-            Log.i(TAG, "reload kinds=$kinds incoming=$incoming")
+            if (kinds.isNotEmpty()) {
+                Log.i(TAG, "reload kinds=$kinds incoming=$incoming")
 
-            if (ContentKind.WORDS in kinds) reloadWords(words)
-            if (ContentKind.KANA in kinds) reloadKana(kana)
-            if (ContentKind.GRAMMAR in kinds) reloadGrammar(grammar)
-            if (ContentKind.SENTENCES in kinds) reloadSentences(sentences)
+                if (ContentKind.WORDS in kinds) reloadWords(words)
+                if (ContentKind.KANA in kinds) reloadKana(kana)
+                if (ContentKind.GRAMMAR in kinds) reloadGrammar(grammar)
+                if (ContentKind.SENTENCES in kinds) reloadSentences(sentences)
 
-            db.metaDao().upsert(MetaEntity(ContentVersions.KEY_KANA, incoming.kana.toString()))
-            db.metaDao().upsert(MetaEntity(ContentVersions.KEY_WORDS, incoming.words.toString()))
-            db.metaDao().upsert(MetaEntity(ContentVersions.KEY_GRAMMAR, incoming.grammar.toString()))
-            db.metaDao().upsert(MetaEntity(ContentVersions.KEY_SENTENCES, incoming.sentences.toString()))
-            db.metaDao().upsert(MetaEntity(ContentVersions.LEGACY_TOTAL, incoming.total().toString()))
+                db.metaDao().upsert(MetaEntity(ContentVersions.KEY_KANA, incoming.kana.toString()))
+                db.metaDao().upsert(MetaEntity(ContentVersions.KEY_WORDS, incoming.words.toString()))
+                db.metaDao().upsert(MetaEntity(ContentVersions.KEY_GRAMMAR, incoming.grammar.toString()))
+                db.metaDao().upsert(MetaEntity(ContentVersions.KEY_SENTENCES, incoming.sentences.toString()))
+            }
+            // PR-R51：停写旧加总 key。升级判定已在上面读完；写入新 key 后删除残留。
+            // 无内容变更时也要删，清理 0.5.x 双写留下的旧 key。
+            db.metaDao().delete(ContentVersions.LEGACY_TOTAL)
         }
     }
 

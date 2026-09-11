@@ -10,7 +10,8 @@
 - 需求文档：`PRD.md`（§17 为 v0.1 评审决策记录，**§18 为 v0.2 决策记录**，与正文冲突时以 §17/§18 为准）
 - 优化方案：`OPTIMIZATION.md`（**Accepted**，用户 2026-09-09 确认 Q1–Q3 推荐项；确认后可写入 PRD §19，尚未改 PRD）
 - Git 身份（仓库级已配置）：`Ageha <ageha6912@gmail.com>`，勿用其他身份提交
-- 已发布：**v0.7.1**（tag + GitHub Release，正式签名 APK）。`versionName = "0.7.1"` / `versionCode` 14
+- 已发布：**v0.7.4**（tag + GitHub Release，正式签名 APK）。`versionName = "0.7.4"` / `versionCode` 17
+- 本地未发版：v0.7.5（PR-R51 停写旧 `content_version`），`versionCode` 18
 
 ## 2. 环境速查
 
@@ -28,7 +29,7 @@
 ```bash
 ./gradlew :app:assembleDebug        # debug APK
 ./gradlew :app:assembleRelease      # 正式签名 APK（keystore 已配置，见第 6 节坑 9）
-./gradlew :app:testDebugUnitTest    # 单元测试（当前 132 项），必须全绿才能交付
+./gradlew :app:testDebugUnitTest    # 单元测试（当前 136 项），必须全绿才能交付
 python tools/validate_content.py    # 内容校验，必须通过才能改内容；CI 已跑
 ```
 
@@ -44,19 +45,31 @@ python tools/validate_content.py    # 内容校验，必须通过才能改内容
 - **发布工程**：R8 minify + 资源收缩（APK 1.5MB）、正式签名接入（keystore）、GitHub Actions 门禁 CI（`.github/workflows/ci.yml`：55 测试 + assembleDebug）
 - 55 项单元测试全绿；PRD §18 决策记录；README 数字已同步
 
-## 4. 当前任务：v0.7.1 已发布（2026-09-10）
+## 4. 当前任务：v0.7.5 本地就绪（PR-R51），待用户确认后发版
 
-v0.7.0 已发布（FSRS）。本题为点击发音 TTS 修复：tag v0.7.1 / versionCode 14。
+### v0.7.5（本地未 tag）— PR-R51 停写旧 content_version
+- `ContentLoader` 不再写 `meta.content_version` 加总 key；装载事务末尾 `MetaDao.delete(LEGACY_TOTAL)` 清理 0.5.x 双写残留
+- **仍读取**旧 key：`hasLegacyTotalOnly` 判定 0.4.x 升级并强制四文件全量重装，升级路径不受影响
+- `MetaDao` 新增 `delete(key)`。内容无变更时也会删旧 key
 
+### v0.7.4（已发布）— 日语 TTS 判定收紧 + 音色选择
+真机结论（Android 15 国行）：中文默认 TTS **会读日语**，但只念汉字跳过假名（「休みの間に予習しておきます。」→ 只念「休間習」），且 `setLanguage(ja)`/voice 列表都可能谎报可用。
+
+- **非 Google 引擎一律不信任日语**（`verifiedJapaneseStatus(..., usingGoogleTts=false)` → `LANG_NOT_SUPPORTED`），点击发音弹「缺少语音引擎」引导装 Google TTS
+- 仅本地已安装 ja voice 可用；网络 voice 视为缺数据
+- 我的 → 发音：列出已下载日语音色（`listInstalledJapaneseVoices`），RadioButton 切换 + 试听；`settings.ttsVoiceName` 持久化，`JapaneseTts.setPreferredVoice` 下次发音生效
+- 显示名：`ja-JP-Standard-A` →「标准 A」（`voiceDisplayName`）
+
+### v0.7.1（已发布）— 点击发音 TTS 修复
 - 每次 `speak` 重套日语；优先已安装的 `ja-JP` 本地 voice
 - voice 列表为空时不误判为不支持；日语 voice 全未下载走「下载语音数据」而不是再装引擎
 - 走媒体音轨（`USAGE_MEDIA` / `STREAM_MUSIC`）+ 短暂音频焦点，避开中文 ROM 静音的无障碍音轨
 - manifest 补 `TTS_SERVICE` / `INSTALL_TTS_DATA` / `TTS_SETTINGS` 的 `<queries>`
-- 132 项单元测试全绿。真机诊断仍先抓 `logcat -s JapaneseTts`
+- 真机诊断仍先抓 `logcat -s JapaneseTts`
 
 v0.7.0：Room v4 FSRS 字段；默认 `FsrsScheduler`（ts-fsrs v5.4.2 long-term，`enable_short_term=false`；Again 仍 `dueAt=now`）；自评文案不变；已掌握 `stability >= 21`。回滚：`AppContainer` 改回 `SrsScheduler`，勿删 `MIGRATION_3_4`。
 
-下一步：**PR-R51** 停写旧 `content_version`，或预生成音频（默认不做）。
+下一步：发版 v0.7.5；或把 OPTIMIZATION.md 结论写入 PRD §19；预生成音频仍默认不做（排 0.8）。
 
 v0.4.3（中文引擎修复）：用户真机「只读汉字跳过假名 + 不弹引导」——默认引擎是中文引擎，init 成功且 availableLanguages 谎报日语。重构 JapaneseTts：装有 Google TTS（com.google.android.tts）时显式按包名初始化不走默认；可用性用 setLanguage(JAPAN) 返回值实测（MISSING_DATA→数据引导 / NOT_SUPPORTED→引擎引导）；manifest 加 <queries>（Android 11+ 包可见性，漏加会查不到 Google TTS）；点击时 refreshJapaneseStatus 保证下载后立即生效。
 
@@ -82,7 +95,7 @@ v0.3.0 已按方案全部交付并发布（tag v0.3.0 + GitHub Release，正式�
 ## 5. 关键架构事实（改代码前必读）
 
 - 手工依赖注入：`AppContainer`（`JapanLearnApp.container`），Compose 侧经 `LocalAppContainer` 获取；无 Hilt
-- 内容流：`assets/content/*.json`（每文件 `version`）→ `ContentSeedPlanner` 决定重装哪些表 → `ContentLoader.seedIfNeeded()` 一次 `withTransaction` 写入 Room（进度表不级联删）。0.5.0 双写旧加总 key `content_version`，不删除。首页/统计计数用 COUNT Flow，已学/到期 JOIN 内容表。
+- 内容流：`assets/content/*.json`（每文件 `version`）→ `ContentSeedPlanner` 决定重装哪些表 → `ContentLoader.seedIfNeeded()` 一次 `withTransaction` 写入 Room（进度表不级联删）。**0.7.5 起停写并删除**旧加总 key `content_version`（仅读：0.4.x 升级判定）。首页/统计计数用 COUNT Flow，已学/到期 JOIN 内容表。
 - Room 当前 **version 3**（`exportSchema = true`，快照 `app/schemas/com.japanlearn.app.data.local.AppDatabase/3.json`）。v1→v2 = kana.`groupName`；v2→v3 = words/grammar.`level`。SQL 在 `AppMigrations.kt`。
 - SRS 调度 `domain/SrsScheduler.kt`（纯函数）；练习生成 `domain/QuizGenerator.kt`（纯函数，含听音变体 `AudioQuizPolicy`）；连击 `StreakCalculator`；限流 `ReviewPlanner`——这些都有单元测试，**改动必须同步补测试**（全局规则：每次改动必须有测试且全绿才能交付）
 - 统计逐题实时落库（每评一题 `stats.addStudy`），不要改回"会话结束才落库"
@@ -118,6 +131,8 @@ v0.3.0 已按方案全部交付并发布（tag v0.3.0 + GitHub Release，正式�
 
 **v0.3 新增**
 27. TextToSpeech 在部分 ROM（无默认引擎/冷启动引擎未就绪）上 onInit 会失败或永不回调——发音引导必须覆盖 FAILED 态，且不能依赖初始化回调一定发生（超时兜底 + retryInit）
+28. **国行中文 TTS 会「能读日语」但只念汉字**（真机 v0.7.2 实测「休みの間に…」→「休間習」）。`setLanguage(ja)` 可能返回可用、voice 列表也可能列出假 ja voice。**非 Google TTS 一律判日语不可用**，点发音引导装 Google TTS；不要试图信任中文引擎的日语能力
+29. 发音诊断真机仍先抓 `adb logcat -s JapaneseTts`；用户无 adb PATH 时用 `E:\Android\Sdk\platform-tools\adb.exe`
 20. 备份导入必须先过 `BackupFileSchema.normalizeForImport`（清自增主键）+ progress 按 (contentType, contentId) 查本地 rowId——直接 upsert 会 UNIQUE constraint 崩溃
 21. Glance 1.1.0：`clickable` 在 `androidx.glance.action` 包（不是 `androidx.glance`）；`actionStartActivity(intent)` 在 `androidx.glance.appwidget.action`；Intent 的 extras 会保留（深链 extra 直接 putExtra 即可）
 22. Git Bash 下 adb shell 里的 `/sdcard/...` 会被路径转换，用 `MSYS_NO_PATHCONV=1 adb shell "..."` 一行式命令

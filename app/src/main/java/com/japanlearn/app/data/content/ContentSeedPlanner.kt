@@ -17,7 +17,7 @@ data class ContentVersions(
         const val KEY_WORDS = "content_version_words"
         const val KEY_GRAMMAR = "content_version_grammar"
         const val KEY_SENTENCES = "content_version_sentences"
-        /** 0.4.x 加总 key。0.5.0 双写、不删除，便于回滚旧 APK。 */
+        /** 0.4.x 加总 key。只读用于升级判定；0.7.5 起不再写入，装载成功后删除。 */
         const val LEGACY_TOTAL = "content_version"
 
         fun fromMeta(get: (String) -> String?): ContentVersions = ContentVersions(
