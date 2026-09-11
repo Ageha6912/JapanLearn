@@ -26,12 +26,14 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -67,6 +69,8 @@ data class ProfileUiState(
     val learnedWords: Int = 0,
     val masteredWords: Int = 0,
     val totalWords: Int = 0,
+    val ttsVoiceName: String = "",
+    val ttsVoices: List<com.japanlearn.app.util.JapaneseTts.VoiceOption> = emptyList(),
 )
 
 class ProfileViewModel(private val app: AppContainer) : ViewModel() {
@@ -82,10 +86,20 @@ class ProfileViewModel(private val app: AppContainer) : ViewModel() {
         collect(app.settings.dailyReviewCap) { s, v -> s.copy(dailyReviewCap = v) }
         collect(app.settings.reminderEnabled) { s, v -> s.copy(reminderEnabled = v) }
         collect(app.settings.reminderHour) { s, v -> s.copy(reminderHour = v) }
+        collect(app.settings.ttsVoiceName) { s, v -> s.copy(ttsVoiceName = v) }
         collect(app.stats.weekly()) { s, v -> s.copy(streak = v.streak) }
         collect(app.progress.learnedWordCount()) { s, v -> s.copy(learnedWords = v) }
         collect(app.progress.masteredWordCount()) { s, v -> s.copy(masteredWords = v) }
         collect(app.content.wordCount()) { s, v -> s.copy(totalWords = v) }
+    }
+
+    fun refreshTtsVoices() {
+        _state.update { it.copy(ttsVoices = app.tts.listInstalledJapaneseVoices()) }
+    }
+
+    fun setTtsVoice(name: String) {
+        app.settings.setTtsVoiceName(name)
+        app.tts.setPreferredVoice(name)
     }
 
     fun setDailyNewWords(v: Int) = app.settings.setDailyNewWords(v)
@@ -179,6 +193,12 @@ fun ProfileScreen(nav: NavHostController) {
                 android.widget.Toast.makeText(context, msg, android.widget.Toast.LENGTH_LONG).show()
             }
         }
+    }
+
+    LaunchedEffect(Unit) {
+        // TTS init 异步，稍等再拉一次列表；用户也可点「试听」触发刷新
+        kotlinx.coroutines.delay(com.japanlearn.app.util.JapaneseTts.INIT_TIMEOUT_MS + 400L)
+        vm.refreshTtsVoices()
     }
 
     if (showResetDialog) {
@@ -323,6 +343,48 @@ fun ProfileScreen(nav: NavHostController) {
                         onSelect = { vm.setReminderHour(context, it) },
                         label = { "%02d:00".format(it) },
                     )
+                }
+            }
+
+            StaggerIn(4) {
+                SectionCard(title = "发音") {
+                    Text("日语音色", style = MaterialTheme.typography.titleSmall)
+                    Text(
+                        "仅列出已下载的本地日语语音。更多音色可在「Google 文字转语音」里下载。",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    if (state.ttsVoices.isEmpty()) {
+                        Text(
+                            "暂无可选音色（需已安装 Google TTS 并下载日语语音）",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    } else {
+                        val selectedName = state.ttsVoiceName.ifEmpty {
+                            state.ttsVoices.maxByOrNull { it.quality }?.name ?: ""
+                        }
+                        state.ttsVoices.forEach { voice ->
+                            Row(
+                                Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                RadioButton(
+                                    selected = voice.name == selectedName,
+                                    onClick = { vm.setTtsVoice(voice.name) },
+                                )
+                                Text(
+                                    voice.label,
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    modifier = Modifier.weight(1f),
+                                )
+                            }
+                        }
+                    }
+                    AppButton("试听当前音色") {
+                        vm.refreshTtsVoices()
+                        vm.speak("こんにちは。日本語の音声をテストします。")
+                    }
                 }
             }
 

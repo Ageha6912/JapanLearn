@@ -25,8 +25,8 @@ android {
         applicationId = "com.japanlearn.app"
         minSdk = 26
         targetSdk = 35
-        versionCode = 14
-        versionName = "0.7.1"
+        versionCode = 17
+        versionName = "0.7.4"
     }
 
     signingConfigs {

@@ -20,8 +20,10 @@ import kotlinx.coroutines.launch
 /** 手工依赖容器（MVP 不引入 Hilt，见 PRD §17.9） */
 class AppContainer(context: Application) {
     val dateProvider: DateProvider = SystemDateProvider()
-    val tts = JapaneseTts(context)
     val settings = SettingsRepository(context)
+    val tts = JapaneseTts(context).also { engine ->
+        engine.setPreferredVoice(settings.ttsVoiceName.value)
+    }
     private val db: AppDatabase = AppDatabase.build(context)
     val content = ContentRepository(db)
     val progress = ProgressRepository(db, dateProvider, FsrsScheduler)

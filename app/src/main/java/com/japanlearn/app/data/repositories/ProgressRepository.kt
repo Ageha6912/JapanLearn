@@ -49,6 +49,8 @@ class SettingsRepository(context: Context) {
     val kanaIntroDismissed = MutableStateFlow(prefs.getBoolean(KEY_KANA_INTRO_DISMISSED, false))
     val studyLevel = MutableStateFlow(prefs.getString(KEY_STUDY_LEVEL, DEFAULT_STUDY_LEVEL) ?: DEFAULT_STUDY_LEVEL)
     val themeMode = MutableStateFlow(ThemeMode.fromRaw(prefs.getString(KEY_THEME, null)))
+    /** 用户偏好的 Google TTS 日语 voice 名；空字符串 = 自动选最高质量。 */
+    val ttsVoiceName = MutableStateFlow(prefs.getString(KEY_TTS_VOICE, "") ?: "")
 
     fun setThemeMode(value: ThemeMode) {
         prefs.edit().putString(KEY_THEME, value.name).apply()
@@ -97,6 +99,11 @@ class SettingsRepository(context: Context) {
         dailyReviewCap.value = value
     }
 
+    fun setTtsVoiceName(value: String) {
+        prefs.edit().putString(KEY_TTS_VOICE, value).apply()
+        ttsVoiceName.value = value
+    }
+
     companion object {
         const val DEFAULT_NEW_WORDS = 10
         const val DEFAULT_NEW_GRAMMAR = 3
@@ -110,6 +117,7 @@ class SettingsRepository(context: Context) {
         private const val KEY_KANA_INTRO_DISMISSED = "kana_intro_dismissed"
         private const val KEY_STUDY_LEVEL = "study_level"
         private const val KEY_THEME = "theme_mode"
+        private const val KEY_TTS_VOICE = "tts_voice_name"
         const val DEFAULT_STUDY_LEVEL = "N5"
         val STUDY_LEVELS = listOf("N5", "N4")
     }

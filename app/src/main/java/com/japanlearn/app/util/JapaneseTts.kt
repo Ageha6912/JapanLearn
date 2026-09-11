@@ -19,7 +19,8 @@ import java.util.Locale
  * - 有 Google TTS 就按包名初始化，避开中文默认引擎只读汉字
  * - 每次发音前重新 setLanguage + 选已安装的 ja-JP 本地 voice
  * - 不信任 availableLanguages；以 setLanguage 返回值 + voice 列表实测
- * - voice 列表为空时不视为中文引擎谎报，避免把能发音的引擎判死
+ * - **非 Google 引擎一律不信任日语**：中文 ROM 默认引擎会谎报可用并只读汉字
+ * - 仅网络 voice 视为未装好离线数据，引导下载而不是硬播
  */
 class JapaneseTts(private val context: Context) {
 
@@ -39,6 +40,13 @@ class JapaneseTts(private val context: Context) {
         val name: String = "",
     )
 
+    /** 设置页可选的已安装日语 voice。 */
+    data class VoiceOption(
+        val name: String,
+        val label: String,
+        val quality: Int,
+    )
+
     private var tts: TextToSpeech? = null
     private var pending: String? = null
     private var japaneseVoice: Voice? = null
@@ -51,6 +59,12 @@ class JapaneseTts(private val context: Context) {
 
     @Volatile
     private var japaneseStatus: Int = TextToSpeech.LANG_NOT_SUPPORTED
+
+    @Volatile
+    private var usingGoogleTts = false
+
+    @Volatile
+    private var preferredVoiceName: String? = null
 
     private val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
     private val audioAttributes = AudioAttributes.Builder()
@@ -119,7 +133,8 @@ class JapaneseTts(private val context: Context) {
     private fun initInternal() {
         val gen = ++generation
         val engineName = if (isGoogleTtsInstalled()) GOOGLE_TTS else null
-        Log.i(TAG, "init with engine=${engineName ?: "system default"} gen=$gen")
+        usingGoogleTts = engineName != null
+        Log.i(TAG, "init with engine=${engineName ?: "system default"} google=$usingGoogleTts gen=$gen")
         val onInit = TextToSpeech.OnInitListener { status ->
             if (gen != generation) return@OnInitListener
             listener.onInit(status)
@@ -163,10 +178,19 @@ class JapaneseTts(private val context: Context) {
             japaneseStatus = TextToSpeech.LANG_NOT_SUPPORTED
             return
         }
+        if (!usingGoogleTts) {
+            // 中文 ROM 默认引擎：init 成功、setLanguage(ja) 可能返回可用，
+            // 但实际只读汉字跳过假名（真机实测「休みの間に…」只念「休間習」）。
+            // 不去探测，直接判不可用，点击时引导安装 Google TTS。
+            japaneseVoice = null
+            japaneseStatus = TextToSpeech.LANG_NOT_SUPPORTED
+            Log.i(TAG, "non-Google engine, treat Japanese as unsupported")
+            return
+        }
         val languageStatus = setJapaneseLanguage(engine)
-        val (voice, probe) = pickInstalledJapaneseVoice(engine)
+        val (voice, probe) = pickInstalledJapaneseVoice(engine, preferredVoiceName)
         japaneseVoice = voice
-        japaneseStatus = verifiedJapaneseStatus(languageStatus, probe)
+        japaneseStatus = verifiedJapaneseStatus(languageStatus, probe, usingGoogleTts)
         try {
             voice?.let { engine.voice = it }
         } catch (e: Exception) {
@@ -189,6 +213,43 @@ class JapaneseTts(private val context: Context) {
             State.WAITING -> pending = text
             State.FAILED -> Unit
         }
+    }
+
+    /** 设置用户偏好的日语 voice；null/空 = 自动选最高质量。下次发音立即生效。 */
+    fun setPreferredVoice(name: String?) {
+        preferredVoiceName = name?.takeIf { it.isNotBlank() }
+        Log.i(TAG, "preferred voice = ${preferredVoiceName ?: "auto"}")
+        if (state == State.READY) applyJapaneseLanguage()
+    }
+
+    fun currentVoiceName(): String? = japaneseVoice?.name
+
+    /**
+     * 列出已安装的本地日语 voice，供设置页选择。
+     * 引擎未就绪或非 Google TTS 时返回空列表。
+     */
+    fun listInstalledJapaneseVoices(): List<VoiceOption> {
+        if (state != State.READY || !usingGoogleTts) return emptyList()
+        val engine = tts ?: return emptyList()
+        val voices = try {
+            engine.voices.orEmpty()
+        } catch (e: Exception) {
+            Log.w(TAG, "voices() failed: ${e.message}")
+            emptySet()
+        }
+        return voices
+            .mapNotNull { v ->
+                val loc = v.locale ?: return@mapNotNull null
+                if (!isJapaneseLocale(loc.language.orEmpty(), iso3Of(loc))) return@mapNotNull null
+                if (v.features.orEmpty().contains("notInstalled")) return@mapNotNull null
+                if (v.isNetworkConnectionRequired) return@mapNotNull null
+                VoiceOption(
+                    name = v.name.orEmpty(),
+                    label = voiceDisplayName(v.name.orEmpty()),
+                    quality = v.quality,
+                )
+            }
+            .sortedWith(compareByDescending<VoiceOption> { it.quality }.thenBy { it.name })
     }
 
     private fun doSpeak(text: String) {
@@ -240,15 +301,24 @@ class JapaneseTts(private val context: Context) {
         const val GOOGLE_TTS = "com.google.android.tts"
         private const val TAG = "JapaneseTts"
 
-        fun verifiedJapaneseStatus(languageStatus: Int, probe: VoiceProbe): Int = when {
-            probe == VoiceProbe.INSTALLED ->
-                if (languageStatus >= TextToSpeech.LANG_AVAILABLE) languageStatus
-                else TextToSpeech.LANG_AVAILABLE
-            languageStatus == TextToSpeech.LANG_MISSING_DATA || probe == VoiceProbe.MISSING_DATA ->
-                TextToSpeech.LANG_MISSING_DATA
-            languageStatus >= TextToSpeech.LANG_AVAILABLE && probe != VoiceProbe.NONE ->
-                languageStatus
-            else -> TextToSpeech.LANG_NOT_SUPPORTED
+        fun verifiedJapaneseStatus(
+            languageStatus: Int,
+            probe: VoiceProbe,
+            usingGoogleTts: Boolean,
+        ): Int {
+            // 非 Google 引擎（中文 ROM 默认 TTS）一律不信任：谎报日语可用却只读汉字
+            if (!usingGoogleTts) return TextToSpeech.LANG_NOT_SUPPORTED
+            return when {
+                probe == VoiceProbe.INSTALLED ->
+                    if (languageStatus >= TextToSpeech.LANG_AVAILABLE) languageStatus
+                    else TextToSpeech.LANG_AVAILABLE
+                languageStatus == TextToSpeech.LANG_MISSING_DATA || probe == VoiceProbe.MISSING_DATA ->
+                    TextToSpeech.LANG_MISSING_DATA
+                // Google TTS 偶发 voices() 为空但实际能发音，此时信任 setLanguage
+                languageStatus >= TextToSpeech.LANG_AVAILABLE && probe != VoiceProbe.NONE ->
+                    languageStatus
+                else -> TextToSpeech.LANG_NOT_SUPPORTED
+            }
         }
 
         fun decideAction(state: State, japaneseUsable: Boolean, japaneseMissingData: Boolean): Action = when {
@@ -273,19 +343,59 @@ class JapaneseTts(private val context: Context) {
             if (voices.isEmpty()) return VoiceProbe.UNKNOWN
             val ja = voices.filter { isJapaneseLocale(it.language, it.iso3) }
             if (ja.isEmpty()) return VoiceProbe.NONE
-            if (ja.any { !it.notInstalled }) return VoiceProbe.INSTALLED
+            // 离线 App：本地已安装才算可用；仅网络 voice 视为需下载数据
+            if (ja.any { !it.notInstalled && !it.networkRequired }) return VoiceProbe.INSTALLED
             return VoiceProbe.MISSING_DATA
         }
 
-        fun pickBestJapaneseVoice(voices: List<VoiceCandidate>): VoiceCandidate? {
+        fun pickBestJapaneseVoice(
+            voices: List<VoiceCandidate>,
+            preferredName: String? = null,
+        ): VoiceCandidate? {
             val usable = voices.filter { !it.notInstalled && isJapaneseLocale(it.language, it.iso3) }
             val local = usable.filter { !it.networkRequired }
             val pool = local.ifEmpty { usable }
+            // 用户显式选过的 voice 优先（仅在仍是可用池内时生效）
+            if (!preferredName.isNullOrBlank()) {
+                pool.firstOrNull { it.name == preferredName }?.let { return it }
+            }
             return pool.maxWithOrNull(
                 compareBy<VoiceCandidate> { if (isJapaneseCountry(it.country)) 1 else 0 }
                     .thenBy { it.quality }
                     .thenBy { if (it.name.contains("ja", ignoreCase = true)) 1 else 0 },
             )
+        }
+
+        /** Google TTS voice 名 → 用户可读标签（ja-JP-Standard-A → 标准 A）。 */
+        fun voiceDisplayName(name: String): String {
+            val n = name.trim()
+            if (n.isEmpty()) return "默认"
+            // 常见 Google TTS 模式：ja-JP-<Quality>-<Letter>
+            val parts = n.split('-')
+            if (parts.size >= 3) {
+                val quality = parts[parts.size - 2]
+                val letter = parts.last()
+                val qualityLabel = when (quality.lowercase(Locale.ROOT)) {
+                    "standard" -> "标准"
+                    "wavenet" -> "WaveNet"
+                    "neural" -> "Neural"
+                    "neural2" -> "Neural2"
+                    "studio" -> "Studio"
+                    "language" -> "默认"
+                    else -> quality
+                }
+                if (letter.length == 1 && letter[0].isLetter()) {
+                    return "$qualityLabel $letter"
+                }
+                if (qualityLabel != quality) return qualityLabel
+            }
+            return n.removePrefix("ja-JP-").removePrefix("ja-jp-").ifEmpty { n }
+        }
+
+        private fun iso3Of(locale: java.util.Locale): String = try {
+            locale.isO3Language.orEmpty()
+        } catch (_: Exception) {
+            ""
         }
 
         private fun setJapaneseLanguage(engine: TextToSpeech): Int {
@@ -304,7 +414,10 @@ class JapaneseTts(private val context: Context) {
             return best
         }
 
-        private fun pickInstalledJapaneseVoice(engine: TextToSpeech): Pair<Voice?, VoiceProbe> {
+        private fun pickInstalledJapaneseVoice(
+            engine: TextToSpeech,
+            preferredName: String? = null,
+        ): Pair<Voice?, VoiceProbe> {
             val voices = try {
                 engine.voices.orEmpty()
             } catch (e: Exception) {
@@ -313,7 +426,7 @@ class JapaneseTts(private val context: Context) {
             }
             Log.i(
                 TAG,
-                "voices count=${voices.size} defaultEngine=${engine.defaultEngine} currentVoice=${engine.voice?.name}",
+                "voices count=${voices.size} defaultEngine=${engine.defaultEngine} currentVoice=${engine.voice?.name} preferred=$preferredName",
             )
             val mapped = voices.map { v ->
                 val loc = v.locale
@@ -328,7 +441,8 @@ class JapaneseTts(private val context: Context) {
                 ) to v
             }
             val probe = classifyJapaneseVoices(mapped.map { it.first })
-            val best = pickBestJapaneseVoice(mapped.map { it.first }) ?: return null to probe
+            val best = pickBestJapaneseVoice(mapped.map { it.first }, preferredName)
+                ?: return null to probe
             return mapped.firstOrNull { it.first == best }?.second to probe
         }
     }

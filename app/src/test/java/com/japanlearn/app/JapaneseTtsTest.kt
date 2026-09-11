@@ -29,38 +29,56 @@ class JapaneseTtsTest {
     }
 
     @Test
+    fun `非 Google 引擎一律不信任日语 避免中文引擎只读汉字`() {
+        // 真机：中文默认引擎 setLanguage(ja) 可能可用、甚至列出假 ja voice，却只念汉字
+        assertEquals(
+            langNotSupported,
+            JapaneseTts.verifiedJapaneseStatus(langAvailable, VoiceProbe.UNKNOWN, usingGoogleTts = false),
+        )
+        assertEquals(
+            langNotSupported,
+            JapaneseTts.verifiedJapaneseStatus(langAvailable, VoiceProbe.INSTALLED, usingGoogleTts = false),
+        )
+        assertEquals(
+            langNotSupported,
+            JapaneseTts.verifiedJapaneseStatus(langAvailable, VoiceProbe.NONE, usingGoogleTts = false),
+        )
+        assertEquals(
+            langNotSupported,
+            JapaneseTts.verifiedJapaneseStatus(langAvailable, VoiceProbe.MISSING_DATA, usingGoogleTts = false),
+        )
+    }
+
+    @Test
+    fun `Google TTS 空 voice 列表时信任 setLanguage`() {
+        // Google TTS 偶发 voices() 为空但实际能发音
+        assertEquals(
+            langAvailable,
+            JapaneseTts.verifiedJapaneseStatus(langAvailable, VoiceProbe.UNKNOWN, usingGoogleTts = true),
+        )
+        assertEquals(
+            langNotSupported,
+            JapaneseTts.verifiedJapaneseStatus(langNotSupported, VoiceProbe.UNKNOWN, usingGoogleTts = true),
+        )
+    }
+
+    @Test
     fun `引擎谎报 setLanguage 可用但没有日语 voice 时必须视为不可用`() {
         assertEquals(
             langNotSupported,
-            JapaneseTts.verifiedJapaneseStatus(langAvailable, VoiceProbe.NONE),
+            JapaneseTts.verifiedJapaneseStatus(langAvailable, VoiceProbe.NONE, usingGoogleTts = true),
         )
         assertEquals(
             langAvailable,
-            JapaneseTts.verifiedJapaneseStatus(langAvailable, VoiceProbe.INSTALLED),
-        )
-        assertEquals(
-            langMissingData,
-            JapaneseTts.verifiedJapaneseStatus(langMissingData, VoiceProbe.NONE),
+            JapaneseTts.verifiedJapaneseStatus(langAvailable, VoiceProbe.INSTALLED, usingGoogleTts = true),
         )
     }
 
     @Test
-    fun `voice 列表为空时信任 setLanguage 不误判为不支持`() {
-        assertEquals(
-            langAvailable,
-            JapaneseTts.verifiedJapaneseStatus(langAvailable, VoiceProbe.UNKNOWN),
-        )
-        assertEquals(
-            langNotSupported,
-            JapaneseTts.verifiedJapaneseStatus(langNotSupported, VoiceProbe.UNKNOWN),
-        )
-    }
-
-    @Test
-    fun `日语 voice 全是未安装时引导下载数据而不是安装引擎`() {
+    fun `日语 voice 全是未安装或仅网络时引导下载数据而不是安装引擎`() {
         assertEquals(
             langMissingData,
-            JapaneseTts.verifiedJapaneseStatus(langAvailable, VoiceProbe.MISSING_DATA),
+            JapaneseTts.verifiedJapaneseStatus(langAvailable, VoiceProbe.MISSING_DATA, usingGoogleTts = true),
         )
         assertEquals(
             Action.GUIDE_VOICE_DATA,
@@ -72,7 +90,11 @@ class JapaneseTtsTest {
     fun `已安装日语 voice 时即使 setLanguage 失败也视为可用`() {
         assertEquals(
             android.speech.tts.TextToSpeech.LANG_AVAILABLE,
-            JapaneseTts.verifiedJapaneseStatus(langNotSupported, VoiceProbe.INSTALLED),
+            JapaneseTts.verifiedJapaneseStatus(
+                langNotSupported,
+                VoiceProbe.INSTALLED,
+                usingGoogleTts = true,
+            ),
         )
     }
 
@@ -102,6 +124,42 @@ class JapaneseTtsTest {
         )
         val picked = JapaneseTts.pickBestJapaneseVoice(listOf(chineseFake, netJa, notInstalled, localJa))
         assertEquals("ja-JP-local", picked?.name)
+    }
+
+    @Test
+    fun `用户偏好的 voice 优先于自动最高质量`() {
+        val a = JapaneseTts.VoiceCandidate(language = "ja", country = "JP", quality = 400, name = "ja-JP-Standard-A")
+        val b = JapaneseTts.VoiceCandidate(language = "ja", country = "JP", quality = 500, name = "ja-JP-Standard-B")
+        // 无偏好：选质量高的 B
+        assertEquals("ja-JP-Standard-B", JapaneseTts.pickBestJapaneseVoice(listOf(a, b))?.name)
+        // 偏好 A：即使质量低也选 A
+        assertEquals(
+            "ja-JP-Standard-A",
+            JapaneseTts.pickBestJapaneseVoice(listOf(a, b), preferredName = "ja-JP-Standard-A")?.name,
+        )
+        // 偏好不存在：回退自动
+        assertEquals(
+            "ja-JP-Standard-B",
+            JapaneseTts.pickBestJapaneseVoice(listOf(a, b), preferredName = "gone")?.name,
+        )
+        // 偏好指向未安装 voice：不选它
+        val missing = JapaneseTts.VoiceCandidate(
+            language = "ja", country = "JP", quality = 900, notInstalled = true, name = "ja-missing",
+        )
+        assertEquals(
+            "ja-JP-Standard-B",
+            JapaneseTts.pickBestJapaneseVoice(listOf(a, b, missing), preferredName = "ja-missing")?.name,
+        )
+    }
+
+    @Test
+    fun `voice 显示名可读化`() {
+        assertEquals("标准 A", JapaneseTts.voiceDisplayName("ja-JP-Standard-A"))
+        assertEquals("标准 D", JapaneseTts.voiceDisplayName("ja-JP-Standard-D"))
+        assertEquals("WaveNet B", JapaneseTts.voiceDisplayName("ja-JP-Wavenet-B"))
+        assertEquals("Neural2 C", JapaneseTts.voiceDisplayName("ja-JP-Neural2-C"))
+        assertEquals("默认", JapaneseTts.voiceDisplayName(""))
+        assertEquals("xyz", JapaneseTts.voiceDisplayName("xyz"))
     }
 
     @Test
@@ -138,6 +196,37 @@ class JapaneseTtsTest {
                 listOf(
                     JapaneseTts.VoiceCandidate(
                         language = "ja", country = "JP", notInstalled = true, name = "ja-missing",
+                    ),
+                    JapaneseTts.VoiceCandidate(language = "ja", country = "JP", name = "ja-local"),
+                ),
+            ),
+        )
+    }
+
+    @Test
+    fun `仅网络日语 voice 视为缺数据 不当作已安装`() {
+        assertEquals(
+            VoiceProbe.MISSING_DATA,
+            JapaneseTts.classifyJapaneseVoices(
+                listOf(
+                    JapaneseTts.VoiceCandidate(
+                        language = "ja",
+                        country = "JP",
+                        networkRequired = true,
+                        name = "ja-jp-net",
+                    ),
+                ),
+            ),
+        )
+        assertEquals(
+            VoiceProbe.INSTALLED,
+            JapaneseTts.classifyJapaneseVoices(
+                listOf(
+                    JapaneseTts.VoiceCandidate(
+                        language = "ja",
+                        country = "JP",
+                        networkRequired = true,
+                        name = "ja-jp-net",
                     ),
                     JapaneseTts.VoiceCandidate(language = "ja", country = "JP", name = "ja-local"),
                 ),
