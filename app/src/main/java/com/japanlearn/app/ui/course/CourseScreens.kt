@@ -255,6 +255,7 @@ data class CourseUnitUiState(
     val learned: Int = 0,
     val total: Int = 0,
     val isCurrent: Boolean = false,
+    val isOverridden: Boolean = false,
 )
 
 class CourseUnitViewModel(
@@ -285,12 +286,14 @@ class CourseUnitViewModel(
                 val row = rows.firstOrNull { it.unit == unit }
                 _state.update { s ->
                     val mapped = rows.map { CourseUnitProgress(it.unit, it.total, it.learned) }
+                    val overrideUnit = CoursePointer.parseOverride(
+                        app.settings.courseUnitOverride.value, level,
+                    )
                     s.copy(
                         learned = row?.learned ?: s.learned,
                         total = row?.total ?: s.total,
-                        isCurrent = (CoursePointer.parseOverride(
-                            app.settings.courseUnitOverride.value, level,
-                        ) ?: CoursePointer.currentUnit(mapped)) == unit,
+                        isCurrent = (overrideUnit ?: CoursePointer.currentUnit(mapped)) == unit,
+                        isOverridden = overrideUnit != null,
                     )
                 }
             }
@@ -339,7 +342,9 @@ fun CourseUnitScreen(nav: NavHostController, level: String, unit: Int) {
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
-                            TextButton(onClick = { vm.clearOverride() }) { Text("恢复自动跟随") }
+                            if (state.isOverridden) {
+                                TextButton(onClick = { vm.clearOverride() }) { Text("恢复自动跟随") }
+                            }
                         } else {
                             TextButton(onClick = { vm.setCurrentHere() }) { Text("设为当前单元") }
                         }
