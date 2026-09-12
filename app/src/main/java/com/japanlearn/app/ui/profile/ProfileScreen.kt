@@ -27,6 +27,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -42,6 +43,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
@@ -51,6 +53,7 @@ import androidx.navigation.NavHostController
 import com.japanlearn.app.AppContainer
 import com.japanlearn.app.LocalAppContainer
 import com.japanlearn.app.Routes
+import com.japanlearn.app.domain.AiConfig
 import com.japanlearn.app.ui.components.AppButton
 import com.japanlearn.app.ui.components.SectionCard
 import com.japanlearn.app.ui.motion.AnimatedCounterText
@@ -72,6 +75,10 @@ data class ProfileUiState(
     val totalWords: Int = 0,
     val ttsVoiceName: String = "",
     val ttsVoices: List<com.japanlearn.app.util.JapaneseTts.VoiceOption> = emptyList(),
+    val aiBaseUrl: String = "",
+    val aiApiKey: String = "",
+    val aiModel: String = "",
+    val aiDailyLimit: Int = 20,
 )
 
 class ProfileViewModel(private val app: AppContainer) : ViewModel() {
@@ -88,6 +95,10 @@ class ProfileViewModel(private val app: AppContainer) : ViewModel() {
         collect(app.settings.reminderEnabled) { s, v -> s.copy(reminderEnabled = v) }
         collect(app.settings.reminderHour) { s, v -> s.copy(reminderHour = v) }
         collect(app.settings.ttsVoiceName) { s, v -> s.copy(ttsVoiceName = v) }
+        collect(app.settings.aiBaseUrl) { s, v -> s.copy(aiBaseUrl = v) }
+        collect(app.settings.aiApiKey) { s, v -> s.copy(aiApiKey = v) }
+        collect(app.settings.aiModel) { s, v -> s.copy(aiModel = v) }
+        collect(app.settings.aiDailyLimit) { s, v -> s.copy(aiDailyLimit = v) }
         collect(app.stats.weekly()) { s, v -> s.copy(streak = v.streak) }
         collect(app.progress.learnedWordCount()) { s, v -> s.copy(learnedWords = v) }
         collect(app.progress.masteredWordCount()) { s, v -> s.copy(masteredWords = v) }
@@ -106,6 +117,11 @@ class ProfileViewModel(private val app: AppContainer) : ViewModel() {
     fun setDailyNewWords(v: Int) = app.settings.setDailyNewWords(v)
     fun setDailyNewGrammar(v: Int) = app.settings.setDailyNewGrammar(v)
     fun setDailyReviewCap(v: Int) = app.settings.setDailyReviewCap(v)
+
+    fun saveAiConfig(baseUrl: String, apiKey: String, model: String) =
+        app.settings.saveAiConfig(baseUrl, apiKey, model)
+
+    fun setAiDailyLimit(v: Int) = app.settings.setAiDailyLimit(v)
 
     fun setReminderEnabled(context: android.content.Context, v: Boolean) {
         app.settings.setReminderEnabled(v)
@@ -383,6 +399,94 @@ fun ProfileScreen(nav: NavHostController) {
             }
 
             StaggerIn(5) {
+                SectionCard(title = "AI 助手（可选，需联网）") {
+                    val configured = AiConfig.isConfigured(state.aiBaseUrl, state.aiApiKey, state.aiModel)
+                    var aiUrl by remember { mutableStateOf(app.settings.aiBaseUrl.value) }
+                    var aiKey by remember { mutableStateOf(app.settings.aiApiKey.value) }
+                    var aiModelText by remember { mutableStateOf(app.settings.aiModel.value) }
+                    val privacyNote = "Key 仅保存在本机，请求只包含你主动输入的内容，不发送任何学习数据。"
+                    if (!configured) {
+                        Text(
+                            "填入你自己的大模型 API Key 启用，不填则完全不出现相关功能。费用由你的 Key 承担。",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .horizontalScroll(rememberScrollState())
+                                .padding(bottom = 2.dp),
+                        ) {
+                            AiConfig.PRESETS.forEach { preset ->
+                                FilterChip(
+                                    selected = false,
+                                    onClick = {
+                                        aiUrl = preset.baseUrl
+                                        aiModelText = preset.model
+                                    },
+                                    label = { Text(preset.name) },
+                                )
+                            }
+                        }
+                        OutlinedTextField(
+                            value = aiUrl,
+                            onValueChange = { aiUrl = it },
+                            label = { Text("接口地址") },
+                            singleLine = true,
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                        OutlinedTextField(
+                            value = aiKey,
+                            onValueChange = { aiKey = it },
+                            label = { Text("API Key") },
+                            singleLine = true,
+                            visualTransformation = PasswordVisualTransformation(),
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                        OutlinedTextField(
+                            value = aiModelText,
+                            onValueChange = { aiModelText = it },
+                            label = { Text("模型名") },
+                            singleLine = true,
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                        Spacer(Modifier.height(6.dp))
+                        AppButton(
+                            "保存并启用",
+                            enabled = aiUrl.isNotBlank() && aiKey.isNotBlank() && aiModelText.isNotBlank(),
+                            onClick = { vm.saveAiConfig(aiUrl, aiKey, aiModelText) },
+                        )
+                        Text(
+                            privacyNote,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    } else {
+                        Text("已启用 · ${state.aiModel}", style = MaterialTheme.typography.titleSmall)
+                        Text(
+                            state.aiBaseUrl,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                        Text("每日调用上限", style = MaterialTheme.typography.titleSmall)
+                        ChipRow(
+                            options = AiConfig.DAILY_LIMIT_CHOICES,
+                            selected = state.aiDailyLimit,
+                            onSelect = { vm.setAiDailyLimit(it) },
+                            label = { if (it == AiConfig.UNLIMITED) "不限" else "$it 次" },
+                        )
+                        Text(
+                            privacyNote,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                        TextButton(onClick = { vm.saveAiConfig("", "", "") }) { Text("清除 AI 配置") }
+                    }
+                }
+            }
+
+            StaggerIn(6) {
                 SectionCard(title = "发音") {
                     Text("日语音色", style = MaterialTheme.typography.titleSmall)
                     Text(
@@ -424,7 +528,7 @@ fun ProfileScreen(nav: NavHostController) {
                 }
             }
 
-            StaggerIn(5) {
+            StaggerIn(6) {
                 SectionCard(title = "数据") {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
@@ -483,7 +587,7 @@ fun ProfileScreen(nav: NavHostController) {
                 }
             }
 
-            StaggerIn(5) {
+            StaggerIn(6) {
                 SectionCard(title = "关于") {
                     Text("JapanLearn v${com.japanlearn.app.BuildConfig.VERSION_NAME}", style = MaterialTheme.typography.bodyLarge)
                     Text(

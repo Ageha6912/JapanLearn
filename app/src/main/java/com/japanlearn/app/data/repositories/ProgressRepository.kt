@@ -7,6 +7,7 @@ import com.japanlearn.app.data.local.ReviewRecordEntity
 import com.japanlearn.app.data.local.UserProgressEntity
 import com.japanlearn.app.data.local.WordEntity
 import com.japanlearn.app.data.local.WrongAnswerEntity
+import com.japanlearn.app.domain.AiConfig
 import com.japanlearn.app.domain.CoursePointer
 import com.japanlearn.app.domain.Mastery
 import com.japanlearn.app.domain.Scheduler
@@ -166,6 +167,40 @@ class SettingsRepository(context: Context) {
 
     private fun checkpointKey(level: String, unit: Int) = "checkpoint_best_${level}_$unit"
 
+    // ---- AI 助手（PRD §19.9，BYOK）----
+
+    val aiBaseUrl = MutableStateFlow(prefs.getString(KEY_AI_BASE_URL, "") ?: "")
+    val aiApiKey = MutableStateFlow(prefs.getString(KEY_AI_API_KEY, "") ?: "")
+    val aiModel = MutableStateFlow(prefs.getString(KEY_AI_MODEL, "") ?: "")
+    val aiDailyLimit = MutableStateFlow(prefs.getInt(KEY_AI_DAILY_LIMIT, 20))
+
+    fun saveAiConfig(baseUrl: String, apiKey: String, model: String) {
+        val url = baseUrl.trim()
+        val key = apiKey.trim()
+        val mdl = model.trim()
+        prefs.edit()
+            .putString(KEY_AI_BASE_URL, url)
+            .putString(KEY_AI_API_KEY, key)
+            .putString(KEY_AI_MODEL, mdl)
+            .apply()
+        aiBaseUrl.value = url
+        aiApiKey.value = key
+        aiModel.value = mdl
+    }
+
+    fun setAiDailyLimit(value: Int) {
+        val v = if (value == AiConfig.UNLIMITED || value > 0) value else 20
+        prefs.edit().putInt(KEY_AI_DAILY_LIMIT, v).apply()
+        aiDailyLimit.value = v
+    }
+
+    /** 当日调用次数（date 为 ISO 日期，调用方从 DateProvider 取）。 */
+    fun aiCallsToday(date: String): Int = prefs.getInt("ai_calls_$date", 0)
+
+    fun incrementAiCalls(date: String) {
+        prefs.edit().putInt("ai_calls_$date", aiCallsToday(date) + 1).apply()
+    }
+
     companion object {
         const val DEFAULT_NEW_WORDS = 10
         const val DEFAULT_NEW_GRAMMAR = 3
@@ -185,6 +220,10 @@ class SettingsRepository(context: Context) {
         private const val KEY_GOAL_DATE = "goal_target_epoch_day"
         private const val KEY_GOAL_TIER_APPLIED = "goal_tier_applied_epoch_day"
         private const val KEY_COURSE_UNIT = "course_unit_override"
+        private const val KEY_AI_BASE_URL = "ai_base_url"
+        private const val KEY_AI_API_KEY = "ai_api_key"
+        private const val KEY_AI_MODEL = "ai_model"
+        private const val KEY_AI_DAILY_LIMIT = "ai_daily_limit"
         const val DEFAULT_STUDY_LEVEL = "N5"
         val STUDY_LEVELS = listOf("N5", "N4")
     }

@@ -31,6 +31,7 @@ class AppContainer(context: Application) {
     val progress = ProgressRepository(db, dateProvider, FsrsScheduler)
     val stats = StatsRepository(db, dateProvider)
     val backup = BackupManager(db)
+    val aiClient: com.japanlearn.app.data.ai.AiClient = com.japanlearn.app.data.ai.OpenAiCompatibleClient()
     private val loader = ContentLoader(context, db)
 
     /** 装载课程内容（首次启动或内容版本升级时生效），IO 线程调用。 */

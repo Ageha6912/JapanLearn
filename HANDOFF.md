@@ -28,7 +28,7 @@
 ```bash
 ./gradlew :app:assembleDebug        # debug APK
 ./gradlew :app:assembleRelease      # 正式签名 APK（keystore 已配置，见第 6 节坑 9）
-./gradlew :app:testDebugUnitTest    # 单元测试（当前 190 项），必须全绿才能交付
+./gradlew :app:testDebugUnitTest    # 单元测试（当前 206 项），必须全绿才能交付
 python tools/validate_content.py    # 内容校验，必须通过才能改内容；CI 已跑
 ```
 
@@ -144,6 +144,15 @@ python tools/validate_content.py    # 内容校验，必须通过才能改内容
 - 功能：助手页三模式（语法解释/句子纠错/翻译）+ 语法详情/错题本两个上下文预填入口；一次性返回非流式
 - Key：SharedPreferences 明文本地存，不进备份不打日志；每日限额默认 20 次/天（10/20/50/不限），按日期本地计数
 - 切分：PR-A 网络与配置基座（OkHttp + AiClient 接口 + 设置区 + 限额纯函数）→ PR-B 助手页 + 上下文入口 → PR-C 收口 v1.1.0（versionCode 22）；Prompt/解析/限额全走纯函数单测，网络用 fake
+
+### v1.1 PR-A 已交付（2026-09-12）— 网络与配置基座
+- 新依赖：`com.squareup.okhttp3:okhttp:4.12.0`（自带 R8 规则）
+- `domain/AiAssistant.kt`（+9 测）：`AiMode` 三模式、`AiPrompts`（三套中文系统提示词 + 上下文附加）、`AiConfig`（三字段 isConfigured、normalizeBaseUrl 自动补 `/chat/completions`、DeepSeek/GLM/OpenAI 三预设、每日限额档 10/20/50/-1）、`AiQuota`（canCall/remaining，-1 = 不限）
+- `domain/AiWire.kt`（+7 测）：请求体构建（model + system/user 两条消息）、响应 content 解析（容错多余字段）、错误信息提取（服务端 message 优先，401/404/429/5xx 兜底文案）
+- `data/ai/AiClient.kt`：`AiClient` 接口（单测用 fake）+ `OpenAiCompatibleClient`（IO 线程、15s/60s 超时、`AiException` 直接带可读中文文案、CancellationException 透传）
+- `SettingsRepository`：`ai_base_url/ai_api_key/ai_model/ai_daily_limit` 四个 key + `ai_calls_{date}` 每日计数；AppContainer 暴露 `aiClient`
+- 设置页（我的）新增「AI 助手（可选，需联网）」卡：未配置 → 三预设 chips + 三字段表单（Key 密码样式）+ 保存并启用；已配置 → 模型/端点展示 + 限额 chips + 清除配置；两态均带隐私说明
+- 全量 206 测全绿；versionName 未动
 - 分配结论：预生成音频正式移出 v0.8（无排期可选 PR，门禁声库书面授权）；埋点推迟至内测；内容扩充为常驻并行线；听力训练留 v0.9
 
 ### v0.7.5（已发布）— PR-R51 停写旧 content_version
@@ -168,7 +177,7 @@ python tools/validate_content.py    # 内容校验，必须通过才能改内容
 
 v0.7.0：Room v4 FSRS 字段；默认 `FsrsScheduler`（ts-fsrs v5.4.2 long-term，`enable_short_term=false`；Again 仍 `dueAt=now`）；自评文案不变；已掌握 `stability >= 21`。回滚：`AppContainer` 改回 `SrsScheduler`，勿删 `MIGRATION_3_4`。
 
-下一步：实施 v1.1（规划定案见 PRD §19.9 与第 4 节）：PR-A 网络与配置基座 → PR-B AI 助手页 → PR-C 收口 v1.1.0。
+下一步：v1.1 继续：PR-B AI 助手页（三模式 + 上下文预填，入口按「已配置」隐藏/显示）→ PR-C 收口 v1.1.0。PR-A 已交付。
 
 v0.4.3（中文引擎修复）：用户真机「只读汉字跳过假名 + 不弹引导」——默认引擎是中文引擎，init 成功且 availableLanguages 谎报日语。重构 JapaneseTts：装有 Google TTS（com.google.android.tts）时显式按包名初始化不走默认；可用性用 setLanguage(JAPAN) 返回值实测（MISSING_DATA→数据引导 / NOT_SUPPORTED→引擎引导）；manifest 加 <queries>（Android 11+ 包可见性，漏加会查不到 Google TTS）；点击时 refreshJapaneseStatus 保证下载后立即生效。
 
