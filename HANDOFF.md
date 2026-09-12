@@ -87,6 +87,12 @@ python tools/validate_content.py    # 内容校验，必须通过才能改内容
 - 统计：会话结束 `addStudy(秒数)` 落时长；不进首页任务卡、不限流
 - 入口：学习 Tab 第 4 张 LearnEntry「听力训练」（VolumeUp 图标）+ 路由 `Routes.LISTENING`
 - 全量 169 测全绿；versionName 未动
+
+### v0.9 PR-B 已交付（2026-09-12）— 每日一句 120 → 180
+- 新场景 **购物 / 交通 / 就医**：`validate_content.py` 的 `SCENES` 白名单按坑 16 同步扩展（三项均 §19.7 点名）
+- 批次 `tools/new_sentences_b3.json`（65 条写稿，5 条与现有库撞句被按 ja 去重跳过，净增 60）；覆盖购物试穿/退换/支付、交通问路/换乘/迟到致歉、就医症状/预约/探病慰问等
+- `sentences.json` **180 条**，version 3 → 5（两次合并各 +1）；`validate_content.py` 全部通过
+- `ContentScaleTest` / `ContentExpansionTest` 断言同步 180 / version 5
 - 分配结论：预生成音频正式移出 v0.8（无排期可选 PR，门禁声库书面授权）；埋点推迟至内测；内容扩充为常驻并行线；听力训练留 v0.9
 
 ### v0.7.5（已发布）— PR-R51 停写旧 content_version
@@ -111,7 +117,7 @@ python tools/validate_content.py    # 内容校验，必须通过才能改内容
 
 v0.7.0：Room v4 FSRS 字段；默认 `FsrsScheduler`（ts-fsrs v5.4.2 long-term，`enable_short_term=false`；Again 仍 `dueAt=now`）；自评文案不变；已掌握 `stability >= 21`。回滚：`AppContainer` 改回 `SrsScheduler`，勿删 `MIGRATION_3_4`。
 
-下一步：v0.9 继续：PR-B 每日一句 120→180（tools 批次管线 + validate + sentences version 升位）→ PR-C 收口 v0.9.0。PR-A 听力训练已交付。
+下一步：v0.9 收口：PR-C（versionName 0.9.0 / versionCode 20 → assembleRelease → 模拟器回归 → tag + GitHub Release）。PR-A 听力训练、PR-B 每日一句 180 均已交付。
 
 v0.4.3（中文引擎修复）：用户真机「只读汉字跳过假名 + 不弹引导」——默认引擎是中文引擎，init 成功且 availableLanguages 谎报日语。重构 JapaneseTts：装有 Google TTS（com.google.android.tts）时显式按包名初始化不走默认；可用性用 setLanguage(JAPAN) 返回值实测（MISSING_DATA→数据引导 / NOT_SUPPORTED→引擎引导）；manifest 加 <queries>（Android 11+ 包可见性，漏加会查不到 Google TTS）；点击时 refreshJapaneseStatus 保证下载后立即生效。
 

@@ -16,7 +16,7 @@ JP_SENTENCE_RE = re.compile(r"^[\u3040-\u309F\u30A0-\u30FF\u3005\u4E00-\u9FFF。
 
 CATEGORIES = {"人物", "数字", "时间", "食物", "地点", "物品", "动作", "形容词", "副词", "自然", "身体"}
 KANA_GROUPS = {"seion", "dakuon", "youon"}
-SCENES = {"日常聊天", "餐厅", "便利店", "旅游", "学校", "工作", "动漫 / 娱乐"}
+SCENES = {"日常聊天", "餐厅", "便利店", "旅游", "学校", "工作", "动漫 / 娱乐", "购物", "交通", "就医"}
 LEVELS = {"N5", "N4"}
 
 errors: list[str] = []
