@@ -10,7 +10,7 @@
 - 需求文档：`PRD.md`（§17 为 v0.1 评审决策记录，**§18 为 v0.2 决策记录**，**§19 为 v0.5–v0.7 决策记录与产品缺口清单**，与正文冲突时以 §17/§18/§19 为准）
 - 优化方案：`OPTIMIZATION.md`（**Accepted**，用户 2026-09-09 确认 Q1–Q3 推荐项；结论已于 2026-09-12 写入 PRD §19）
 - Git 身份（仓库级已配置）：`Ageha <ageha6912@gmail.com>`，勿用其他身份提交
-- 已发布：**v1.2.0**（tag + GitHub Release，正式签名 APK）。`versionName = "1.2.0"` / `versionCode` 23
+- 已发布：**v1.2.1**（tag + GitHub Release，正式签名 APK）。`versionName = "1.2.1"` / `versionCode` 24
 
 ## 2. 环境速查
 
@@ -44,7 +44,7 @@ python tools/validate_content.py    # 内容校验，必须通过才能改内容
 - **发布工程**：R8 minify + 资源收缩（APK 1.5MB）、正式签名接入（keystore）、GitHub Actions 门禁 CI（`.github/workflows/ci.yml`：55 测试 + assembleDebug）
 - 55 项单元测试全绿；PRD §18 决策记录；README 数字已同步
 
-## 4. 当前任务：v1.2.0 已发布（2026-09-12）
+## 4. 当前任务：v1.2.1 已发布（2026-09-12，INTERNET 权限热修复）
 
 ### v0.8 规划（PRD §19.6，grilling 两轮定案）
 - 主题：学习目标系统 + 个性化每日学习计划——级别 + 可选目标日期，倒推夹 5/10/15/20 档位、按周校准；存 SharedPreferences 不动 Room；纯函数 `StudyPlanner` 带测试；`ReviewPlanner`/FSRS 零接触
@@ -173,6 +173,12 @@ python tools/validate_content.py    # 内容校验，必须通过才能改内容
 - 模拟器回归通过（坑 11 版本号已核对，完整闭环实测）：学习会话答错 + 自评不认识 → 错题入本（复习 Tab 错题本 1 条待攻克 + 突击卡出现）→ 突击会话重出该错题（1/1 全出）→ 答对 → 结算「错题本已全部清空！」——答对移除语义端到端验证
 - README 同步（突击行 + 词库 1104 + 测试 213）；tag v1.2.0 + GitHub Release（JapanLearn-v1.2.0.apk）；截图 `.screenshots/v120_*.png`（未入库）
 - **坐标坑提醒**：模拟器截图是缩略图（900×2000），设备实际 1080×2400——点击坐标必须 ×1.2 换算，或用 `android_ui_describe` 拿真实 bounds
+
+### v1.2.1 热修复（2026-09-12）— 用户真机报「网络不可用或接口无法连接」
+- **根因**：App 纯离线起家，manifest 从未声明 `INTERNET`；v1.1 加 AI 助手时遗漏 → 所有请求在 socket 层被系统拦截，走进兜底文案
+- **为什么回归没发现**：模拟器假 Key 测试同样报「网络不可用」，被误判为「模拟器没网」——两种原因（无权限/无网络）共享同一兜底文案，无法区分。**正确姿势：假 Key 若请求真正发出应收到 401 文案「API Key 无效或无权限」，收到网络错误即说明请求根本没出去**
+- 修复：manifest 补 `INTERNET` + `ManifestTest` 守护测试（215 测全绿）；验证方式 `adb shell dumpsys package com.japanlearn.app | grep INTERNET`（granted=true）
+- 用户真机覆盖 v1.2.1 后即可正常使用 AI 助手（配置保留）
 
 ### v1.2 规划（PRD §19.10，grilling 两轮定案）
 - 主题：错题与 SRS 深度联动——**错题突击会话**（复习 Tab 入口，三类错题各有出题通路：word 混合题型 / kana romaji 四选一 / grammar 自带练习；10 题循环取；recordAuxAnswer 判分：答对移除、答错 +1；不推 SRS dueAt）+ **复习队列错题优先**（dueWords/dueGrammar LEFT JOIN wrong_answers 排序，纯排序可回滚）
