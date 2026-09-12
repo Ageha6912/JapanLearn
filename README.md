@@ -6,7 +6,7 @@
   <img src="https://img.shields.io/badge/platform-Android%208.0%2B-1B3A5C?logo=android&logoColor=white" alt="Android 8.0 及以上">
   <img src="https://img.shields.io/badge/Kotlin-2.0-7F52FF?logo=kotlin&logoColor=white" alt="Kotlin 2.0">
   <img src="https://img.shields.io/badge/Jetpack%20Compose-Material%203-4285F4?logo=jetpackcompose&logoColor=white" alt="Jetpack Compose Material 3">
-  <img src="https://img.shields.io/badge/tests-213%20passing-4E7D5B" alt="213 项单元测试通过">
+  <img src="https://img.shields.io/badge/tests-223%20passing-4E7D5B" alt="223 项单元测试通过">
   <a href="./LICENSE"><img src="https://img.shields.io/badge/license-MIT-C75B5B" alt="MIT 许可证"></a>
 </p>
 
@@ -43,7 +43,7 @@ JapanLearn 是一个**完全离线、无需账号**的日语入门 App，为日�
 | 🏠 今日学习 | 新词 / 语法 / 待复习聚合，实时进度，连击天数 |
 | 🈁 五十音 | 101 组（清音 / 浊音 / 拗音），罗马音 + 示例词 + 发音，分组测验，题量可选 |
 | 📚 N5/N4 课程 | 22 个课程单元（N5/N4 各 11 个）：单元内顺序学词 + 配套语法，当前单元自动推进，单元测试 10 题检查点 |
-| 📖 单词 / 语法全库 | 1104 词（N5 504 + N4 600）+ 87 条语法：假名、词性、例句、接续说明，列表带掌握度色点，可按单元筛选 |
+| 📖 单词 / 语法全库 | 1104 词（N5 504 + N4 600）+ 120 条语法：假名、词性、例句、接续说明，列表带掌握度色点，可按单元筛选 |
 | 🔁 SRS 复习 | 到期自动出队，混合单词与语法，限流顺延 |
 | 🔊 听音选词 | 练习中按 30% 概率升级为听音变体（TTS 播放选释义） |
 | ⌨️ 打假名 | 中→日约 20% 改为看中文写读音（假名或罗马音） |
@@ -55,7 +55,7 @@ JapanLearn 是一个**完全离线、无需账号**的日语入门 App，为日�
 | 🎯 学习目标 | 设 N5/N4 目标与达成日期，按剩余内容量推荐每日新词档位，每周自动校准 |
 | 🎧 听力训练 | 听音辨词 / 听写假名 / 听句选义三题型混合，对错同步错题本 |
 | 🏆 学习成果 | 累计时长、掌握词数、最长连击、单元完成进度、复习正确率一页看全 |
-| 🤖 AI 助手（可选） | 自备 API Key 直连大模型：语法解释 / 句子纠错 / 翻译；Key 仅存本机，不配则完全隐藏，每日限额可调 |
+| 🤖 AI 助手（可选） | 自备 API Key 直连大模型：语法解释 / 句子纠错 / 翻译，流式打字机输出；Key 仅存本机，不配则完全隐藏，每日限额可调 |
 | ⚙️ 每日任务量 | 新词（5/10/15/20）、语法数、复习上限可调 |
 
 ## 快速开始
@@ -66,7 +66,7 @@ JapanLearn 是一个**完全离线、无需账号**的日语入门 App，为日�
 git clone https://github.com/Ageha6912/JapanLearn.git
 cd JapanLearn
 ./gradlew :app:assembleDebug     # 产出 app/build/outputs/apk/debug/app-debug.apk
-./gradlew :app:testDebugUnitTest # 运行单元测试（当前 213 项）
+./gradlew :app:testDebugUnitTest # 运行单元测试（当前 223 项）
 python tools/validate_content.py # 改内容后必须通过
 ```
 
@@ -118,7 +118,7 @@ app/src/main/java/com/japanlearn/app/
 
 ## 测试
 
-213 项单元测试全绿（PRD §17.8 强制要求）。改内容须另跑 `python tools/validate_content.py`（CI 已接入）：
+223 项单元测试全绿（PRD §17.8 强制要求）。改内容须另跑 `python tools/validate_content.py`（CI 已接入）：
 
 - `FsrsSchedulerTest` / `StudyPlannerTest`：FSRS 调度、目标倒推推荐档位与周校准
 - `QuizGeneratorTest`：选项数量、含正确答案、不重复、双向词卡、种子可复现、小内容池退化、听音/汉字变体
