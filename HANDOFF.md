@@ -153,6 +153,14 @@ python tools/validate_content.py    # 内容校验，必须通过才能改内容
 - `SettingsRepository`：`ai_base_url/ai_api_key/ai_model/ai_daily_limit` 四个 key + `ai_calls_{date}` 每日计数；AppContainer 暴露 `aiClient`
 - 设置页（我的）新增「AI 助手（可选，需联网）」卡：未配置 → 三预设 chips + 三字段表单（Key 密码样式）+ 保存并启用；已配置 → 模型/端点展示 + 限额 chips + 清除配置；两态均带隐私说明
 - 全量 206 测全绿；versionName 未动
+
+### v1.1 PR-B 已交付（2026-09-12）— AI 助手页与上下文入口
+- `ui/ai/AiAssistantScreen.kt`：三模式 chips（语法解释/句子纠错/翻译）+ 多行输入 + 发送（loading 态「思考中…」）→ 结果卡（按模式换标题）；错误卡（`AiException` 文案直接展示）；顶部「需联网 · 费用由 Key 承担 · 今日剩余 N 次」行
+- 未配置态：页面可达但只显示引导卡 + 「去设置」（跳我的 Tab）；额度用完发送时给明确提示
+- 上下文预填：导航参数 `mode/input/context`（`Uri.encode` 传输，Navigation 自动解码）；带上下文时显示「已带入教材上下文」提示条
+- **入口三处（全部 gated by `aiConfigured` 组合流）**：我的 AI 卡「开始对话」、语法详情「问 AI 讲解」（带入 title/meaning/connection）、错题本每条「AI 讲解」（带入 primary）
+- 每次成功调用 `incrementAiCalls(今天)` 落计数；`aiConfigured` 是 SettingsRepository 上的 combine 流，复用注意
+- 本 PR 为纯 UI 层，无新增纯逻辑（发送闸门/额度判定复用已测的 AiQuota/AiConfig）；全量 206 测全绿；versionName 未动
 - 分配结论：预生成音频正式移出 v0.8（无排期可选 PR，门禁声库书面授权）；埋点推迟至内测；内容扩充为常驻并行线；听力训练留 v0.9
 
 ### v0.7.5（已发布）— PR-R51 停写旧 content_version
@@ -177,7 +185,7 @@ python tools/validate_content.py    # 内容校验，必须通过才能改内容
 
 v0.7.0：Room v4 FSRS 字段；默认 `FsrsScheduler`（ts-fsrs v5.4.2 long-term，`enable_short_term=false`；Again 仍 `dueAt=now`）；自评文案不变；已掌握 `stability >= 21`。回滚：`AppContainer` 改回 `SrsScheduler`，勿删 `MIGRATION_3_4`。
 
-下一步：v1.1 继续：PR-B AI 助手页（三模式 + 上下文预填，入口按「已配置」隐藏/显示）→ PR-C 收口 v1.1.0。PR-A 已交付。
+下一步：v1.1 收口：PR-C（versionName 1.1.0 / versionCode 22 → assembleRelease → 模拟器回归（配置 Key 走一次真实调用，如无 Key 则验证未配置门控）→ README 增补 AI 助手 → tag + GitHub Release）。PR-A/PR-B 均已交付。
 
 v0.4.3（中文引擎修复）：用户真机「只读汉字跳过假名 + 不弹引导」——默认引擎是中文引擎，init 成功且 availableLanguages 谎报日语。重构 JapaneseTts：装有 Google TTS（com.google.android.tts）时显式按包名初始化不走默认；可用性用 setLanguage(JAPAN) 返回值实测（MISSING_DATA→数据引导 / NOT_SUPPORTED→引擎引导）；manifest 加 <queries>（Android 11+ 包可见性，漏加会查不到 Google TTS）；点击时 refreshJapaneseStatus 保证下载后立即生效。
 

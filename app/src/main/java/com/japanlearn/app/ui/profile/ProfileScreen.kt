@@ -469,6 +469,8 @@ fun ProfileScreen(nav: NavHostController) {
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
+                        Spacer(Modifier.height(6.dp))
+                        AppButton("开始对话", onClick = { nav.navigate(Routes.aiAssistant()) })
                         Text("每日调用上限", style = MaterialTheme.typography.titleSmall)
                         ChipRow(
                             options = AiConfig.DAILY_LIMIT_CHOICES,

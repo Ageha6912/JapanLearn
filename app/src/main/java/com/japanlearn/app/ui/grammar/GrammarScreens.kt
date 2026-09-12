@@ -26,6 +26,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -228,6 +229,14 @@ fun GrammarDetailScreen(nav: NavHostController, grammarId: String) {
                 com.japanlearn.app.ui.review.LoadingPlaceholder()
             } else {
                 StaggerIn(0) { GrammarCardContent(g) { vm.speak(it) } }
+                // AI 讲解入口：仅在用户已配置 API Key 时出现（PRD §19.9）
+                val aiReady by app.settings.aiConfigured.collectAsStateWithLifecycle(initialValue = false)
+                if (aiReady) {
+                    TextButton(onClick = {
+                        val context = "教材说明：${g.meaning}；接续：${g.connection}"
+                        nav.navigate(Routes.aiAssistant(com.japanlearn.app.domain.AiMode.GRAMMAR, input = g.title, context = context))
+                    }) { Text("问 AI 讲解这条语法") }
+                }
                 when {
                     state.quiz == null -> StaggerIn(1) {
                         AppButton("练一练") { vm.beginPractice() }

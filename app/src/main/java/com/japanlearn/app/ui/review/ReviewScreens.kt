@@ -32,6 +32,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -507,6 +508,8 @@ fun WrongAnswersScreen(nav: NavHostController) {
     val app = LocalAppContainer.current
     val vm: WrongAnswersViewModel = androidx.lifecycle.viewmodel.compose.viewModel { WrongAnswersViewModel(app) }
     val items by vm.items.collectAsStateWithLifecycle(initialValue = emptyList())
+    // AI 讲解入口：仅在用户已配置 API Key 时出现（PRD §19.9）
+    val aiReady by app.settings.aiConfigured.collectAsStateWithLifecycle(initialValue = false)
 
     Scaffold(
         topBar = { AppTopBar("错题本") { nav.popBackStack() } },
@@ -545,6 +548,16 @@ fun WrongAnswersScreen(nav: NavHostController) {
                                         style = MaterialTheme.typography.bodySmall,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     )
+                                    if (aiReady) {
+                                        TextButton(onClick = {
+                                            nav.navigate(
+                                                Routes.aiAssistant(
+                                                    com.japanlearn.app.domain.AiMode.GRAMMAR,
+                                                    input = w.primary,
+                                                ),
+                                            )
+                                        }) { Text("AI 讲解") }
+                                    }
                                 }
                                 Surface(
                                     shape = androidx.compose.foundation.shape.CircleShape,

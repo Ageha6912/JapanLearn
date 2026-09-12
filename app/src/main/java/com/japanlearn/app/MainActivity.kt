@@ -71,6 +71,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.japanlearn.app.data.ThemeMode
 import com.japanlearn.app.ui.home.HomeScreen
+import com.japanlearn.app.ui.ai.AiAssistantScreen
 import com.japanlearn.app.ui.course.CourseCheckpointScreen
 import com.japanlearn.app.ui.course.CourseScreen
 import com.japanlearn.app.ui.course.CourseUnitScreen
@@ -121,6 +122,7 @@ object Routes {
     const val COURSE_UNIT = "courseUnit/{level}/{unit}"
     const val COURSE_CHECKPOINT = "courseCheckpoint/{level}/{unit}"
     const val ACHIEVEMENTS = "achievements"
+    const val AI_ASSISTANT = "aiAssistant?mode={mode}&input={input}&context={context}"
     const val SENTENCE = "sentence/{index}"
 
     fun wordSession(count: Int) = "wordSession/$count"
@@ -129,6 +131,8 @@ object Routes {
     fun sentence(index: Int) = "sentence/$index"
     fun courseUnit(level: String, unit: Int) = "courseUnit/$level/$unit"
     fun courseCheckpoint(level: String, unit: Int) = "courseCheckpoint/$level/$unit"
+    fun aiAssistant(mode: com.japanlearn.app.domain.AiMode = com.japanlearn.app.domain.AiMode.GRAMMAR, input: String = "", context: String = "") =
+        "aiAssistant?mode=${mode.name}&input=${android.net.Uri.encode(input)}&context=${android.net.Uri.encode(context)}"
 
     val TABS = listOf(HOME, LEARN, REVIEW, PROFILE)
 }
@@ -238,6 +242,32 @@ fun MainRoot(navTarget: String? = null) {
             composable(Routes.WRONG_ANSWERS) { WrongAnswersScreen(navController) }
             composable(Routes.STATS) { StatsScreen(navController) }
             composable(Routes.ACHIEVEMENTS) { AchievementsScreen(navController) }
+            composable(
+                Routes.AI_ASSISTANT,
+                arguments = listOf(
+                    androidx.navigation.navArgument("mode") {
+                        type = androidx.navigation.NavType.StringType
+                        defaultValue = com.japanlearn.app.domain.AiMode.GRAMMAR.name
+                    },
+                    androidx.navigation.navArgument("input") {
+                        type = androidx.navigation.NavType.StringType
+                        defaultValue = ""
+                    },
+                    androidx.navigation.navArgument("context") {
+                        type = androidx.navigation.NavType.StringType
+                        defaultValue = ""
+                    },
+                ),
+            ) { entry ->
+                AiAssistantScreen(
+                    navController,
+                    initialMode = entry.arguments?.getString("mode")
+                        ?.let { name -> runCatching { com.japanlearn.app.domain.AiMode.valueOf(name) }.getOrNull() }
+                        ?: com.japanlearn.app.domain.AiMode.GRAMMAR,
+                    initialInput = entry.arguments?.getString("input").orEmpty(),
+                    initialContext = entry.arguments?.getString("context").orEmpty(),
+                )
+            }
             composable(Routes.GOAL) { GoalScreen(navController) }
             composable(Routes.LISTENING) { ListeningSessionScreen(navController) }
             composable(Routes.COURSE) { CourseScreen(navController) }

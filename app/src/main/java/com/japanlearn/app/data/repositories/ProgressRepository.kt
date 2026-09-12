@@ -174,6 +174,11 @@ class SettingsRepository(context: Context) {
     val aiModel = MutableStateFlow(prefs.getString(KEY_AI_MODEL, "") ?: "")
     val aiDailyLimit = MutableStateFlow(prefs.getInt(KEY_AI_DAILY_LIMIT, 20))
 
+    /** 三字段齐备 = 已启用；未启用时所有 AI 入口隐藏（PRD §19.9）。 */
+    val aiConfigured: Flow<Boolean> = kotlinx.coroutines.flow.combine(aiBaseUrl, aiApiKey, aiModel) { u, k, m ->
+        AiConfig.isConfigured(u, k, m)
+    }
+
     fun saveAiConfig(baseUrl: String, apiKey: String, model: String) {
         val url = baseUrl.trim()
         val key = apiKey.trim()
