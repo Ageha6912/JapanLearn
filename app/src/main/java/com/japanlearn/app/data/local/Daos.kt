@@ -243,6 +243,12 @@ interface ReviewRecordDao {
     @Query("SELECT COUNT(*) FROM review_records WHERE reviewedAt >= :from")
     fun countSinceFlow(from: Long): Flow<Int>
 
+    @Query("SELECT COUNT(*) FROM review_records")
+    suspend fun countAll(): Int
+
+    @Query("SELECT COUNT(*) FROM review_records WHERE correct = 1")
+    suspend fun countAllCorrect(): Int
+
     @Query("DELETE FROM review_records")
     suspend fun clear()
 

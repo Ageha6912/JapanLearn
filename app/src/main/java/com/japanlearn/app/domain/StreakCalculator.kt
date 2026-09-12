@@ -20,4 +20,17 @@ object StreakCalculator {
         }
         return count
     }
+
+    /** 历史最长连续学习天数（PRD §19.8 学习成果页）：在全量学习日期里找最长连续段。 */
+    fun longestStreak(studyDates: Set<String>): Int {
+        if (studyDates.isEmpty()) return 0
+        val sorted = studyDates.mapNotNull { runCatching { LocalDate.parse(it) }.getOrNull() }.sorted()
+        var longest = 1
+        var run = 1
+        for (i in 1 until sorted.size) {
+            run = if (sorted[i] == sorted[i - 1].plusDays(1)) run + 1 else 1
+            if (run > longest) longest = run
+        }
+        return longest
+    }
 }

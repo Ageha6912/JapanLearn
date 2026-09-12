@@ -283,7 +283,18 @@ fun ProfileScreen(nav: NavHostController) {
                             )
                         }
                     }
-                    AppButton("查看学习统计", onClick = { nav.navigate(Routes.STATS) })
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        AppButton(
+                            "查看学习统计",
+                            modifier = Modifier.weight(1f),
+                            onClick = { nav.navigate(Routes.STATS) },
+                        )
+                        AppButton(
+                            "学习成果",
+                            modifier = Modifier.weight(1f),
+                            onClick = { nav.navigate(Routes.ACHIEVEMENTS) },
+                        )
+                    }
                 }
             }
 

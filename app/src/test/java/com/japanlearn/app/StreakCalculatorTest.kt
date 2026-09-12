@@ -39,4 +39,24 @@ class StreakCalculatorTest {
         val today = LocalDate.of(2026, 9, 5)
         assertEquals(0, StreakCalculator.streak(emptySet(), today))
     }
+
+    @Test
+    fun `最长连击取历史最高段`() {
+        val dates = setOf(
+            "2026-08-30", "2026-08-31", "2026-09-01", // 三天
+            "2026-09-04", "2026-09-05", // 两天的近期段
+        )
+        assertEquals(3, StreakCalculator.longestStreak(dates))
+    }
+
+    @Test
+    fun `最长连击空集为零`() {
+        assertEquals(0, StreakCalculator.longestStreak(emptySet()))
+    }
+
+    @Test
+    fun `最长连击忽略非法日期字符串`() {
+        val dates = setOf("2026-09-01", "2026-09-02", "not-a-date")
+        assertEquals(2, StreakCalculator.longestStreak(dates))
+    }
 }

@@ -28,7 +28,7 @@
 ```bash
 ./gradlew :app:assembleDebug        # debug APK
 ./gradlew :app:assembleRelease      # 正式签名 APK（keystore 已配置，见第 6 节坑 9）
-./gradlew :app:testDebugUnitTest    # 单元测试（当前 187 项），必须全绿才能交付
+./gradlew :app:testDebugUnitTest    # 单元测试（当前 190 项），必须全绿才能交付
 python tools/validate_content.py    # 内容校验，必须通过才能改内容；CI 已跑
 ```
 
@@ -125,6 +125,12 @@ python tools/validate_content.py    # 内容校验，必须通过才能改内容
 - `ui/course/CourseScreens.kt`：单元列表页（级别切换、当前单元高亮、检查点最佳、全部单词/语法入口）→ 单元详情页（词表带掌握度色点、语法列表、设为当前单元）→ 单元测试页（10 题，对错只落错题本 + 统计，成绩记最佳，彩带结算）
 - 路由：`course` / `courseUnit/{level}/{unit}` / `courseCheckpoint/{level}/{unit}`
 - 全量 187 测全绿；versionName 未动
+
+### v1.0 PR-C 已交付（2026-09-12）— 学习成果页
+- `ui/stats/AchievementsScreen.kt` + 我的 Tab 学习者卡片双按钮（查看学习统计 / 学习成果）；路由 `achievements`
+- 指标（零新表纯聚合）：累计时长（`formatStudyDuration`）、已学/掌握单词、已学语法、当前连击、**历史最长连击**（`StreakCalculator.longestStreak` 纯函数 +3 测）、单元完成 x/22（`completedUnitCount` 聚合两级别）、复习正确率（`review_records` 全量 correct 计数）
+- **取舍（§19.8「零新表」）**：听力正确率不做（v0.9 听力只记错题不记对错，无数据源）；五十音进度不做（五十音无进度表）；待后续版本需要时再引入记录
+- 全量 190 测全绿；versionName 未动
 - 分配结论：预生成音频正式移出 v0.8（无排期可选 PR，门禁声库书面授权）；埋点推迟至内测；内容扩充为常驻并行线；听力训练留 v0.9
 
 ### v0.7.5（已发布）— PR-R51 停写旧 content_version
@@ -149,7 +155,7 @@ python tools/validate_content.py    # 内容校验，必须通过才能改内容
 
 v0.7.0：Room v4 FSRS 字段；默认 `FsrsScheduler`（ts-fsrs v5.4.2 long-term，`enable_short_term=false`；Again 仍 `dueAt=now`）；自评文案不变；已掌握 `stability >= 21`。回滚：`AppContainer` 改回 `SrsScheduler`，勿删 `MIGRATION_3_4`。
 
-下一步：v1.0 继续：PR-C 学习成果页（我的 Tab，零新表聚合）→ PR-D 收口 v1.0.0（versionCode 21 + README 里程碑重写 + showcase 重生成）。PR-A/PR-B 均已交付。
+下一步：v1.0 收口：PR-D（versionName 1.0.0 / versionCode 21 → assembleRelease → 模拟器回归 → README 里程碑重写 + showcase 重生成 → tag + GitHub Release）。PR-A/B/C 均已交付。
 
 v0.4.3（中文引擎修复）：用户真机「只读汉字跳过假名 + 不弹引导」——默认引擎是中文引擎，init 成功且 availableLanguages 谎报日语。重构 JapaneseTts：装有 Google TTS（com.google.android.tts）时显式按包名初始化不走默认；可用性用 setLanguage(JAPAN) 返回值实测（MISSING_DATA→数据引导 / NOT_SUPPORTED→引擎引导）；manifest 加 <queries>（Android 11+ 包可见性，漏加会查不到 Google TTS）；点击时 refreshJapaneseStatus 保证下载后立即生效。
 

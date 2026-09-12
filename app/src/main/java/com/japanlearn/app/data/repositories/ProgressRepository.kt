@@ -411,4 +411,24 @@ class StatsRepository(
         val day = dates.today().toEpochDay()
         return (day % size).toInt()
     }
+
+    // ---- 学习成果页（PRD §19.8）：全部来自现有表的聚合 ----
+
+    /** 全量学习日期（ISO 字符串），用于最长连击计算。 */
+    suspend fun allStudyDates(): Set<String> = db.dailyStudyDao().allDates().toSet()
+
+    /** 复习自评正确率（correct to 总数）；无记录返回 null。 */
+    suspend fun reviewAccuracy(): Pair<Int, Int>? {
+        val total = db.reviewRecordDao().countAll()
+        if (total == 0) return null
+        return db.reviewRecordDao().countAllCorrect() to total
+    }
+
+    /** 两个级别合计的已完成课程单元数（完成 = 该单元词全部学过）。 */
+    suspend fun completedUnitCount(): Int {
+        val levels = listOf("N5", "N4")
+        return levels.sumOf { level ->
+            db.wordDao().unitProgressByLevel(level).count { it.total > 0 && it.learned >= it.total }
+        }
+    }
 }

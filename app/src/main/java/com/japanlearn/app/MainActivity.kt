@@ -89,6 +89,7 @@ import com.japanlearn.app.ui.review.ReviewHomeScreen
 import com.japanlearn.app.ui.review.ReviewSessionScreen
 import com.japanlearn.app.ui.review.WrongAnswersScreen
 import com.japanlearn.app.ui.sentence.SentenceScreen
+import com.japanlearn.app.ui.stats.AchievementsScreen
 import com.japanlearn.app.ui.stats.StatsScreen
 import com.japanlearn.app.ui.theme.JapanLearnTheme
 import com.japanlearn.app.ui.words.WordListScreen
@@ -119,6 +120,7 @@ object Routes {
     const val COURSE = "course"
     const val COURSE_UNIT = "courseUnit/{level}/{unit}"
     const val COURSE_CHECKPOINT = "courseCheckpoint/{level}/{unit}"
+    const val ACHIEVEMENTS = "achievements"
     const val SENTENCE = "sentence/{index}"
 
     fun wordSession(count: Int) = "wordSession/$count"
@@ -235,6 +237,7 @@ fun MainRoot(navTarget: String? = null) {
             composable(Routes.REVIEW_SESSION) { ReviewSessionScreen(navController) }
             composable(Routes.WRONG_ANSWERS) { WrongAnswersScreen(navController) }
             composable(Routes.STATS) { StatsScreen(navController) }
+            composable(Routes.ACHIEVEMENTS) { AchievementsScreen(navController) }
             composable(Routes.GOAL) { GoalScreen(navController) }
             composable(Routes.LISTENING) { ListeningSessionScreen(navController) }
             composable(Routes.COURSE) { CourseScreen(navController) }
