@@ -10,7 +10,7 @@
 - 需求文档：`PRD.md`（§17 为 v0.1 评审决策记录，**§18 为 v0.2 决策记录**，**§19 为 v0.5–v0.7 决策记录与产品缺口清单**，与正文冲突时以 §17/§18/§19 为准）
 - 优化方案：`OPTIMIZATION.md`（**Accepted**，用户 2026-09-09 确认 Q1–Q3 推荐项；结论已于 2026-09-12 写入 PRD §19）
 - Git 身份（仓库级已配置）：`Ageha <ageha6912@gmail.com>`，勿用其他身份提交
-- 已发布：**v0.8.0**（tag + GitHub Release，正式签名 APK）。`versionName = "0.8.0"` / `versionCode` 19
+- 已发布：**v0.9.0**（tag + GitHub Release，正式签名 APK）。`versionName = "0.9.0"` / `versionCode` 20
 
 ## 2. 环境速查
 
@@ -44,7 +44,7 @@ python tools/validate_content.py    # 内容校验，必须通过才能改内容
 - **发布工程**：R8 minify + 资源收缩（APK 1.5MB）、正式签名接入（keystore）、GitHub Actions 门禁 CI（`.github/workflows/ci.yml`：55 测试 + assembleDebug）
 - 55 项单元测试全绿；PRD §18 决策记录；README 数字已同步
 
-## 4. 当前任务：v0.8.0 已发布（2026-09-12）
+## 4. 当前任务：v0.9.0 已发布（2026-09-12）
 
 ### v0.8 规划（PRD §19.6，grilling 两轮定案）
 - 主题：学习目标系统 + 个性化每日学习计划——级别 + 可选目标日期，倒推夹 5/10/15/20 档位、按周校准；存 SharedPreferences 不动 Room；纯函数 `StudyPlanner` 带测试；`ReviewPlanner`/FSRS 零接触
@@ -93,6 +93,12 @@ python tools/validate_content.py    # 内容校验，必须通过才能改内容
 - 批次 `tools/new_sentences_b3.json`（65 条写稿，5 条与现有库撞句被按 ja 去重跳过，净增 60）；覆盖购物试穿/退换/支付、交通问路/换乘/迟到致歉、就医症状/预约/探病慰问等
 - `sentences.json` **180 条**，version 3 → 5（两次合并各 +1）；`validate_content.py` 全部通过
 - `ContentScaleTest` / `ContentExpansionTest` 断言同步 180 / version 5
+
+### PR-C 已发布（2026-09-12）— v0.9.0 收口
+- versionName 0.9.0 / versionCode 20；重新 assembleRelease（坑 5）
+- 模拟器回归通过（坑 11 版本号已核对）：全新安装引导正常（v0.8 特性无回归）、学习 Tab 听力训练入口卡、题量选择、听句选义与听音辨词两题型渲染 + 答题判定 + 反馈流转、**TTS 引擎缺失时进会话直接弹引导对话框（§19.7 前置检测实测生效，AVD 无 TTS 恰好验证）**
+- tag v0.9.0 + GitHub Release（JapanLearn-v0.9.0.apk）；回归截图 `.screenshots/v090_*.png`（未入库）
+- CI 门禁：收口 commit 全绿（169 测 + assembleDebug）
 - 分配结论：预生成音频正式移出 v0.8（无排期可选 PR，门禁声库书面授权）；埋点推迟至内测；内容扩充为常驻并行线；听力训练留 v0.9
 
 ### v0.7.5（已发布）— PR-R51 停写旧 content_version
@@ -117,7 +123,7 @@ python tools/validate_content.py    # 内容校验，必须通过才能改内容
 
 v0.7.0：Room v4 FSRS 字段；默认 `FsrsScheduler`（ts-fsrs v5.4.2 long-term，`enable_short_term=false`；Again 仍 `dueAt=now`）；自评文案不变；已掌握 `stability >= 21`。回滚：`AppContainer` 改回 `SrsScheduler`，勿删 `MIGRATION_3_4`。
 
-下一步：v0.9 收口：PR-C（versionName 0.9.0 / versionCode 20 → assembleRelease → 模拟器回归 → tag + GitHub Release）。PR-A 听力训练、PR-B 每日一句 180 均已交付。
+下一步：v1.0 方向规划。§19.5 高优先级剩余：N5/N4 课程化、内容扩充（常驻线）；中优先级以「错题与 SRS 深度联动」（v0.9 已推进半步：听力错题入本）与「更完整学习统计」靠前。规划时照例 grilling 两轮。
 
 v0.4.3（中文引擎修复）：用户真机「只读汉字跳过假名 + 不弹引导」——默认引擎是中文引擎，init 成功且 availableLanguages 谎报日语。重构 JapaneseTts：装有 Google TTS（com.google.android.tts）时显式按包名初始化不走默认；可用性用 setLanguage(JAPAN) 返回值实测（MISSING_DATA→数据引导 / NOT_SUPPORTED→引擎引导）；manifest 加 <queries>（Android 11+ 包可见性，漏加会查不到 Google TTS）；点击时 refreshJapaneseStatus 保证下载后立即生效。
 
