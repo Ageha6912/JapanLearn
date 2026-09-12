@@ -48,4 +48,17 @@ object AppMigrations {
             db.execSQL(SQL_3_4_SEED)
         }
     }
+
+    // v5（PRD §19.8 课程化）：words/grammar 加 unit 列；内容 version 升位后由装载器重写真实值
+    const val SQL_4_5_WORDS_UNIT =
+        "ALTER TABLE words ADD COLUMN unit INTEGER NOT NULL DEFAULT 0"
+    const val SQL_4_5_GRAMMAR_UNIT =
+        "ALTER TABLE grammar ADD COLUMN unit INTEGER NOT NULL DEFAULT 0"
+
+    val MIGRATION_4_5 = object : Migration(4, 5) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL(SQL_4_5_WORDS_UNIT)
+            db.execSQL(SQL_4_5_GRAMMAR_UNIT)
+        }
+    }
 }

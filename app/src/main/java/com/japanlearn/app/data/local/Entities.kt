@@ -19,6 +19,7 @@ data class WordEntity(
     val exampleZh: String,
     val level: String,
     val order: Int,
+    val unit: Int = 0,
 )
 
 @Entity(tableName = "grammar")
@@ -32,6 +33,7 @@ data class GrammarEntity(
     val exercisesJson: String,
     val level: String,
     val order: Int,
+    val unit: Int = 0,
 )
 
 @Entity(tableName = "kana")

@@ -43,7 +43,8 @@ class ContentExpansionTest {
         val titles = file.grammar.map { it.title }.toSet()
         assertTrue(titles.contains("～んです / ～のです"))
         assertTrue(titles.contains("～について"))
-        assertEquals(5, file.version)
+        assertEquals(6, file.version)
+        assertTrue(file.grammar.all { it.unit in 1..11 })
     }
 
     @Test

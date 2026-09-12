@@ -26,6 +26,13 @@ class AppMigrationsTest {
     }
 
     @Test
+    fun `4到5 给 words 和 grammar 加 unit 列`() {
+        assertTrue(AppMigrations.SQL_4_5_WORDS_UNIT.contains("ALTER TABLE words ADD COLUMN unit"))
+        assertTrue(AppMigrations.SQL_4_5_GRAMMAR_UNIT.contains("ALTER TABLE grammar ADD COLUMN unit"))
+        assertTrue(AppMigrations.SQL_4_5_WORDS_UNIT.contains("NOT NULL DEFAULT 0"))
+    }
+
+    @Test
     fun `Room schema v3 快照已入库`() {
         assertTrue(schemaExists("3.json"))
     }
@@ -33,6 +40,11 @@ class AppMigrationsTest {
     @Test
     fun `Room schema v4 快照已入库`() {
         assertTrue(schemaExists("4.json"))
+    }
+
+    @Test
+    fun `Room schema v5 快照已入库`() {
+        assertTrue(schemaExists("5.json"))
     }
 
     private fun schemaExists(name: String): Boolean {

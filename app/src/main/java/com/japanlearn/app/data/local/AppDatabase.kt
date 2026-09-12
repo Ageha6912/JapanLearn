@@ -17,7 +17,7 @@ import androidx.room.RoomDatabase
         WrongAnswerEntity::class,
         MetaEntity::class,
     ],
-    version = 4,
+    version = 5,
     exportSchema = true,
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -38,6 +38,7 @@ abstract class AppDatabase : RoomDatabase() {
                     AppMigrations.MIGRATION_1_2,
                     AppMigrations.MIGRATION_2_3,
                     AppMigrations.MIGRATION_3_4,
+                    AppMigrations.MIGRATION_4_5,
                 )
                 .build()
     }

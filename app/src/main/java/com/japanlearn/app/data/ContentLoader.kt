@@ -82,7 +82,7 @@ class ContentLoader(
             WordEntity(
                 id = w.id, ja = w.ja, kana = w.kana, romaji = w.romaji, zh = w.zh,
                 pos = w.pos, cat = w.cat, example = w.example, exampleZh = w.exampleZh,
-                level = w.level, order = i,
+                level = w.level, order = i, unit = w.unit,
             )
         }
         require(entities.isNotEmpty()) { "words.json has no items" }
@@ -117,7 +117,7 @@ class ContentLoader(
                 explanation = g.explanation,
                 examplesJson = ContentJson.encodeToString(g.examples),
                 exercisesJson = ContentJson.encodeToString(g.exercises),
-                level = g.level, order = i,
+                level = g.level, order = i, unit = g.unit,
             )
         }
         require(entities.isNotEmpty()) { "grammar.json has no items" }

@@ -6,6 +6,7 @@ import com.japanlearn.app.data.content.KanaFile
 import com.japanlearn.app.data.content.SentencesFile
 import com.japanlearn.app.data.content.WordsFile
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.io.File
 
@@ -37,6 +38,21 @@ class ContentScaleTest {
     fun `sentences json 180`() {
         val file = ContentJson.decodeFromString<SentencesFile>(readContent("sentences.json"))
         assertEquals(180, file.sentences.size)
+    }
+
+    @Test
+    fun `words 覆盖两个级别各 11 个课程单元`() {
+        val file = ContentJson.decodeFromString<WordsFile>(readContent("words.json"))
+        val pairs = file.words.map { it.level to it.unit }.toSet()
+        assertEquals(22, pairs.size)
+        assertTrue(file.words.all { it.unit in 1..11 })
+    }
+
+    @Test
+    fun `grammar 单元都在 1 到 11 之间`() {
+        val file = ContentJson.decodeFromString<GrammarFile>(readContent("grammar.json"))
+        assertTrue(file.grammar.all { it.unit in 1..11 })
+        assertEquals(11, file.grammar.map { it.unit }.distinct().size)
     }
 
     private fun readContent(name: String): String {

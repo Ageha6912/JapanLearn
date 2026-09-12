@@ -15,6 +15,8 @@ ROMAJI_RE = re.compile(r"^[a-zāīūēōâîûêô'-]+( [a-zāīūēōâîûêô
 JP_SENTENCE_RE = re.compile(r"^[\u3040-\u309F\u30A0-\u30FF\u3005\u4E00-\u9FFF。、！？\s]+$")  # 假名+汉字+标点
 
 CATEGORIES = {"人物", "数字", "时间", "食物", "地点", "物品", "动作", "形容词", "副词", "自然", "身体"}
+CAT_UNIT = {c: i + 1 for i, c in enumerate(sorted(CATEGORIES, key=["人物", "数字", "时间", "食物", "地点", "物品", "动作", "形容词", "副词", "自然", "身体"].index))}
+UNITS_PER_LEVEL = 11
 KANA_GROUPS = {"seion", "dakuon", "youon"}
 SCENES = {"日常聊天", "餐厅", "便利店", "旅游", "学校", "工作", "动漫 / 娱乐", "购物", "交通", "就医"}
 LEVELS = {"N5", "N4"}
@@ -87,6 +89,8 @@ def validate_words(data, kana_set):
         seen_pairs[pair] = w["id"]
         if not JP_SENTENCE_RE.match(w["example"]):
             err(f"word {w['id']}: 例句含异常字符 {w['example']!r}")
+        if w.get("unit") != CAT_UNIT.get(w["cat"]):
+            err(f"word {w['id']} {w['ja']}: unit {w.get('unit')!r} 与分类 {w['cat']} 不符（应为 {CAT_UNIT.get(w['cat'])}）")
     non_empty(data["words"], "id", ["ja", "kana", "romaji", "zh", "pos", "cat", "example", "exampleZh"], "word")
     cats, levels = {}, {}
     for w in data["words"]:
@@ -105,6 +109,9 @@ def validate_grammar(data):
         seen.add(g["id"])
         if g.get("level") not in LEVELS:
             err(f"grammar {g['id']} {g['title']}: 非法级别 {g.get('level')!r}")
+        unit = g.get("unit")
+        if not isinstance(unit, int) or not 1 <= unit <= UNITS_PER_LEVEL:
+            err(f"grammar {g['id']} {g['title']}: 非法单元 {unit!r}")
         if not g["examples"]:
             err(f"grammar {g['id']}: 无例句")
         if not g["exercises"]:
