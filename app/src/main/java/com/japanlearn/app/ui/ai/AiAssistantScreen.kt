@@ -52,7 +52,10 @@ data class AiAssistantUiState(
     val mode: AiMode = AiMode.GRAMMAR,
     val input: String = "",
     val context: String? = null,
+    /** 首个增量到达前为 true（显示「思考中」）；打字机阶段为 false。 */
     val loading: Boolean = false,
+    /** 流式进行中（含等待与打字），期间禁用发送。 */
+    val streaming: Boolean = false,
     val result: String? = null,
     val error: String? = null,
     val callsToday: Int = 0,
@@ -101,7 +104,7 @@ class AiAssistantViewModel(
 
     fun send() {
         val s = _state.value
-        if (!s.configured || s.loading || s.input.isBlank()) return
+        if (!s.configured || s.streaming || s.input.isBlank()) return
         val today = app.dateProvider.today().toString()
         val used = app.settings.aiCallsToday(today)
         if (!AiQuota.canCall(used, s.dailyLimit)) {
@@ -109,9 +112,10 @@ class AiAssistantViewModel(
             return
         }
         viewModelScope.launch {
-            _state.update { it.copy(loading = true, error = null, result = null) }
+            _state.update { it.copy(loading = true, streaming = true, error = null, result = null) }
+            var counted = false
             try {
-                val text = app.aiClient.complete(
+                val text = app.aiClient.stream(
                     AiCompletionRequest(
                         baseUrl = s.baseUrl,
                         apiKey = s.apiKey,
@@ -119,15 +123,23 @@ class AiAssistantViewModel(
                         systemPrompt = AiPrompts.systemPrompt(s.mode),
                         userPrompt = AiPrompts.userPrompt(s.mode, s.input, s.context),
                     ),
+                    onDelta = { delta ->
+                        // 首个增量到达 = 200 已收到、token 已在服务端消耗，此时计数（PRD §19.11）
+                        if (!counted) {
+                            counted = true
+                            app.settings.incrementAiCalls(today)
+                        }
+                        _state.update { it.copy(loading = false, result = (it.result ?: "") + delta) }
+                    },
                 )
-                app.settings.incrementAiCalls(today)
-                _state.update { it.copy(loading = false, result = text) }
+                _state.update { it.copy(loading = false, streaming = false, result = text) }
             } catch (e: CancellationException) {
                 throw e
             } catch (e: AiException) {
-                _state.update { it.copy(loading = false, error = e.message) }
+                // 流中断：保留已收到的部分文本，附错误说明
+                _state.update { it.copy(loading = false, streaming = false, error = e.message) }
             } catch (e: Exception) {
-                _state.update { it.copy(loading = false, error = "出错了：${e.message}") }
+                _state.update { it.copy(loading = false, streaming = false, error = "出错了：${e.message}") }
             }
         }
     }
@@ -230,8 +242,12 @@ fun AiAssistantScreen(
                                 },
                             )
                             AppButton(
-                                text = if (state.loading) "思考中…" else "发送",
-                                enabled = !state.loading && state.input.isNotBlank(),
+                                text = when {
+                                    state.loading -> "思考中…"
+                                    state.streaming -> "回答中…"
+                                    else -> "发送"
+                                },
+                                enabled = !state.streaming && state.input.isNotBlank(),
                                 onClick = { vm.send() },
                             )
                         }

@@ -17,9 +17,10 @@ object AiWire {
 
     private val json = Json { ignoreUnknownKeys = true }
 
-    fun requestBody(model: String, systemPrompt: String, userPrompt: String): String =
+    fun requestBody(model: String, systemPrompt: String, userPrompt: String, stream: Boolean = false): String =
         buildJsonObject {
             put("model", model)
+            if (stream) put("stream", true)
             put(
                 "messages",
                 JsonArray(
@@ -60,5 +61,23 @@ object AiWire {
             in 500..599 -> "服务端暂时不可用，请稍后再试"
             else -> "请求失败（HTTP $httpCode）"
         }
+    }
+
+    /**
+     * 解析一行 SSE（流式，PRD §19.11），返回该行的增量文本；非数据行返回 null。
+     * 覆盖：`data: {...}` 增量块、`data: [DONE]` 终止行、`: keep-alive` 注释行、残缺 JSON。
+     */
+    fun parseStreamDelta(line: String): String? {
+        val trimmed = line.trim()
+        if (!trimmed.startsWith("data:")) return null
+        val payload = trimmed.removePrefix("data:").trim()
+        if (payload.isEmpty() || payload == "[DONE]") return null
+        return runCatching {
+            val root = json.parseToJsonElement(payload).jsonObject
+            val choices = root.getValue("choices").jsonArray
+            if (choices.isEmpty()) return null
+            val delta = (choices[0] as JsonObject).getValue("delta").jsonObject
+            delta["content"]?.let { it.jsonPrimitive.content }
+        }.getOrNull()
     }
 }

@@ -108,6 +108,56 @@ class AiWireTest {
         assertTrue(body.contains("\"role\":\"user\""))
         assertTrue(body.contains("系统提示"))
         assertTrue(body.contains("用户输入"))
+        // 默认非流式：不出现 stream 字段
+        assertFalse(body.contains("stream"))
+    }
+
+    @Test
+    fun `流式请求体带 stream 标记`() {
+        val body = AiWire.requestBody("deepseek-chat", "系统提示", "用户输入", stream = true)
+        assertTrue(body.contains("\"stream\":true"))
+    }
+
+    // ---- parseStreamDelta（v1.3 流式）----
+
+    @Test
+    fun `正常增量块返回 content`() {
+        val line = """data: {"choices":[{"delta":{"content":"朝"}}]}"""
+        assertEquals("朝", AiWire.parseStreamDelta(line))
+    }
+
+    @Test
+    fun `DONE 终止行返回 null`() {
+        assertNull(AiWire.parseStreamDelta("data: [DONE]"))
+    }
+
+    @Test
+    fun `注释心跳行返回 null`() {
+        assertNull(AiWire.parseStreamDelta(": keep-alive"))
+        assertNull(AiWire.parseStreamDelta(""))
+    }
+
+    @Test
+    fun `角色块无 content 返回 null`() {
+        val line = """data: {"choices":[{"delta":{"role":"assistant"}}]}"""
+        assertNull(AiWire.parseStreamDelta(line))
+    }
+
+    @Test
+    fun `空 choices 返回 null`() {
+        assertNull(AiWire.parseStreamDelta("""data: {"choices":[]}"""))
+    }
+
+    @Test
+    fun `残缺 JSON 返回 null 不抛异常`() {
+        assertNull(AiWire.parseStreamDelta("data: {partial json"))
+        assertNull(AiWire.parseStreamDelta("not data line"))
+    }
+
+    @Test
+    fun `带前导空格的行也能解析`() {
+        val line = """  data: {"choices":[{"delta":{"content":"日"}}]}  """
+        assertEquals("日", AiWire.parseStreamDelta(line))
     }
 
     @Test

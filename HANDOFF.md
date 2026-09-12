@@ -28,7 +28,7 @@
 ```bash
 ./gradlew :app:assembleDebug        # debug APK
 ./gradlew :app:assembleRelease      # 正式签名 APK（keystore 已配置，见第 6 节坑 9）
-./gradlew :app:testDebugUnitTest    # 单元测试（当前 213 项），必须全绿才能交付
+./gradlew :app:testDebugUnitTest    # 单元测试（当前 223 项），必须全绿才能交付
 python tools/validate_content.py    # 内容校验，必须通过才能改内容；CI 已跑
 ```
 
@@ -186,6 +186,13 @@ python tools/validate_content.py    # 内容校验，必须通过才能改内容
 - 搭车：N4 语法二批（87 → ~120，N4 每单元 3-4 → 6-7 条）
 - 切分：PR-A 流式管线 → PR-B 语法二批 → PR-C 收口 v1.3.0（versionCode 25）；统计增强/汉字专项排 v1.4 候选
 
+### v1.3 PR-A 已交付（2026-09-12）— AI 流式管线
+- `AiWire.requestBody` 加 `stream` 参数（false 时不出现该字段）；新增 `parseStreamDelta(line)` 纯函数（+8 测）：`data: {...}` 增量 / `[DONE]` / `: keep-alive` 注释 / 角色块无 content / 空 choices / 残缺 JSON 全覆盖
+- `AiClient` 接口新增 `stream(request, onDelta): String`；`OpenAiCompatibleClient` 用 `body.source().readUtf8Line()` 逐行读 SSE（OkHttp read timeout 是字节间超时，60s 对流式安全）；非 2xx 读全量 body 走既有错误文案
+- VM：`streaming` 状态（流式全程禁用发送防并发）；首个增量到达即 `incrementAiCalls`（等价 200 已收）；流中断保留已收文本 + 错误卡并列显示；离开页面 ViewModel 取消流
+- UI：按钮三态「思考中… / 回答中… / 发送」；结果卡文本逐步增长（打字机）
+- 全量 223 测全绿；versionName 未动
+
 ### v1.2 规划（PRD §19.10，grilling 两轮定案）
 - 主题：错题与 SRS 深度联动——**错题突击会话**（复习 Tab 入口，三类错题各有出题通路：word 混合题型 / kana romaji 四选一 / grammar 自带练习；10 题循环取；recordAuxAnswer 判分：答对移除、答错 +1；不推 SRS dueAt）+ **复习队列错题优先**（dueWords/dueGrammar LEFT JOIN wrong_answers 排序，纯排序可回滚）
 - 统计口径不混：突击时长落 addStudy，对错不进复习正确率
@@ -231,7 +238,7 @@ python tools/validate_content.py    # 内容校验，必须通过才能改内容
 
 v0.7.0：Room v4 FSRS 字段；默认 `FsrsScheduler`（ts-fsrs v5.4.2 long-term，`enable_short_term=false`；Again 仍 `dueAt=now`）；自评文案不变；已掌握 `stability >= 21`。回滚：`AppContainer` 改回 `SrsScheduler`，勿删 `MIGRATION_3_4`。
 
-下一步：实施 v1.3（规划定案见 PRD §19.11 与第 4 节）：PR-A 流式管线 → PR-B N4 语法二批 → PR-C 收口 v1.3.0。
+下一步：v1.3 继续：PR-B N4 语法二批（87 → ~120，批次管线 + 单元归属）→ PR-C 收口 v1.3.0。PR-A 已交付。
 
 v0.4.3（中文引擎修复）：用户真机「只读汉字跳过假名 + 不弹引导」——默认引擎是中文引擎，init 成功且 availableLanguages 谎报日语。重构 JapaneseTts：装有 Google TTS（com.google.android.tts）时显式按包名初始化不走默认；可用性用 setLanguage(JAPAN) 返回值实测（MISSING_DATA→数据引导 / NOT_SUPPORTED→引擎引导）；manifest 加 <queries>（Android 11+ 包可见性，漏加会查不到 Google TTS）；点击时 refreshJapaneseStatus 保证下载后立即生效。
 
