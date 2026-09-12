@@ -28,11 +28,18 @@
 ```bash
 ./gradlew :app:assembleDebug        # debug APK
 ./gradlew :app:assembleRelease      # 正式签名 APK（keystore 已配置，见第 6 节坑 9）
-./gradlew :app:testDebugUnitTest    # 单元测试（当前 226 项），必须全绿才能交付
+./gradlew :app:testDebugUnitTest    # 单元测试（当前 231 项），必须全绿才能交付
 python tools/validate_content.py    # 内容校验，必须通过才能改内容；CI 已跑
 ```
 
 ## 3. 已完成
+
+### 宣传网页同步 v1.3.1（2026-09-12）
+- `web/`（**整个目录仍未提交进 git**，untracked）内容从 v0.7.5 时代一次性同步到 v1.3.1：版本号/正式签名、FSRS 描述替换旧固定倍率规则（模糊1d/熟悉×1.5/熟练×2 上限60天）、数字 804→1104 词 / 87→120 语法 / 120→180 每日一句 / 22 课程单元、新增课程化/听力训练/学习目标/错题突击/学习成果功能卡与独立「AI 助手（可选）」区块（BYOK/流式/隐私默认关）+ AI 隐私 FAQ、对比表加 AI 行
+- 截图全部换 v1.3.1 时代源图：`web/tools_refresh_shots.py` PICKS 改为 v131_release_home_fab / v131_learn_tab / v131_course_unit / v100_02_word_session_unit1 / v100_07_checkpoint / v090_04_listening_quiz / v120_05_review_tab / v131_release_popup（ achievements/stats 现有截图带旧数字 804，弃用）
+- 新增 `web/tools_check_web.py`（63 项一致性校验：页面数字 vs 内容 JSON、versionName vs 页面、旧表述清除、锚点/资源/外链），全绿；页面数字今后改动先跑它
+- 渲染验证：Chrome headless 桌面 1440 全页 + 移动 390（经 iframe 壳——**headless 直接 --window-size=390 会被 Windows Chrome 最小窗宽 ~500px 钳制，出现假横向溢出**，见坑 20）
+- showcase 改 `grid-auto-flow: column` 横向滚动（8 张图）；新增 `.ai-grid` 四列网格样式
 
 ### v0.1.0（MVP，已发布）
 - 五十音/单词/语法学习闭环、SRS 复习（模糊 1d/熟悉×1.5/熟练×2 上限 60 天）、每日限流 30、错题本、统计、每日一句、系统 TTS
@@ -44,7 +51,16 @@ python tools/validate_content.py    # 内容校验，必须通过才能改内容
 - **发布工程**：R8 minify + 资源收缩（APK 1.5MB）、正式签名接入（keystore）、GitHub Actions 门禁 CI（`.github/workflows/ci.yml`：55 测试 + assembleDebug）
 - 55 项单元测试全绿；PRD §18 决策记录；README 数字已同步
 
-## 4. 当前任务：v1.3.1 已发布（2026-09-12）
+## 4. 当前任务：v1.3.2 已发布（2026-09-12）
+
+### v1.3.2 已发布（2026-09-12）— 修复流式回答前出现大量 null
+- 用户真机反馈（截图）：AI 弹窗回答前拼出大量「nullnullnull…」，正文跟在后面
+- 根因：思考模型（如 deepseek-reasoner）思考阶段 SSE chunk 为 `delta.content: null` + `reasoning_content`；`delta["content"]` 取到的是 `JsonNull` 对象（Kotlin 非 null），`JsonNull.content` 恰是字符串 `"null"`，被当增量拼接。v1.3.0/1.3.1 均存在，用户换用思考类模型后暴露
+- 修复：`AiWire.textOrNull` 只接受 JSON 字符串字面量（`isString && !is JsonNull`），`parseStreamDelta` 与 `parseContent` 共用；数字/布尔/对象/数组一律 null。思考阶段回归「思考中…」等待态，首个真实 content 到达才计数（额度语义不变）
+- 坑：修复第一版只挡 `JsonNull`，测试暴露数字 `123` 仍会透传（`JsonPrimitive.content` 对数字字面量返回 "123"）——`isString` 判断补上
+- 测试：+6（null 块 / reasoning 块 / reasoning 后正常 content / 数字布尔 / 非流式 null），全量 231 全绿
+- versionName 1.3.2 / versionCode 27；release 包覆盖安装回归（配置保留、FAB 与弹窗正常）；tag v1.3.2 + GitHub Release（JapanLearn-v1.3.2.apk）https://github.com/Ageha6912/JapanLearn/releases/tag/v1.3.2
+- 流式成功路径（含思考模型不再出 null）待用户真机验证（坑 12）
 
 ### v1.3.1 已发布（2026-09-12）— AI 助手首页悬浮按钮 + 弹窗
 - 用户需求：AI 助手做成首页右下角固定按钮，点击弹出 AI 弹窗，形态同首页设置弹窗（TransformCardPopup）
@@ -337,6 +353,7 @@ v0.3.0 已按方案全部交付并发布（tag v0.3.0 + GitHub Release，正式�
 **仓库纪律**
 18. `.screenshots/14_release_home.png`、`15_v011_about.png`、`16_v011_final_scroll.png` 三张截图**用户明确不入库**，保持未跟踪状态
 19. 用户在意的验证顺序：改内容 → `validate_content.py` 通过；改代码 → `testDebugUnitTest` 全绿；发版 → 模拟器 release 包回归走查（核对本节坑 11 的版本号）
+20. **Chrome headless 截移动端会被 Windows 最小窗宽 ~500px 钳制**：`--window-size=390` 实际布局 ~489px，出现假横向溢出。验移动端用 iframe 壳页（内嵌 390px iframe）或真设备模拟；整页 reveal 动画要配 `--virtual-time-budget` 才会全部显示
 
 ## 7. 其他备忘
 
