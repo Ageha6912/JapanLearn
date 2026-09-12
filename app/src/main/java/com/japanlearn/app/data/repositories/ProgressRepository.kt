@@ -12,6 +12,7 @@ import com.japanlearn.app.domain.Scheduler
 import com.japanlearn.app.domain.SrsScheduler
 import com.japanlearn.app.domain.SrsState
 import com.japanlearn.app.domain.StreakCalculator
+import com.japanlearn.app.domain.StudyPlanner
 import com.japanlearn.app.util.DateProvider
 import com.japanlearn.app.util.ReminderScheduler
 import kotlinx.coroutines.flow.Flow
@@ -51,6 +52,10 @@ class SettingsRepository(context: Context) {
     val themeMode = MutableStateFlow(ThemeMode.fromRaw(prefs.getString(KEY_THEME, null)))
     /** 用户偏好的 Google TTS 日语 voice 名；空字符串 = 自动选最高质量。 */
     val ttsVoiceName = MutableStateFlow(prefs.getString(KEY_TTS_VOICE, "") ?: "")
+    // 学习目标（PRD §19.6）：级别 + 可选目标日期 + 上次自动应用推荐档的日期
+    val goalLevel = MutableStateFlow(StudyPlanner.normalizeLevel(prefs.getString(KEY_GOAL_LEVEL, null)))
+    val goalTargetEpochDay = MutableStateFlow(prefs.getLong(KEY_GOAL_DATE, 0L))
+    val goalTierAppliedEpochDay = MutableStateFlow(prefs.getLong(KEY_GOAL_TIER_APPLIED, 0L))
 
     fun setThemeMode(value: ThemeMode) {
         prefs.edit().putString(KEY_THEME, value.name).apply()
@@ -104,6 +109,25 @@ class SettingsRepository(context: Context) {
         ttsVoiceName.value = value
     }
 
+    /** 设置或更新学习目标；同时重置档位校准时间戳，随后应通过 recalibrateGoal 应用推荐档。 */
+    fun setGoal(level: String, targetEpochDay: Long) {
+        val normalized = StudyPlanner.normalizeLevel(level)
+        val day = targetEpochDay.coerceAtLeast(0L)
+        prefs.edit().putString(KEY_GOAL_LEVEL, normalized).putLong(KEY_GOAL_DATE, day).apply()
+        goalLevel.value = normalized
+        goalTargetEpochDay.value = day
+        goalTierAppliedEpochDay.value = 0L
+    }
+
+    fun clearGoal() = setGoal(StudyPlanner.LEVEL_NONE, 0L)
+
+    /** 应用目标推荐档位并记录校准日期（目标设置与每周校准时调用）。 */
+    fun applyGoalTier(tier: Int, appliedEpochDay: Long) {
+        setDailyNewWords(tier)
+        prefs.edit().putLong(KEY_GOAL_TIER_APPLIED, appliedEpochDay).apply()
+        goalTierAppliedEpochDay.value = appliedEpochDay
+    }
+
     companion object {
         const val DEFAULT_NEW_WORDS = 10
         const val DEFAULT_NEW_GRAMMAR = 3
@@ -118,6 +142,9 @@ class SettingsRepository(context: Context) {
         private const val KEY_STUDY_LEVEL = "study_level"
         private const val KEY_THEME = "theme_mode"
         private const val KEY_TTS_VOICE = "tts_voice_name"
+        private const val KEY_GOAL_LEVEL = "goal_level"
+        private const val KEY_GOAL_DATE = "goal_target_epoch_day"
+        private const val KEY_GOAL_TIER_APPLIED = "goal_tier_applied_epoch_day"
         const val DEFAULT_STUDY_LEVEL = "N5"
         val STUDY_LEVELS = listOf("N5", "N4")
     }

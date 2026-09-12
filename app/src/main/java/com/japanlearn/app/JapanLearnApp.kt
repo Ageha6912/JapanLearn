@@ -10,11 +10,13 @@ import com.japanlearn.app.data.SettingsRepository
 import com.japanlearn.app.data.StatsRepository
 import com.japanlearn.app.data.local.AppDatabase
 import com.japanlearn.app.domain.FsrsScheduler
+import com.japanlearn.app.domain.StudyPlanner
 import com.japanlearn.app.util.DateProvider
 import com.japanlearn.app.util.JapaneseTts
 import com.japanlearn.app.util.SystemDateProvider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 /** 手工依赖容器（MVP 不引入 Hilt，见 PRD §17.9） */
@@ -34,6 +36,23 @@ class AppContainer(context: Application) {
     /** 装载课程内容（首次启动或内容版本升级时生效），IO 线程调用。 */
     suspend fun seedContent() {
         loader.seedIfNeeded()
+    }
+
+    /** 目标周校准（PRD §19.6）：距上次自动应用 ≥ 7 天时按剩余内容重算并应用推荐档位。 */
+    suspend fun recalibrateGoal() {
+        val level = StudyPlanner.normalizeLevel(settings.goalLevel.value)
+        if (level == StudyPlanner.LEVEL_NONE) return
+        val today = dateProvider.today().toEpochDay()
+        if (!StudyPlanner.shouldRecalibrate(settings.goalTierAppliedEpochDay.value, today)) return
+        val total = content.wordCountByLevel(level).first()
+        val learned = content.learnedWordCountByLevel(level).first()
+        val plan = StudyPlanner.plan(
+            remainingWords = (total - learned).coerceAtLeast(0),
+            targetEpochDay = settings.goalTargetEpochDay.value,
+            todayEpochDay = today,
+        )
+        val tier = plan.recommendedTier ?: return
+        settings.applyGoalTier(tier, today)
     }
 }
 
@@ -62,6 +81,12 @@ class JapanLearnApp : Application() {
                 container.settings.reminderHour.value,
                 container.settings.reminderMinute.value,
             )
+            // 目标周校准（PRD §19.6）：有目标时按剩余内容量重算推荐档位
+            try {
+                container.recalibrateGoal()
+            } catch (e: Exception) {
+                Log.e("JapanLearnApp", "goal recalibrate failed", e)
+            }
         }
     }
 }

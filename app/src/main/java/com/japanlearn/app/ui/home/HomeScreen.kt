@@ -28,6 +28,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.automirrored.outlined.NavigateNext
+import androidx.compose.material.icons.filled.Flag
 import androidx.compose.material.icons.filled.LocalFireDepartment
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Settings
@@ -61,6 +62,7 @@ import com.japanlearn.app.data.ThemeMode
 import com.japanlearn.app.data.breakdown
 import com.japanlearn.app.data.local.SentenceEntity
 import com.japanlearn.app.domain.HomeKanaIntro
+import com.japanlearn.app.domain.StudyPlanner
 import com.japanlearn.app.ui.components.AppButton
 import com.japanlearn.app.ui.components.SectionCard
 import com.japanlearn.app.ui.components.StatTile
@@ -74,11 +76,23 @@ import com.japanlearn.app.ui.motion.StaggerIn
 import com.japanlearn.app.ui.motion.PopupAnchor
 import com.japanlearn.app.ui.motion.TransformCardPopup
 import com.japanlearn.app.ui.motion.pressScale
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+
+/** 首页任务卡的目标摘要行（只读，点击进学习目标页）。 */
+data class GoalSummaryLine(
+    val level: String,
+    val daysRemaining: Int?,
+    val percent: Int,
+)
 
 data class HomeUiState(
     val totalWords: Int = 0,
@@ -97,6 +111,7 @@ data class HomeUiState(
     val sentence: SentenceEntity? = null,
     val sentenceIndex: Int = 0,
     val kanaIntroDismissed: Boolean = false,
+    val goalSummary: GoalSummaryLine? = null,
 )
 
 class HomeViewModel(private val app: AppContainer) : ViewModel() {
@@ -126,6 +141,7 @@ class HomeViewModel(private val app: AppContainer) : ViewModel() {
         collect(app.settings.dailyNewWords) { s, v -> s.copy(targetNewWords = v) }
         collect(app.settings.dailyNewGrammar) { s, v -> s.copy(targetNewGrammar = v) }
         collect(app.settings.kanaIntroDismissed) { s, v -> s.copy(kanaIntroDismissed = v) }
+        collect(goalSummaryFlow()) { s, v -> s.copy(goalSummary = v) }
         // 今日一句：收集 Room Flow 而非一次性读取——首次启动时内容装载（seed）可能晚于
         // 首页打开，一次性读到空表会把句子永久置空，横条从此消失
         viewModelScope.launch {
@@ -142,6 +158,30 @@ class HomeViewModel(private val app: AppContainer) : ViewModel() {
     fun speak(text: String) = app.tts.speak(text)
 
     fun dismissKanaIntro() = app.settings.setKanaIntroDismissed(true)
+
+    /** 目标摘要（只读）：按目标级别取内容计数，合成剩余天数与总进度百分比。 */
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private fun goalSummaryFlow(): Flow<GoalSummaryLine?> =
+        app.settings.goalLevel.flatMapLatest { level ->
+            if (level == StudyPlanner.LEVEL_NONE) {
+                flowOf(null)
+            } else {
+                combine(
+                    app.content.wordCountByLevel(level),
+                    app.content.learnedWordCountByLevel(level),
+                    app.content.grammarCountByLevel(level),
+                    app.content.learnedGrammarCountByLevel(level),
+                    app.settings.goalTargetEpochDay,
+                ) { totalW, learnedW, totalG, learnedG, target ->
+                    val today = app.dateProvider.today().toEpochDay()
+                    GoalSummaryLine(
+                        level = level,
+                        daysRemaining = if (target > 0) (target - today).toInt() else null,
+                        percent = StudyPlanner.progressPercent(learnedW + learnedG, totalW + totalG),
+                    )
+                }
+            }
+        }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -284,6 +324,39 @@ fun HomeScreen(nav: NavHostController) {
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
+                        state.goalSummary?.let { summary ->
+                            Surface(
+                                onClick = { nav.navigate(Routes.GOAL) },
+                                shape = MaterialTheme.shapes.small,
+                                color = MaterialTheme.colorScheme.secondaryContainer,
+                                modifier = Modifier.fillMaxWidth(),
+                            ) {
+                                Row(
+                                    Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                ) {
+                                    Icon(
+                                        Icons.Filled.Flag,
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.onSecondaryContainer,
+                                        modifier = Modifier.size(16.dp),
+                                    )
+                                    Text(
+                                        goalSummaryText(summary),
+                                        style = MaterialTheme.typography.labelLarge,
+                                        color = MaterialTheme.colorScheme.onSecondaryContainer,
+                                        modifier = Modifier.weight(1f),
+                                    )
+                                    Icon(
+                                        Icons.AutoMirrored.Outlined.NavigateNext,
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.onSecondaryContainer,
+                                        modifier = Modifier.size(16.dp),
+                                    )
+                                }
+                            }
+                        }
                         AppButton(
                             text = when {
                                 canStartWords -> "开始今日学习"
@@ -532,5 +605,15 @@ private fun ProgressLine(
             height = 6.dp,
             fillColor = fillColor,
         )
+    }
+}
+
+private fun goalSummaryText(summary: GoalSummaryLine): String {
+    val percent = "已完成 ${summary.percent}%"
+    return when {
+        summary.daysRemaining != null && summary.daysRemaining > 0 ->
+            "距 ${summary.level} 目标 ${summary.daysRemaining} 天 · $percent"
+        summary.daysRemaining != null -> "${summary.level} 目标日已到 · $percent"
+        else -> "${summary.level} 目标 · $percent"
     }
 }

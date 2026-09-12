@@ -79,6 +79,7 @@ import com.japanlearn.app.ui.grammar.GrammarSessionScreen
 import com.japanlearn.app.ui.learn.LearnTabScreen
 import com.japanlearn.app.ui.motion.MotionTokens
 import com.japanlearn.app.ui.motion.rememberReducedMotion
+import com.japanlearn.app.ui.profile.GoalScreen
 import com.japanlearn.app.ui.profile.ProfileScreen
 import com.japanlearn.app.ui.review.ReviewHomeScreen
 import com.japanlearn.app.ui.review.ReviewSessionScreen
@@ -109,6 +110,7 @@ object Routes {
     const val REVIEW_SESSION = "reviewSession"
     const val WRONG_ANSWERS = "wrongAnswers"
     const val STATS = "stats"
+    const val GOAL = "goal"
     const val SENTENCE = "sentence/{index}"
 
     fun wordSession(count: Int) = "wordSession/$count"
@@ -223,6 +225,7 @@ fun MainRoot(navTarget: String? = null) {
             composable(Routes.REVIEW_SESSION) { ReviewSessionScreen(navController) }
             composable(Routes.WRONG_ANSWERS) { WrongAnswersScreen(navController) }
             composable(Routes.STATS) { StatsScreen(navController) }
+            composable(Routes.GOAL) { GoalScreen(navController) }
             composable(Routes.SENTENCE) { entry ->
                 SentenceScreen(navController, entry.arguments?.getString("index")?.toIntOrNull() ?: 0)
             }

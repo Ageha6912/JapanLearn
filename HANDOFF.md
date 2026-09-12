@@ -28,7 +28,7 @@
 ```bash
 ./gradlew :app:assembleDebug        # debug APK
 ./gradlew :app:assembleRelease      # 正式签名 APK（keystore 已配置，见第 6 节坑 9）
-./gradlew :app:testDebugUnitTest    # 单元测试（当前 136 项），必须全绿才能交付
+./gradlew :app:testDebugUnitTest    # 单元测试（当前 152 项），必须全绿才能交付
 python tools/validate_content.py    # 内容校验，必须通过才能改内容；CI 已跑
 ```
 
@@ -51,6 +51,13 @@ python tools/validate_content.py    # 内容校验，必须通过才能改内容
 - UI：我的 → 「学习目标」页 + 首页任务卡只读摘要行
 - Onboarding 搭车：首启三步可跳过（含目标收集），独立 PR；零进度首页「先学五十音」横幅
 - 切分：PR-A 目标+计划 → PR-B Onboarding → PR-C 收口 v0.8.0（versionCode 19）；PR-B 赶不上随 v0.8.1
+
+### PR-A 已交付（2026-09-12）— 学习目标 + 个性化每日计划
+- `domain/StudyPlanner.kt` 纯函数：按目标日期倒推推荐档位（剩余量÷剩余天数向上取整，夹 5/10/15/20 封顶 20，超限记 overdue）、`progressPercent`、周校准判定 `shouldRecalibrate`；16 项单测
+- `SettingsRepository`：新增 `goal_level` / `goal_target_epoch_day` / `goal_tier_applied_epoch_day` 三个 SharedPreferences key；`setGoal` 重置校准戳、`applyGoalTier` 应用档位并盖戳；**未动 Room schema**
+- `AppContainer.recalibrateGoal()`：应用启动每周校准（距上次自动应用 ≥7 天才重算），目标设置/更新后立即校准一次
+- UI：我的 → 「学习目标」入口卡 + 新页 `ui/profile/GoalScreen.kt`（级别选择 / 达成日 1·3·6 个月预设 / 推荐档采用 / 清除目标）；原「学习目标」卡改名「每日任务量」；首页任务卡只读摘要行（点击跳目标页，未设目标不显示）
+- 全量 152 测全绿；versionName 未动（版本号只在 PR-C 收口改）
 - 分配结论：预生成音频正式移出 v0.8（无排期可选 PR，门禁声库书面授权）；埋点推迟至内测；内容扩充为常驻并行线；听力训练留 v0.9
 
 ### v0.7.5（已发布）— PR-R51 停写旧 content_version
@@ -75,7 +82,7 @@ python tools/validate_content.py    # 内容校验，必须通过才能改内容
 
 v0.7.0：Room v4 FSRS 字段；默认 `FsrsScheduler`（ts-fsrs v5.4.2 long-term，`enable_short_term=false`；Again 仍 `dueAt=now`）；自评文案不变；已掌握 `stability >= 21`。回滚：`AppContainer` 改回 `SrsScheduler`，勿删 `MIGRATION_3_4`。
 
-下一步：实施 v0.8（规划定案见 PRD §19.6 与第 4 节）：PR-A 目标+计划 → PR-B Onboarding → PR-C 收口 v0.8.0。
+下一步：继续 v0.8：PR-B Onboarding（首启三步引导，规划见 PRD §19.6）→ PR-C 收口 v0.8.0。PR-A 目标+计划已交付。
 
 v0.4.3（中文引擎修复）：用户真机「只读汉字跳过假名 + 不弹引导」——默认引擎是中文引擎，init 成功且 availableLanguages 谎报日语。重构 JapaneseTts：装有 Google TTS（com.google.android.tts）时显式按包名初始化不走默认；可用性用 setLanguage(JAPAN) 返回值实测（MISSING_DATA→数据引导 / NOT_SUPPORTED→引擎引导）；manifest 加 <queries>（Android 11+ 包可见性，漏加会查不到 Google TTS）；点击时 refreshJapaneseStatus 保证下载后立即生效。
 
@@ -102,7 +109,7 @@ v0.3.0 已按方案全部交付并发布（tag v0.3.0 + GitHub Release，正式�
 
 - 手工依赖注入：`AppContainer`（`JapanLearnApp.container`），Compose 侧经 `LocalAppContainer` 获取；无 Hilt
 - 内容流：`assets/content/*.json`（每文件 `version`）→ `ContentSeedPlanner` 决定重装哪些表 → `ContentLoader.seedIfNeeded()` 一次 `withTransaction` 写入 Room（进度表不级联删）。**0.7.5 起停写并删除**旧加总 key `content_version`（仅读：0.4.x 升级判定）。首页/统计计数用 COUNT Flow，已学/到期 JOIN 内容表。
-- Room 当前 **version 3**（`exportSchema = true`，快照 `app/schemas/com.japanlearn.app.data.local.AppDatabase/3.json`）。v1→v2 = kana.`groupName`；v2→v3 = words/grammar.`level`。SQL 在 `AppMigrations.kt`。
+- Room 当前 **version 4**（`exportSchema = true`，快照 `app/schemas/com.japanlearn.app.data.local.AppDatabase/4.json`）。v1→v2 = kana.`groupName`；v2→v3 = words/grammar.`level`；v3→v4 = FSRS 字段（`stability/difficulty/lapses/fsrsState`）。SQL 在 `AppMigrations.kt`。
 - SRS 调度 `domain/SrsScheduler.kt`（纯函数）；练习生成 `domain/QuizGenerator.kt`（纯函数，含听音变体 `AudioQuizPolicy`）；连击 `StreakCalculator`；限流 `ReviewPlanner`——这些都有单元测试，**改动必须同步补测试**（全局规则：每次改动必须有测试且全绿才能交付）
 - 统计逐题实时落库（每评一题 `stats.addStudy`），不要改回"会话结束才落库"
 - 设计系统：和色（藍 #1B3A5C × 桜 #C75B5B × 和纸 #F7F5F0）+ Manrope 字体 + `ui/motion/Motion.kt` 动效令牌（`StaggerIn`/`AnimatedCounterText` 等，尊重系统减弱动画）

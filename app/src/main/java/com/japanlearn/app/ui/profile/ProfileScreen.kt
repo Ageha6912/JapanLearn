@@ -21,6 +21,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Backup
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Flag
 import androidx.compose.material.icons.filled.LocalFireDepartment
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.FilterChip
@@ -287,7 +288,31 @@ fun ProfileScreen(nav: NavHostController) {
             }
 
             StaggerIn(2) {
-                SectionCard(title = "学习目标") {
+                SectionCard(title = "学习目标", onClick = { nav.navigate(Routes.GOAL) }) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        Icon(
+                            Icons.Filled.Flag,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(18.dp),
+                        )
+                        Column {
+                            Text("设定 N5 / N4 目标与达成日期", style = MaterialTheme.typography.titleSmall)
+                            Text(
+                                "按剩余内容量自动推荐每日新词量",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
+                    }
+                }
+            }
+
+            StaggerIn(3) {
+                SectionCard(title = "每日任务量") {
                     Text("每天新词数", style = MaterialTheme.typography.titleSmall)
                     ChipRow(
                         options = listOf(5, 10, 15, 20),
@@ -309,7 +334,7 @@ fun ProfileScreen(nav: NavHostController) {
                 }
             }
 
-            StaggerIn(3) {
+            StaggerIn(4) {
                 SectionCard(title = "提醒") {
                     Row(
                         Modifier.fillMaxWidth(),
@@ -346,7 +371,7 @@ fun ProfileScreen(nav: NavHostController) {
                 }
             }
 
-            StaggerIn(4) {
+            StaggerIn(5) {
                 SectionCard(title = "发音") {
                     Text("日语音色", style = MaterialTheme.typography.titleSmall)
                     Text(
@@ -388,7 +413,7 @@ fun ProfileScreen(nav: NavHostController) {
                 }
             }
 
-            StaggerIn(4) {
+            StaggerIn(5) {
                 SectionCard(title = "数据") {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
@@ -447,7 +472,7 @@ fun ProfileScreen(nav: NavHostController) {
                 }
             }
 
-            StaggerIn(4) {
+            StaggerIn(5) {
                 SectionCard(title = "关于") {
                     Text("JapanLearn v${com.japanlearn.app.BuildConfig.VERSION_NAME}", style = MaterialTheme.typography.bodyLarge)
                     Text(
