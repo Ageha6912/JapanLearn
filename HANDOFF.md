@@ -28,7 +28,7 @@
 ```bash
 ./gradlew :app:assembleDebug        # debug APK
 ./gradlew :app:assembleRelease      # 正式签名 APK（keystore 已配置，见第 6 节坑 9）
-./gradlew :app:testDebugUnitTest    # 单元测试（当前 206 项），必须全绿才能交付
+./gradlew :app:testDebugUnitTest    # 单元测试（当前 213 项），必须全绿才能交付
 python tools/validate_content.py    # 内容校验，必须通过才能改内容；CI 已跑
 ```
 
@@ -174,6 +174,14 @@ python tools/validate_content.py    # 内容校验，必须通过才能改内容
 - 搭车：N4 词二批 +300（总库 804 → 1104，批次管线 + unit 归属）
 - 推迟：流式输出（等 AI 真实使用反馈）、统计增强（等数据基建需求）
 - 切分：PR-A 突击会话 + 队列加权 → PR-B N4 词二批 → PR-C 收口 v1.2.0（versionCode 23）
+
+### v1.2 PR-A 已交付（2026-09-12）— 错题突击 + 队列加权
+- `domain/DrillBuilder.kt`（+7 测）：错题池编排纯函数——word 走 QuizVariantPicker 混合题型、kana 走 kanaQuiz、grammar 用自带练习（VM 解析 exercisesJson 映射为 `DrillGrammarExercise`）；洗牌循环取、已删内容跳过
+- `ui/review/WrongAnswerDrillScreen.kt`：突击会话（LOADING→QUIZ→DONE），判分走 `recordAuxAnswer`（答对移除、答错 +1，不推 SRS）；结算「答对 x/y · 剩余 N 道待清」，全部清空撒彩带；「再来一轮」重载错题池
+- **队列加权**：`dueWords`/`dueGrammar` 加 `LEFT JOIN wrong_answers`，`ORDER BY CASE WHEN wa.contentId IS NOT NULL THEN 0 ELSE 1 END, p.dueAt`（错题优先，纯排序可回滚）
+- 入口：复习 Tab 错题本卡下方「错题突击」卡（`wrongCount > 0` 才显示，Bolt 图标）
+- 新坑：**新图标必须补显式 import**（`Icons.Filled.Bolt` 不 import 就是 Unresolved，与图标是否存在无关）；文件内 private 状态类被 public VM 属性暴露时直接改 public（与 WordSessionUiState 惯例一致）
+- 全量 213 测全绿；versionName 未动
 - 分配结论：预生成音频正式移出 v0.8（无排期可选 PR，门禁声库书面授权）；埋点推迟至内测；内容扩充为常驻并行线；听力训练留 v0.9
 
 ### v0.7.5（已发布）— PR-R51 停写旧 content_version
@@ -198,7 +206,7 @@ python tools/validate_content.py    # 内容校验，必须通过才能改内容
 
 v0.7.0：Room v4 FSRS 字段；默认 `FsrsScheduler`（ts-fsrs v5.4.2 long-term，`enable_short_term=false`；Again 仍 `dueAt=now`）；自评文案不变；已掌握 `stability >= 21`。回滚：`AppContainer` 改回 `SrsScheduler`，勿删 `MIGRATION_3_4`。
 
-下一步：实施 v1.2（规划定案见 PRD §19.10 与第 4 节）：PR-A 错题突击会话 + 队列加权 → PR-B N4 词二批 → PR-C 收口 v1.2.0。
+下一步：v1.2 继续：PR-B N4 词二批 +300（804 → 1104，批次管线 + unit 归属 + validate）→ PR-C 收口 v1.2.0。PR-A 已交付。
 
 v0.4.3（中文引擎修复）：用户真机「只读汉字跳过假名 + 不弹引导」——默认引擎是中文引擎，init 成功且 availableLanguages 谎报日语。重构 JapaneseTts：装有 Google TTS（com.google.android.tts）时显式按包名初始化不走默认；可用性用 setLanguage(JAPAN) 返回值实测（MISSING_DATA→数据引导 / NOT_SUPPORTED→引擎引导）；manifest 加 <queries>（Android 11+ 包可见性，漏加会查不到 Google TTS）；点击时 refreshJapaneseStatus 保证下载后立即生效。
 

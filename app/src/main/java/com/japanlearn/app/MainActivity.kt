@@ -88,6 +88,7 @@ import com.japanlearn.app.ui.profile.GoalScreen
 import com.japanlearn.app.ui.profile.ProfileScreen
 import com.japanlearn.app.ui.review.ReviewHomeScreen
 import com.japanlearn.app.ui.review.ReviewSessionScreen
+import com.japanlearn.app.ui.review.WrongAnswerDrillScreen
 import com.japanlearn.app.ui.review.WrongAnswersScreen
 import com.japanlearn.app.ui.sentence.SentenceScreen
 import com.japanlearn.app.ui.stats.AchievementsScreen
@@ -115,6 +116,7 @@ object Routes {
     const val GRAMMAR_SESSION = "grammarSession/{count}"
     const val REVIEW_SESSION = "reviewSession"
     const val WRONG_ANSWERS = "wrongAnswers"
+    const val WRONG_ANSWER_DRILL = "wrongAnswerDrill"
     const val STATS = "stats"
     const val GOAL = "goal"
     const val LISTENING = "listening"
@@ -240,6 +242,7 @@ fun MainRoot(navTarget: String? = null) {
             }
             composable(Routes.REVIEW_SESSION) { ReviewSessionScreen(navController) }
             composable(Routes.WRONG_ANSWERS) { WrongAnswersScreen(navController) }
+            composable(Routes.WRONG_ANSWER_DRILL) { WrongAnswerDrillScreen(navController) }
             composable(Routes.STATS) { StatsScreen(navController) }
             composable(Routes.ACHIEVEMENTS) { AchievementsScreen(navController) }
             composable(

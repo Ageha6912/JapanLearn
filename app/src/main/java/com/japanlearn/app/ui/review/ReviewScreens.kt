@@ -22,6 +22,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.MenuBook
+import androidx.compose.material.icons.filled.Bolt
 import androidx.compose.material.icons.filled.Inventory2
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.outlined.EditNote
@@ -189,6 +190,37 @@ fun ReviewHomeScreen(nav: NavHostController) {
                         }
                         FilledTonalButton(onClick = { nav.navigate(Routes.WRONG_ANSWERS) }) {
                             Text("查看")
+                        }
+                    }
+                }
+            }
+
+            // 错题突击（PRD §19.10）：错题本为空时隐藏
+            if (state.wrongCount > 0) {
+                StaggerIn(3) {
+                    SectionCard(title = "错题突击", onClick = { nav.navigate(Routes.WRONG_ANSWER_DRILL) }) {
+                        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                            Surface(shape = androidx.compose.foundation.shape.CircleShape, color = MaterialTheme.colorScheme.primaryContainer) {
+                                Box(Modifier.padding(8.dp)) {
+                                    Icon(
+                                        Icons.Filled.Bolt,
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                                        modifier = Modifier.size(20.dp),
+                                    )
+                                }
+                            }
+                            Column(Modifier.weight(1f)) {
+                                Text("把 ${state.wrongCount} 道错题变成练习", style = MaterialTheme.typography.titleSmall)
+                                Text(
+                                    "答对即清出错误本，每轮 10 题",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                            }
+                            FilledTonalButton(onClick = { nav.navigate(Routes.WRONG_ANSWER_DRILL) }) {
+                                Text("突击")
+                            }
                         }
                     }
                 }

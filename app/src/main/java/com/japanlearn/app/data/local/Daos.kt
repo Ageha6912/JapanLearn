@@ -51,9 +51,12 @@ interface WordDao {
     )
     suspend fun newWords(n: Int, level: String): List<WordEntity>
 
+    /** SRS 到期队列（PRD §19.10）：错题优先出队，其余按到期时间。 */
     @Query(
         "SELECT w.* FROM words w JOIN user_progress p ON p.contentId = w.id AND p.contentType = 'word' " +
-            "WHERE p.dueAt <= :now ORDER BY p.dueAt LIMIT :limit"
+            "LEFT JOIN wrong_answers wa ON wa.contentId = w.id AND wa.contentType = 'word' " +
+            "WHERE p.dueAt <= :now " +
+            "ORDER BY CASE WHEN wa.contentId IS NOT NULL THEN 0 ELSE 1 END, p.dueAt LIMIT :limit"
     )
     suspend fun dueWords(now: Long, limit: Int): List<WordEntity>
 
@@ -126,9 +129,12 @@ interface GrammarDao {
     )
     suspend fun newGrammar(n: Int, level: String): List<GrammarEntity>
 
+    /** SRS 到期队列（PRD §19.10）：错题优先出队，其余按到期时间。 */
     @Query(
         "SELECT g.* FROM grammar g JOIN user_progress p ON p.contentId = g.id AND p.contentType = 'grammar' " +
-            "WHERE p.dueAt <= :now ORDER BY p.dueAt LIMIT :limit"
+            "LEFT JOIN wrong_answers wa ON wa.contentId = g.id AND wa.contentType = 'grammar' " +
+            "WHERE p.dueAt <= :now " +
+            "ORDER BY CASE WHEN wa.contentId IS NOT NULL THEN 0 ELSE 1 END, p.dueAt LIMIT :limit"
     )
     suspend fun dueGrammar(now: Long, limit: Int): List<GrammarEntity>
 
