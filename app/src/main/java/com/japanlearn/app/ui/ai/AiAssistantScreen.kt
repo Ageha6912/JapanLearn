@@ -172,118 +172,143 @@ fun AiAssistantScreen(
                     .fillMaxSize()
                     .verticalScroll(rememberScrollState())
                     .padding(horizontal = 20.dp),
-                verticalArrangement = Arrangement.spacedBy(14.dp),
             ) {
-                if (!state.configured) {
-                    StaggerIn(0) {
-                        SectionCard(title = "尚未启用") {
-                            Text(
-                                "AI 助手需要填入你自己的大模型 API Key。不配置则完全不使用，核心学习功能不受影响。",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                AiAssistantPanel(
+                    state = state,
+                    onMode = { vm.setMode(it) },
+                    onInput = { vm.setInput(it) },
+                    onSend = { vm.send() },
+                    onOpenConfig = { nav.navigateToTab(Routes.PROFILE) },
+                )
+                Spacer(Modifier.height(12.dp))
+            }
+        }
+    }
+}
+
+/**
+ * AI 助手正文：全屏页与首页弹窗共用。
+ * 自身不滚动，滚动约束由宿主通过 modifier 传入。
+ */
+@Composable
+fun AiAssistantPanel(
+    state: AiAssistantUiState,
+    onMode: (AiMode) -> Unit,
+    onInput: (String) -> Unit,
+    onSend: () -> Unit,
+    onOpenConfig: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier,
+        verticalArrangement = Arrangement.spacedBy(14.dp),
+    ) {
+        if (!state.configured) {
+            StaggerIn(0) {
+                SectionCard(title = "尚未启用") {
+                    Text(
+                        "AI 助手需要填入你自己的大模型 API Key。不配置则完全不使用，核心学习功能不受影响。",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    AppButton("去设置 AI 助手", onClick = onOpenConfig)
+                }
+            }
+        } else {
+            StaggerIn(0) {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        AiMode.entries.forEach { mode ->
+                            FilterChip(
+                                selected = state.mode == mode,
+                                onClick = { onMode(mode) },
+                                label = { Text(mode.label) },
                             )
-                            AppButton("去设置 AI 助手", onClick = { nav.navigateToTab(Routes.PROFILE) })
                         }
                     }
-                } else {
-                    StaggerIn(0) {
-                        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                                AiMode.entries.forEach { mode ->
-                                    FilterChip(
-                                        selected = state.mode == mode,
-                                        onClick = { vm.setMode(mode) },
-                                        label = { Text(mode.label) },
-                                    )
+                    Text(
+                        "需联网 · 调用费用由你的 API Key 承担" +
+                            (AiQuota.remaining(state.callsToday, state.dailyLimit)?.let { " · 今日剩余 $it 次" }
+                                ?: " · 今日不限次数"),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            }
+
+            state.context?.let { ctx ->
+                StaggerIn(1) {
+                    Surface(
+                        shape = MaterialTheme.shapes.small,
+                        color = MaterialTheme.colorScheme.secondaryContainer,
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        Text(
+                            "已带入教材上下文：" + ctx,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSecondaryContainer,
+                            modifier = Modifier.padding(10.dp),
+                        )
+                    }
+                }
+            }
+
+            StaggerIn(2) {
+                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    OutlinedTextField(
+                        value = state.input,
+                        onValueChange = { onInput(it) },
+                        modifier = Modifier.fillMaxWidth(),
+                        minLines = 3,
+                        placeholder = {
+                            Text(
+                                when (state.mode) {
+                                    AiMode.GRAMMAR -> "输入想弄懂的语法点或句子，如：〜てしまう"
+                                    AiMode.CORRECT -> "粘贴你想检查的日语句子"
+                                    AiMode.TRANSLATE -> "输入日语或中文，自动互译"
                                 }
-                            }
-                            Text(
-                                "需联网 · 调用费用由你的 API Key 承担" +
-                                    (AiQuota.remaining(state.callsToday, state.dailyLimit)?.let { " · 今日剩余 $it 次" }
-                                        ?: " · 今日不限次数"),
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
-                        }
-                    }
+                        },
+                    )
+                    AppButton(
+                        text = when {
+                            state.loading -> "思考中…"
+                            state.streaming -> "回答中…"
+                            else -> "发送"
+                        },
+                        enabled = !state.streaming && state.input.isNotBlank(),
+                        onClick = onSend,
+                    )
+                }
+            }
 
-                    state.context?.let { ctx ->
-                        StaggerIn(1) {
-                            Surface(
-                                shape = MaterialTheme.shapes.small,
-                                color = MaterialTheme.colorScheme.secondaryContainer,
-                                modifier = Modifier.fillMaxWidth(),
-                            ) {
-                                Text(
-                                    "已带入教材上下文：" + ctx,
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSecondaryContainer,
-                                    modifier = Modifier.padding(10.dp),
-                                )
-                            }
-                        }
+            state.error?.let { msg ->
+                StaggerIn(3) {
+                    SectionCard {
+                        Text(
+                            msg,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.error,
+                        )
                     }
+                }
+            }
 
-                    StaggerIn(2) {
-                        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                            OutlinedTextField(
-                                value = state.input,
-                                onValueChange = { vm.setInput(it) },
-                                modifier = Modifier.fillMaxWidth(),
-                                minLines = 3,
-                                placeholder = {
-                                    Text(
-                                        when (state.mode) {
-                                            AiMode.GRAMMAR -> "输入想弄懂的语法点或句子，如：〜てしまう"
-                                            AiMode.CORRECT -> "粘贴你想检查的日语句子"
-                                            AiMode.TRANSLATE -> "输入日语或中文，自动互译"
-                                        }
-                                    )
-                                },
-                            )
-                            AppButton(
-                                text = when {
-                                    state.loading -> "思考中…"
-                                    state.streaming -> "回答中…"
-                                    else -> "发送"
-                                },
-                                enabled = !state.streaming && state.input.isNotBlank(),
-                                onClick = { vm.send() },
-                            )
-                        }
+            if (state.loading) {
+                Box(Modifier.fillMaxWidth().padding(vertical = 24.dp), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator()
+                }
+            }
+
+            state.result?.let { text ->
+                StaggerIn(4) {
+                    SectionCard(title = when (state.mode) {
+                        AiMode.GRAMMAR -> "语法讲解"
+                        AiMode.CORRECT -> "批改结果"
+                        AiMode.TRANSLATE -> "译文"
+                    }) {
+                        Text(text, style = MaterialTheme.typography.bodyMedium)
                     }
-
-                    state.error?.let { msg ->
-                        StaggerIn(3) {
-                            SectionCard {
-                                Text(
-                                    msg,
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.error,
-                                )
-                            }
-                        }
-                    }
-
-                    if (state.loading) {
-                        Box(Modifier.fillMaxWidth().padding(vertical = 24.dp), contentAlignment = Alignment.Center) {
-                            CircularProgressIndicator()
-                        }
-                    }
-
-                    state.result?.let { text ->
-                        StaggerIn(4) {
-                            SectionCard(title = when (state.mode) {
-                                AiMode.GRAMMAR -> "语法讲解"
-                                AiMode.CORRECT -> "批改结果"
-                                AiMode.TRANSLATE -> "译文"
-                            }) {
-                                Text(text, style = MaterialTheme.typography.bodyMedium)
-                            }
-                        }
-                    }
-
-                    Spacer(Modifier.height(12.dp))
                 }
             }
         }

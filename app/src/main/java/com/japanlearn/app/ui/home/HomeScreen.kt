@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -28,6 +29,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.automirrored.outlined.NavigateNext
+import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Flag
 import androidx.compose.material.icons.filled.LocalFireDepartment
 import androidx.compose.material.icons.filled.Refresh
@@ -61,9 +63,12 @@ import com.japanlearn.app.Routes
 import com.japanlearn.app.data.ThemeMode
 import com.japanlearn.app.data.breakdown
 import com.japanlearn.app.data.local.SentenceEntity
+import com.japanlearn.app.domain.AiMode
 import com.japanlearn.app.domain.HomeKanaIntro
 import com.japanlearn.app.domain.OnboardingGate
 import com.japanlearn.app.domain.StudyPlanner
+import com.japanlearn.app.ui.ai.AiAssistantPanel
+import com.japanlearn.app.ui.ai.AiAssistantViewModel
 import com.japanlearn.app.ui.components.AppButton
 import com.japanlearn.app.ui.components.SectionCard
 import com.japanlearn.app.ui.components.StatTile
@@ -115,6 +120,8 @@ data class HomeUiState(
     val kanaIntroDismissed: Boolean = false,
     val goalSummary: GoalSummaryLine? = null,
     val onboardingDone: Boolean = false,
+    /** AI 助手是否已配置（PRD §19.9：未配置则所有入口隐藏）。 */
+    val aiConfigured: Boolean = false,
     /** 首次收到进度 Flow 后才允许判定引导门槛，避免老用户在计数到达前闪现引导。 */
     val progressLoaded: Boolean = false,
 )
@@ -147,6 +154,7 @@ class HomeViewModel(private val app: AppContainer) : ViewModel() {
         collect(app.settings.dailyNewGrammar) { s, v -> s.copy(targetNewGrammar = v) }
         collect(app.settings.kanaIntroDismissed) { s, v -> s.copy(kanaIntroDismissed = v) }
         collect(app.settings.onboardingDone) { s, v -> s.copy(onboardingDone = v) }
+        collect(app.settings.aiConfigured) { s, v -> s.copy(aiConfigured = v) }
         collect(goalSummaryFlow()) { s, v -> s.copy(goalSummary = v) }
         // 今日一句：收集 Room Flow 而非一次性读取——首次启动时内容装载（seed）可能晚于
         // 首页打开，一次性读到空表会把句子永久置空，横条从此消失
@@ -214,6 +222,13 @@ fun HomeScreen(nav: NavHostController) {
 
     var showSettings by remember { mutableStateOf(false) }
     var showSentence by remember { mutableStateOf(false) }
+    var showAi by remember { mutableStateOf(false) }
+
+    // AI 助手弹窗的会话状态挂在首页 ViewModelStore 上：关闭弹窗再打开不丢上下文
+    val aiVm: AiAssistantViewModel = androidx.lifecycle.viewmodel.compose.viewModel(key = "homeAi") {
+        AiAssistantViewModel(app, AiMode.GRAMMAR, "", "")
+    }
+    val aiState by aiVm.uiState.collectAsStateWithLifecycle()
 
     Box(Modifier.fillMaxSize()) {
         Scaffold { padding ->
@@ -464,13 +479,33 @@ fun HomeScreen(nav: NavHostController) {
                         }
                     }
                 }
-                Spacer(Modifier.height(10.dp))
+                Spacer(Modifier.height(if (state.aiConfigured) 76.dp else 10.dp))
                 }
             }
         }
 
         // 今日任务全部完成时撒彩带
         ConfettiBurst(trigger = if (allDone && todayDone > 0) 1 else 0)
+
+        // AI 助手悬浮按钮：右下角常驻，仅在已配置 API Key 时出现（PRD §19.9）
+        if (state.aiConfigured) {
+            Surface(
+                onClick = { showAi = true },
+                shape = CircleShape,
+                color = MaterialTheme.colorScheme.primaryContainer,
+                shadowElevation = 6.dp,
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(end = 20.dp, bottom = 20.dp),
+            ) {
+                Icon(
+                    Icons.Filled.AutoAwesome,
+                    contentDescription = "AI 助手",
+                    tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                    modifier = Modifier.padding(14.dp).size(24.dp),
+                )
+            }
+        }
 
         // 设置卡片：从右上角按钮生长弹出
         TransformCardPopup(visible = showSettings, anchor = PopupAnchor.TopEnd, onDismiss = { showSettings = false }) {
@@ -558,8 +593,7 @@ fun HomeScreen(nav: NavHostController) {
         }
 
         // 今日一句卡片：从底部横条生长弹出
-        TransformCardPopup(visible = showSentence, anchor = PopupAnchor.BottomCenter, onDismiss = { showSentence = false }) {
-            state.sentence?.let { s2 ->
+        TransformCardPopup(visible = showSentence, anchor = PopupAnchor.BottomCenter, onDismiss = { showSentence = false }) {            state.sentence?.let { s2 ->
                 Surface(shape = MaterialTheme.shapes.small, color = MaterialTheme.colorScheme.secondaryContainer) {
                     Text(
                         "今日一句 · " + s2.scene,
@@ -588,6 +622,24 @@ fun HomeScreen(nav: NavHostController) {
                     }
                 }
             }
+        }
+
+        // AI 助手弹窗：从右下角悬浮按钮生长弹出，形态同设置弹窗
+        TransformCardPopup(visible = showAi, anchor = PopupAnchor.BottomEnd, onDismiss = { showAi = false }) {
+            Text("AI 助手", style = MaterialTheme.typography.titleLarge)
+            AiAssistantPanel(
+                state = aiState,
+                onMode = { aiVm.setMode(it) },
+                onInput = { aiVm.setInput(it) },
+                onSend = { aiVm.send() },
+                onOpenConfig = {
+                    showAi = false
+                    nav.navigateToTab(Routes.PROFILE)
+                },
+                modifier = Modifier
+                    .heightIn(max = 430.dp)
+                    .verticalScroll(rememberScrollState()),
+            )
         }
 
         // 首启三步引导：只在「没看过引导且零进度」时全屏覆盖（PRD §19.6）

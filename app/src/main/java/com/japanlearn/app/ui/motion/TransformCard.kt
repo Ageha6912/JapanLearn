@@ -33,16 +33,21 @@ enum class PopupAnchor {
 
     /** 底部居中触发（如今日一句横条）。 */
     BottomCenter,
+
+    /** 右下角触发（如 AI 助手悬浮按钮）。 */
+    BottomEnd,
 }
 
-private fun PopupAnchor.transformOrigin() = when (this) {
+internal fun PopupAnchor.transformOrigin() = when (this) {
     PopupAnchor.TopEnd -> TransformOrigin(1f, 0f)
     PopupAnchor.BottomCenter -> TransformOrigin(0.5f, 1f)
+    PopupAnchor.BottomEnd -> TransformOrigin(1f, 1f)
 }
 
-private fun PopupAnchor.alignment() = when (this) {
+internal fun PopupAnchor.alignment() = when (this) {
     PopupAnchor.TopEnd -> Alignment.TopEnd
     PopupAnchor.BottomCenter -> Alignment.BottomCenter
+    PopupAnchor.BottomEnd -> Alignment.BottomEnd
 }
 
 /**
@@ -76,7 +81,7 @@ fun TransformCardPopup(
 
     // 卡片：贴着触发角对齐，从 0 放大到 1
     // 弹出节奏与视频一致：约 600ms 从容到位，带一次轻微过冲（冲过头一点点再收回）
-    // 底部锚点（今日一句横条）时底部留出横条高度，卡片出现在横条上方而非覆盖它
+    // 底部锚点（今日一句横条 / AI 悬浮按钮）时底部留出触发物高度，卡片出现在其上方而非覆盖它
     Box(
         modifier = modifier
             .fillMaxSize()
@@ -84,7 +89,7 @@ fun TransformCardPopup(
                 start = 40.dp,
                 top = 52.dp,
                 end = 40.dp,
-                bottom = if (anchor == PopupAnchor.BottomCenter) 96.dp else 52.dp,
+                bottom = if (anchor == PopupAnchor.BottomCenter || anchor == PopupAnchor.BottomEnd) 96.dp else 52.dp,
             ),
         contentAlignment = anchor.alignment(),
     ) {
