@@ -17,9 +17,9 @@ import java.io.File
 class ContentScaleTest {
 
     @Test
-    fun `words json 804`() {
+    fun `words json 1104`() {
         val file = ContentJson.decodeFromString<WordsFile>(readContent("words.json"))
-        assertEquals(804, file.words.size)
+        assertEquals(1104, file.words.size)
     }
 
     @Test

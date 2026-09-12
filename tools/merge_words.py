@@ -10,6 +10,11 @@ existing_ja = {w["ja"] for w in main["words"]}
 existing_kana_zh = {(w["kana"], w["zh"]) for w in main["words"]}
 existing_ids = {int(w["id"][1:]) for w in main["words"]}
 
+CAT_UNIT = {
+    "人物": 1, "数字": 2, "时间": 3, "食物": 4, "地点": 5, "物品": 6,
+    "动作": 7, "形容词": 8, "副词": 9, "自然": 10, "身体": 11,
+}
+
 next_id = max(existing_ids) + 1
 added, skipped = [], []
 for batch_file in sorted(Path(__file__).resolve().parent.glob("new_words_*.json")):
@@ -18,7 +23,9 @@ for batch_file in sorted(Path(__file__).resolve().parent.glob("new_words_*.json"
         if w["ja"] in existing_ja or (w["kana"], w["zh"]) in existing_kana_zh:
             skipped.append(f"{w['ja']}({w['zh']})")
             continue
-        main["words"].append({**w, "id": f"w{next_id:03d}"})
+        if w["cat"] not in CAT_UNIT:
+            raise SystemExit(f"{batch_file.name}: {w['ja']} 非法分类 {w['cat']}")
+        main["words"].append({**w, "id": f"w{next_id:03d}", "unit": CAT_UNIT[w["cat"]]})
         existing_ja.add(w["ja"])
         existing_kana_zh.add((w["kana"], w["zh"]))
         next_id += 1

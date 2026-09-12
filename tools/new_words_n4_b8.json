@@ -1,0 +1,125 @@
+{
+  "words": [
+    {
+      "ja": "助言",
+      "kana": "じょげん",
+      "romaji": "jogen",
+      "zh": "建议 / 忠告",
+      "pos": "名词",
+      "cat": "动作",
+      "example": "先生の助言に従って勉強しました。",
+      "exampleZh": "听从老师的建议学习。",
+      "level": "N4"
+    },
+    {
+      "ja": "打ち合わせ",
+      "kana": "うちあわせ",
+      "romaji": "uchiawase",
+      "zh": "碰头会 / 商议",
+      "pos": "名词",
+      "cat": "动作",
+      "example": "公開前に打ち合わせを行います。",
+      "exampleZh": "发布前先开碰头会。",
+      "level": "N4"
+    },
+    {
+      "ja": "取り替える",
+      "kana": "とりかえる",
+      "romaji": "torikaeru",
+      "zh": "更换",
+      "pos": "动词",
+      "cat": "动作",
+      "example": "壊れた部品を新しいのに取り替えました。",
+      "exampleZh": "把坏零件换成了新的。",
+      "level": "N4"
+    },
+    {
+      "ja": "解凍する",
+      "kana": "かいとうする",
+      "romaji": "kaitousuru",
+      "zh": "解冻",
+      "pos": "动词",
+      "cat": "动作",
+      "example": "肉を冷蔵庫で解凍します。",
+      "exampleZh": "把肉放进冷藏室解冻。",
+      "level": "N4"
+    },
+    {
+      "ja": "辞書",
+      "kana": "じしょ",
+      "romaji": "jisho",
+      "zh": "词典",
+      "pos": "名词",
+      "cat": "物品",
+      "example": "辞書を引きながら記事を読みました。",
+      "exampleZh": "边查词典边读了文章。",
+      "level": "N4"
+    },
+    {
+      "ja": "目印",
+      "kana": "めじるし",
+      "romaji": "mejirushi",
+      "zh": "标记",
+      "pos": "名词",
+      "cat": "物品",
+      "example": "地図に集合の場所を目印として書きました。",
+      "exampleZh": "在地图上标出了集合地点。",
+      "level": "N4"
+    },
+    {
+      "ja": "合図",
+      "kana": "あいず",
+      "romaji": "aizu",
+      "zh": "暗号 / 信号",
+      "pos": "名词",
+      "cat": "物品",
+      "example": "合図があったら列を出ます。",
+      "exampleZh": "收到暗号就出列。",
+      "level": "N4"
+    },
+    {
+      "ja": "品物",
+      "kana": "しなもの",
+      "romaji": "shinamono",
+      "zh": "物品 / 商品",
+      "pos": "名词",
+      "cat": "物品",
+      "example": "この店は品物がいいと評判です。",
+      "exampleZh": "这家店以货品好出名。",
+      "level": "N4"
+    },
+    {
+      "ja": "忘れ物",
+      "kana": "わすれもの",
+      "romaji": "wasuremono",
+      "zh": "遗忘的物品",
+      "pos": "名词",
+      "cat": "物品",
+      "example": "忘れ物がないか確認してください。",
+      "exampleZh": "请确认有没有落下东西。",
+      "level": "N4"
+    },
+    {
+      "ja": "売り場",
+      "kana": "うりば",
+      "romaji": "uriba",
+      "zh": "柜台 / 卖场",
+      "pos": "名词",
+      "cat": "地点",
+      "example": "靴の売り場は三階にあります。",
+      "exampleZh": "鞋类柜台在三楼。",
+      "level": "N4"
+    },
+    {
+      "ja": "特売",
+      "kana": "とくばい",
+      "romaji": "tokubai",
+      "zh": "特价销售",
+      "pos": "名词",
+      "cat": "物品",
+      "example": "今日は特売の日です。",
+      "exampleZh": "今天是特价日。",
+      "level": "N4"
+    }
+  ]
+}

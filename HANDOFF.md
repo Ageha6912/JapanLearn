@@ -182,6 +182,13 @@ python tools/validate_content.py    # 内容校验，必须通过才能改内容
 - 入口：复习 Tab 错题本卡下方「错题突击」卡（`wrongCount > 0` 才显示，Bolt 图标）
 - 新坑：**新图标必须补显式 import**（`Icons.Filled.Bolt` 不 import 就是 Unresolved，与图标是否存在无关）；文件内 private 状态类被 public VM 属性暴露时直接改 public（与 WordSessionUiState 惯例一致）
 - 全量 213 测全绿；versionName 未动
+
+### v1.2 PR-B 已交付（2026-09-12）— N4 词二批 +300
+- 词库 **804 → 1104**（N4 300 → 600），words version 8 → 11（分批合并各 +1）
+- 批次文件 `tools/new_words_n4_b5..b9.json`（322 条写稿，与库内既有词去重后净增 300）；覆盖人物家族称呼/时间时段/食材调味/地点设施/日用品/动作动词/形容词/副词等，每词带例句
+- **merge_words.py 已补 unit 自动归属**（按分类映射，非法分类直接报错）——后续批次无需再跑 assign_units
+- **TypeAnswerNormalizer 金标 allowlist +6**（w821/w941/w1057/w1066/w1067/w1069）：片假名长音符「ー」无法由罗马音表产生，属 allowlist 设计场景；助言 romaji jyogen→jogen 实修
+- 全量 213 测全绿；validate 通过；versionName 未动
 - 分配结论：预生成音频正式移出 v0.8（无排期可选 PR，门禁声库书面授权）；埋点推迟至内测；内容扩充为常驻并行线；听力训练留 v0.9
 
 ### v0.7.5（已发布）— PR-R51 停写旧 content_version
@@ -206,7 +213,7 @@ python tools/validate_content.py    # 内容校验，必须通过才能改内容
 
 v0.7.0：Room v4 FSRS 字段；默认 `FsrsScheduler`（ts-fsrs v5.4.2 long-term，`enable_short_term=false`；Again 仍 `dueAt=now`）；自评文案不变；已掌握 `stability >= 21`。回滚：`AppContainer` 改回 `SrsScheduler`，勿删 `MIGRATION_3_4`。
 
-下一步：v1.2 继续：PR-B N4 词二批 +300（804 → 1104，批次管线 + unit 归属 + validate）→ PR-C 收口 v1.2.0。PR-A 已交付。
+下一步：v1.2 收口：PR-C（versionName 1.2.0 / versionCode 23 → assembleRelease → 模拟器回归 → README 增补 → tag + GitHub Release）。PR-A/PR-B 均已交付。
 
 v0.4.3（中文引擎修复）：用户真机「只读汉字跳过假名 + 不弹引导」——默认引擎是中文引擎，init 成功且 availableLanguages 谎报日语。重构 JapaneseTts：装有 Google TTS（com.google.android.tts）时显式按包名初始化不走默认；可用性用 setLanguage(JAPAN) 返回值实测（MISSING_DATA→数据引导 / NOT_SUPPORTED→引擎引导）；manifest 加 <queries>（Android 11+ 包可见性，漏加会查不到 Google TTS）；点击时 refreshJapaneseStatus 保证下载后立即生效。
 
