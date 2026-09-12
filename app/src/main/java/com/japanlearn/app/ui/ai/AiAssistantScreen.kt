@@ -213,26 +213,28 @@ fun AiAssistantScreen(
                     }
 
                     StaggerIn(2) {
-                        OutlinedTextField(
-                            value = state.input,
-                            onValueChange = { vm.setInput(it) },
-                            modifier = Modifier.fillMaxWidth(),
-                            minLines = 3,
-                            placeholder = {
-                                Text(
-                                    when (state.mode) {
-                                        AiMode.GRAMMAR -> "输入想弄懂的语法点或句子，如：〜てしまう"
-                                        AiMode.CORRECT -> "粘贴你想检查的日语句子"
-                                        AiMode.TRANSLATE -> "输入日语或中文，自动互译"
-                                    }
-                                )
-                            },
-                        )
-                        AppButton(
-                            text = if (state.loading) "思考中…" else "发送",
-                            enabled = !state.loading && state.input.isNotBlank(),
-                            onClick = { vm.send() },
-                        )
+                        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                            OutlinedTextField(
+                                value = state.input,
+                                onValueChange = { vm.setInput(it) },
+                                modifier = Modifier.fillMaxWidth(),
+                                minLines = 3,
+                                placeholder = {
+                                    Text(
+                                        when (state.mode) {
+                                            AiMode.GRAMMAR -> "输入想弄懂的语法点或句子，如：〜てしまう"
+                                            AiMode.CORRECT -> "粘贴你想检查的日语句子"
+                                            AiMode.TRANSLATE -> "输入日语或中文，自动互译"
+                                        }
+                                    )
+                                },
+                            )
+                            AppButton(
+                                text = if (state.loading) "思考中…" else "发送",
+                                enabled = !state.loading && state.input.isNotBlank(),
+                                onClick = { vm.send() },
+                            )
+                        }
                     }
 
                     state.error?.let { msg ->
