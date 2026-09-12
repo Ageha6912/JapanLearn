@@ -144,6 +144,34 @@ class AiWireTest {
     }
 
     @Test
+    fun `content 为 JSON null 返回 null 不拼字面量`() {
+        // 思考模型（如 deepseek-reasoner）思考阶段的 chunk：content 显式为 null。
+        // 修复前 JsonNull.content 被当成字符串 "null" 拼进回答（v1.3.1 真机 bug）
+        val line = """data: {"choices":[{"delta":{"content":null}}]}"""
+        assertNull(AiWire.parseStreamDelta(line))
+    }
+
+    @Test
+    fun `思考模型的 reasoning 块返回 null`() {
+        val line = """data: {"choices":[{"delta":{"reasoning_content":"先分析语法点","content":null}}]}"""
+        assertNull(AiWire.parseStreamDelta(line))
+    }
+
+    @Test
+    fun `reasoning 块之后的正常 content 不受影响`() {
+        val reasoning = """data: {"choices":[{"delta":{"reasoning_content":"想想","content":null}}]}"""
+        val answer = """data: {"choices":[{"delta":{"content":"「は」读 wa"}}]}"""
+        assertNull(AiWire.parseStreamDelta(reasoning))
+        assertEquals("「は」读 wa", AiWire.parseStreamDelta(answer))
+    }
+
+    @Test
+    fun `content 为数字或布尔返回 null`() {
+        assertNull(AiWire.parseStreamDelta("""data: {"choices":[{"delta":{"content":123}}]}"""))
+        assertNull(AiWire.parseStreamDelta("""data: {"choices":[{"delta":{"content":true}}]}"""))
+    }
+
+    @Test
     fun `空 choices 返回 null`() {
         assertNull(AiWire.parseStreamDelta("""data: {"choices":[]}"""))
     }
@@ -174,6 +202,12 @@ class AiWireTest {
             {"id":"x","usage":{},"choices":[{"finish_reason":"stop","message":{"content":"OK"}}]}
         """.trimIndent()
         assertEquals("OK", AiWire.parseContent(response))
+    }
+
+    @Test
+    fun `非流式 content 为 JSON null 返回 null`() {
+        val response = """{"choices":[{"message":{"role":"assistant","content":null}}]}"""
+        assertNull(AiWire.parseContent(response))
     }
 
     @Test
