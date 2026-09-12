@@ -193,6 +193,13 @@ python tools/validate_content.py    # 内容校验，必须通过才能改内容
 - UI：按钮三态「思考中… / 回答中… / 发送」；结果卡文本逐步增长（打字机）
 - 全量 223 测全绿；versionName 未动
 
+### v1.3 PR-B 已交付（2026-09-12）— N4 语法二批 +33
+- 语法 **87 → 120**（N4 37 → 70，每单元 3 → 6-7 条），grammar version 6 → 7
+- 批次 `tools/new_grammar_n4_b3.json`（33 条零撞车，每条 2 例句 + 2 练习题，unit 1–11 每单元恰好 3 条）
+- 覆盖：～し / ～ても（逆接）/ ～ほど / ～たびに / ～たとたん / ～につれて / ～とおりに / ～さ名词化 / ～くする・にする / ～たがる / ～ばよかった / ～かどうか / ～の・～こと名词化 / ～ことになっている / ～ことにする / ～出す / ～合う / ～直す / ～ば～ほど / ～てもかまいません / ～ずつ / ～ごとに / ～として / ～だけ / ～うちに / ～によって / ～にとって / お～になる・お～する 敬语 等
+- 稿件自查修掉：练习题语法不自然 1 处、选项重复 1 处（validate 会拦）、例句单位混用 1 处
+- 全量 223 测全绿；validate 通过；versionName 未动
+
 ### v1.2 规划（PRD §19.10，grilling 两轮定案）
 - 主题：错题与 SRS 深度联动——**错题突击会话**（复习 Tab 入口，三类错题各有出题通路：word 混合题型 / kana romaji 四选一 / grammar 自带练习；10 题循环取；recordAuxAnswer 判分：答对移除、答错 +1；不推 SRS dueAt）+ **复习队列错题优先**（dueWords/dueGrammar LEFT JOIN wrong_answers 排序，纯排序可回滚）
 - 统计口径不混：突击时长落 addStudy，对错不进复习正确率
@@ -238,7 +245,7 @@ python tools/validate_content.py    # 内容校验，必须通过才能改内容
 
 v0.7.0：Room v4 FSRS 字段；默认 `FsrsScheduler`（ts-fsrs v5.4.2 long-term，`enable_short_term=false`；Again 仍 `dueAt=now`）；自评文案不变；已掌握 `stability >= 21`。回滚：`AppContainer` 改回 `SrsScheduler`，勿删 `MIGRATION_3_4`。
 
-下一步：v1.3 继续：PR-B N4 语法二批（87 → ~120，批次管线 + 单元归属）→ PR-C 收口 v1.3.0。PR-A 已交付。
+下一步：v1.3 收口：PR-C（versionName 1.3.0 / versionCode 25 → assembleRelease → 模拟器回归（重点：AI 流式打字机 + 语法 120 装载）→ README 增补 → tag + GitHub Release）。PR-A/PR-B 均已交付。
 
 v0.4.3（中文引擎修复）：用户真机「只读汉字跳过假名 + 不弹引导」——默认引擎是中文引擎，init 成功且 availableLanguages 谎报日语。重构 JapaneseTts：装有 Google TTS（com.google.android.tts）时显式按包名初始化不走默认；可用性用 setLanguage(JAPAN) 返回值实测（MISSING_DATA→数据引导 / NOT_SUPPORTED→引擎引导）；manifest 加 <queries>（Android 11+ 包可见性，漏加会查不到 Google TTS）；点击时 refreshJapaneseStatus 保证下载后立即生效。
 

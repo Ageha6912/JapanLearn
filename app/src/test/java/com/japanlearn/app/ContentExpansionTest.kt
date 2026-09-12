@@ -37,13 +37,13 @@ class ContentExpansionTest {
     }
 
     @Test
-    fun `合并后语法 87 且含点名两条`() {
+    fun `合并后语法 120 且含点名两条`() {
         val file = ContentJson.decodeFromString<GrammarFile>(readContent("grammar.json"))
-        assertEquals(87, file.grammar.size)
+        assertEquals(120, file.grammar.size)
         val titles = file.grammar.map { it.title }.toSet()
         assertTrue(titles.contains("～んです / ～のです"))
         assertTrue(titles.contains("～について"))
-        assertEquals(6, file.version)
+        assertEquals(7, file.version)
         assertTrue(file.grammar.all { it.unit in 1..11 })
     }
 
