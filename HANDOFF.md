@@ -99,6 +99,14 @@ python tools/validate_content.py    # 内容校验，必须通过才能改内容
 - 模拟器回归通过（坑 11 版本号已核对）：全新安装引导正常（v0.8 特性无回归）、学习 Tab 听力训练入口卡、题量选择、听句选义与听音辨词两题型渲染 + 答题判定 + 反馈流转、**TTS 引擎缺失时进会话直接弹引导对话框（§19.7 前置检测实测生效，AVD 无 TTS 恰好验证）**
 - tag v0.9.0 + GitHub Release（JapanLearn-v0.9.0.apk）；回归截图 `.screenshots/v090_*.png`（未入库）
 - CI 门禁：收口 commit 全绿（169 测 + assembleDebug）
+
+### v1.0 规划（PRD §19.8，grilling 两轮定案）
+- 主题：N5/N4 课程化——11 分类即 11 单元（友好命名），语法按难度均分；软推进（浏览自由、当前单元=第一个未完成单元、今日新词从当前单元顺序取）；单元测试 10 题 soft 检查点（复用 QuizVariantPicker）
+- 数据：words/grammar JSON 加 `unit` 字段 + Room v4→v5 加 unit 列（沿 level 先例），version 升位自动重装
+- UI：学习 Tab「单词/语法」两卡合并为「课程」大卡 → 单元列表 → 单元详情；全量词表保留为「全部单词」入口
+- 搭车：学习成果页（我的 Tab，零新表聚合：时长/词数/连击/单元完成 x/22/正确率/五十音）
+- 切分：PR-A 数据与迁移 → PR-B 课程 UI → PR-C 成果页（可并行）→ PR-D 收口 v1.0.0（versionCode 21 + README 里程碑重写 + showcase 重生成）
+- 分配结论：AI 助手（语法解释/句子纠错）v1.0 不做；建议 v1.1 以 BYOK（用户自备 API Key 直连）形态做，不建后端不加登录
 - 分配结论：预生成音频正式移出 v0.8（无排期可选 PR，门禁声库书面授权）；埋点推迟至内测；内容扩充为常驻并行线；听力训练留 v0.9
 
 ### v0.7.5（已发布）— PR-R51 停写旧 content_version
@@ -123,7 +131,7 @@ python tools/validate_content.py    # 内容校验，必须通过才能改内容
 
 v0.7.0：Room v4 FSRS 字段；默认 `FsrsScheduler`（ts-fsrs v5.4.2 long-term，`enable_short_term=false`；Again 仍 `dueAt=now`）；自评文案不变；已掌握 `stability >= 21`。回滚：`AppContainer` 改回 `SrsScheduler`，勿删 `MIGRATION_3_4`。
 
-下一步：v1.0 方向规划。§19.5 高优先级剩余：N5/N4 课程化、内容扩充（常驻线）；中优先级以「错题与 SRS 深度联动」（v0.9 已推进半步：听力错题入本）与「更完整学习统计」靠前。规划时照例 grilling 两轮。
+下一步：实施 v1.0（规划定案见 PRD §19.8 与第 4 节）：PR-A 数据与迁移（unit + Room v5）→ PR-B 课程 UI → PR-C 学习成果页 → PR-D 收口 v1.0.0。
 
 v0.4.3（中文引擎修复）：用户真机「只读汉字跳过假名 + 不弹引导」——默认引擎是中文引擎，init 成功且 availableLanguages 谎报日语。重构 JapaneseTts：装有 Google TTS（com.google.android.tts）时显式按包名初始化不走默认；可用性用 setLanguage(JAPAN) 返回值实测（MISSING_DATA→数据引导 / NOT_SUPPORTED→引擎引导）；manifest 加 <queries>（Android 11+ 包可见性，漏加会查不到 Google TTS）；点击时 refreshJapaneseStatus 保证下载后立即生效。
 
