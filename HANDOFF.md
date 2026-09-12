@@ -28,7 +28,7 @@
 ```bash
 ./gradlew :app:assembleDebug        # debug APK
 ./gradlew :app:assembleRelease      # 正式签名 APK（keystore 已配置，见第 6 节坑 9）
-./gradlew :app:testDebugUnitTest    # 单元测试（当前 223 项），必须全绿才能交付
+./gradlew :app:testDebugUnitTest    # 单元测试（当前 226 项），必须全绿才能交付
 python tools/validate_content.py    # 内容校验，必须通过才能改内容；CI 已跑
 ```
 
@@ -45,6 +45,15 @@ python tools/validate_content.py    # 内容校验，必须通过才能改内容
 - 55 项单元测试全绿；PRD §18 决策记录；README 数字已同步
 
 ## 4. 当前任务：v1.3.0 已发布（2026-09-12）
+
+### 未发版改动（2026-09-12）— AI 助手首页悬浮按钮 + 弹窗
+- 用户需求：AI 助手做成首页右下角固定按钮，点击弹出 AI 弹窗，形态同首页设置弹窗（TransformCardPopup）
+- 实现：TransformCardPopup 新增 `PopupAnchor.BottomEnd`（从右下角生长，底部留 96dp 避开按钮）；AiAssistantScreen 抽出共享 `AiAssistantPanel`（全屏页与弹窗共用同一正文，流式/错误/额度逻辑只此一份）；首页右下角 AutoAwesome 悬浮按钮（primaryContainer），弹窗会话状态挂首页 ViewModelStore（key "homeAi"），关闭重开不丢上下文
+- 不变式保持：未配置 API Key 时按钮不出现（PRD §19.9）；语法详情/复习页/我的页三个深链入口仍走全屏 AiAssistantScreen
+- 细节：aiConfigured 时首页内容末尾 spacer 10→76dp 防止按钮盖住今日一句横条；调试中发现把整段 else 内容裹进单个 StaggerIn 会复现叠绘坑，已改为每段各自包 StaggerIn
+- 测试：新增 TransformCardTest（3 项锚点映射，映射函数 private→internal），全量 226 项全绿
+- 模拟器回归：未配置时按钮隐藏 ✓ / 配置后按钮出现 ✓ / 弹窗形态与设置弹窗一致 ✓ / 输入激活发送 ✓ / 假 Key 错误卡在弹窗内显示 ✓ / 遮罩点击关闭 ✓ / 深链全屏页上下文预填正常 ✓
+- **未发版**：versionName 仍 1.3.0。随 v1.4 或热修复版本一起发布，由用户决定
 
 ### v0.8 规划（PRD §19.6，grilling 两轮定案）
 - 主题：学习目标系统 + 个性化每日学习计划——级别 + 可选目标日期，倒推夹 5/10/15/20 档位、按周校准；存 SharedPreferences 不动 Room；纯函数 `StudyPlanner` 带测试；`ReviewPlanner`/FSRS 零接触
