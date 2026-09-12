@@ -167,6 +167,13 @@ python tools/validate_content.py    # 内容校验，必须通过才能改内容
 - 模拟器回归通过（坑 11 版本号已核对，假 Key 走真实请求）：未配置态（三预设+表单+保存灰）→ 预设填入/Key 遮蔽/模型自动填 → 已配置态（启用徽章/开始对话/限额/隐私/清除）→ 助手页发送 → 「网络不可用或接口无法连接」错误卡实测（模拟器无法连通外网 LLM API 属预期；401 等分支由 AiWireTest 覆盖）
 - **回归抓到并修复一个真 bug**：AI 助手页发送按钮与输入框重叠（`StaggerIn` 是 Box 布局，两个组件塞进同一 StaggerIn 会叠绘——已在 fix 提交外包 Column；**新增多组件块时不要塞进同一个 StaggerIn**）
 - README 增补 AI 助手行 + 测试数 206；tag v1.1.0 + GitHub Release（JapanLearn-v1.1.0.apk）；截图 `.screenshots/v110_*.png`（未入库）
+
+### v1.2 规划（PRD §19.10，grilling 两轮定案）
+- 主题：错题与 SRS 深度联动——**错题突击会话**（复习 Tab 入口，三类错题各有出题通路：word 混合题型 / kana romaji 四选一 / grammar 自带练习；10 题循环取；recordAuxAnswer 判分：答对移除、答错 +1；不推 SRS dueAt）+ **复习队列错题优先**（dueWords/dueGrammar LEFT JOIN wrong_answers 排序，纯排序可回滚）
+- 统计口径不混：突击时长落 addStudy，对错不进复习正确率
+- 搭车：N4 词二批 +300（总库 804 → 1104，批次管线 + unit 归属）
+- 推迟：流式输出（等 AI 真实使用反馈）、统计增强（等数据基建需求）
+- 切分：PR-A 突击会话 + 队列加权 → PR-B N4 词二批 → PR-C 收口 v1.2.0（versionCode 23）
 - 分配结论：预生成音频正式移出 v0.8（无排期可选 PR，门禁声库书面授权）；埋点推迟至内测；内容扩充为常驻并行线；听力训练留 v0.9
 
 ### v0.7.5（已发布）— PR-R51 停写旧 content_version
@@ -191,7 +198,7 @@ python tools/validate_content.py    # 内容校验，必须通过才能改内容
 
 v0.7.0：Room v4 FSRS 字段；默认 `FsrsScheduler`（ts-fsrs v5.4.2 long-term，`enable_short_term=false`；Again 仍 `dueAt=now`）；自评文案不变；已掌握 `stability >= 21`。回滚：`AppContainer` 改回 `SrsScheduler`，勿删 `MIGRATION_3_4`。
 
-下一步：v1.2 规划（候选：流式输出增强、错题与 SRS 深度联动、统计增强、N4 词二批内容；AI 助手真机实测待用户提供 Key 后进行）。规划时照例 grilling 两轮。
+下一步：实施 v1.2（规划定案见 PRD §19.10 与第 4 节）：PR-A 错题突击会话 + 队列加权 → PR-B N4 词二批 → PR-C 收口 v1.2.0。
 
 v0.4.3（中文引擎修复）：用户真机「只读汉字跳过假名 + 不弹引导」——默认引擎是中文引擎，init 成功且 availableLanguages 谎报日语。重构 JapaneseTts：装有 Google TTS（com.google.android.tts）时显式按包名初始化不走默认；可用性用 setLanguage(JAPAN) 返回值实测（MISSING_DATA→数据引导 / NOT_SUPPORTED→引擎引导）；manifest 加 <queries>（Android 11+ 包可见性，漏加会查不到 Google TTS）；点击时 refreshJapaneseStatus 保证下载后立即生效。
 
