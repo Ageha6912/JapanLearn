@@ -180,6 +180,12 @@ python tools/validate_content.py    # 内容校验，必须通过才能改内容
 - 修复：manifest 补 `INTERNET` + `ManifestTest` 守护测试（215 测全绿）；验证方式 `adb shell dumpsys package com.japanlearn.app | grep INTERNET`（granted=true）
 - 用户真机覆盖 v1.2.1 后即可正常使用 AI 助手（配置保留）
 
+### v1.3 规划（PRD §19.11，grilling 两轮定案 + 真机反馈调整）
+- **真机反馈**：AI 回答质量还行（Prompt 不动）、等结果太久 → 主题定为 **AI 流式输出**（原推荐「统计增强」让位，挪 v1.4）
+- 流式：同端点 `stream: true`，SSE 逐行解析（纯函数带单测）；首字到达即打字机；中断保留部分文本；无停止按钮（离开即取消）；**首个增量到达即计数**
+- 搭车：N4 语法二批（87 → ~120，N4 每单元 3-4 → 6-7 条）
+- 切分：PR-A 流式管线 → PR-B 语法二批 → PR-C 收口 v1.3.0（versionCode 25）；统计增强/汉字专项排 v1.4 候选
+
 ### v1.2 规划（PRD §19.10，grilling 两轮定案）
 - 主题：错题与 SRS 深度联动——**错题突击会话**（复习 Tab 入口，三类错题各有出题通路：word 混合题型 / kana romaji 四选一 / grammar 自带练习；10 题循环取；recordAuxAnswer 判分：答对移除、答错 +1；不推 SRS dueAt）+ **复习队列错题优先**（dueWords/dueGrammar LEFT JOIN wrong_answers 排序，纯排序可回滚）
 - 统计口径不混：突击时长落 addStudy，对错不进复习正确率
@@ -225,7 +231,7 @@ python tools/validate_content.py    # 内容校验，必须通过才能改内容
 
 v0.7.0：Room v4 FSRS 字段；默认 `FsrsScheduler`（ts-fsrs v5.4.2 long-term，`enable_short_term=false`；Again 仍 `dueAt=now`）；自评文案不变；已掌握 `stability >= 21`。回滚：`AppContainer` 改回 `SrsScheduler`，勿删 `MIGRATION_3_4`。
 
-下一步：v1.3 规划（候选：AI 真机反馈后的流式输出/Prompt 调优、统计增强（届时错题维度有数据）、N4 语法二批；听力训练句库扩量随常驻线）。规划时照例 grilling 两轮。
+下一步：实施 v1.3（规划定案见 PRD §19.11 与第 4 节）：PR-A 流式管线 → PR-B N4 语法二批 → PR-C 收口 v1.3.0。
 
 v0.4.3（中文引擎修复）：用户真机「只读汉字跳过假名 + 不弹引导」——默认引擎是中文引擎，init 成功且 availableLanguages 谎报日语。重构 JapaneseTts：装有 Google TTS（com.google.android.tts）时显式按包名初始化不走默认；可用性用 setLanguage(JAPAN) 返回值实测（MISSING_DATA→数据引导 / NOT_SUPPORTED→引擎引导）；manifest 加 <queries>（Android 11+ 包可见性，漏加会查不到 Google TTS）；点击时 refreshJapaneseStatus 保证下载后立即生效。
 
