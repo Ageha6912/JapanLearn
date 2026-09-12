@@ -48,6 +48,8 @@ class SettingsRepository(context: Context) {
         ReminderScheduler.coerceMinute(prefs.getInt(KEY_REMINDER_MINUTE, ReminderScheduler.DEFAULT_MINUTE)),
     )
     val kanaIntroDismissed = MutableStateFlow(prefs.getBoolean(KEY_KANA_INTRO_DISMISSED, false))
+    /** 首启引导已完成/跳过（PRD §19.6）：看过就永不打扰。 */
+    val onboardingDone = MutableStateFlow(prefs.getBoolean(KEY_ONBOARDING_DONE, false))
     val studyLevel = MutableStateFlow(prefs.getString(KEY_STUDY_LEVEL, DEFAULT_STUDY_LEVEL) ?: DEFAULT_STUDY_LEVEL)
     val themeMode = MutableStateFlow(ThemeMode.fromRaw(prefs.getString(KEY_THEME, null)))
     /** 用户偏好的 Google TTS 日语 voice 名；空字符串 = 自动选最高质量。 */
@@ -87,6 +89,11 @@ class SettingsRepository(context: Context) {
     fun setKanaIntroDismissed(value: Boolean) {
         prefs.edit().putBoolean(KEY_KANA_INTRO_DISMISSED, value).apply()
         kanaIntroDismissed.value = value
+    }
+
+    fun setOnboardingDone(value: Boolean) {
+        prefs.edit().putBoolean(KEY_ONBOARDING_DONE, value).apply()
+        onboardingDone.value = value
     }
 
     fun setDailyNewWords(value: Int) {
@@ -139,6 +146,7 @@ class SettingsRepository(context: Context) {
         private const val KEY_REMINDER_HOUR = "reminder_hour"
         private const val KEY_REMINDER_MINUTE = "reminder_minute"
         private const val KEY_KANA_INTRO_DISMISSED = "kana_intro_dismissed"
+        private const val KEY_ONBOARDING_DONE = "onboarding_done"
         private const val KEY_STUDY_LEVEL = "study_level"
         private const val KEY_THEME = "theme_mode"
         private const val KEY_TTS_VOICE = "tts_voice_name"

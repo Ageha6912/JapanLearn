@@ -28,7 +28,7 @@
 ```bash
 ./gradlew :app:assembleDebug        # debug APK
 ./gradlew :app:assembleRelease      # 正式签名 APK（keystore 已配置，见第 6 节坑 9）
-./gradlew :app:testDebugUnitTest    # 单元测试（当前 152 项），必须全绿才能交付
+./gradlew :app:testDebugUnitTest    # 单元测试（当前 156 项），必须全绿才能交付
 python tools/validate_content.py    # 内容校验，必须通过才能改内容；CI 已跑
 ```
 
@@ -58,6 +58,14 @@ python tools/validate_content.py    # 内容校验，必须通过才能改内容
 - `AppContainer.recalibrateGoal()`：应用启动每周校准（距上次自动应用 ≥7 天才重算），目标设置/更新后立即校准一次
 - UI：我的 → 「学习目标」入口卡 + 新页 `ui/profile/GoalScreen.kt`（级别选择 / 达成日 1·3·6 个月预设 / 推荐档采用 / 清除目标）；原「学习目标」卡改名「每日任务量」；首页任务卡只读摘要行（点击跳目标页，未设目标不显示）
 - 全量 152 测全绿；versionName 未动（版本号只在 PR-C 收口改）
+
+### PR-B 已交付（2026-09-12）— Onboarding 首启三步引导
+- `domain/OnboardingGate.kt` 纯函数 + 4 项单测：只对「未看过引导且零进度（learnedWords==0 && learnedGrammar==0）」的用户显示，老用户与跳过/完成者永不打扰
+- `SettingsRepository.onboardingDone`（SharedPreferences key `onboarding_done`），完成或跳过即置位
+- `ui/onboarding/OnboardingScreen.kt` 全屏覆盖层（HomeScreen 根 Box 顶层）：① 闭环说明（学习/练习/复习三行）→ ② 当前水平（复用 `settings.setStudyLevel`）+ 可选目标（复用 `setGoal` + `recalibrateGoal`，选完立即生效）→ ③ 直达五十音（nav KANA）或直接开始；任意一步可跳过，BackHandler=跳过
+- 防闪烁：`progressLoaded`（首个进度 Flow 到达）后才判定门槛，避免升级老用户在计数到达前闪现引导；覆盖层空白区 `blockClicks()` 防点击透传
+- 零进度「先学五十音」横幅沿用既有 `HomeKanaIntro`，未重复实现
+- 全量 156 测全绿；versionName 未动
 - 分配结论：预生成音频正式移出 v0.8（无排期可选 PR，门禁声库书面授权）；埋点推迟至内测；内容扩充为常驻并行线；听力训练留 v0.9
 
 ### v0.7.5（已发布）— PR-R51 停写旧 content_version
@@ -82,7 +90,7 @@ python tools/validate_content.py    # 内容校验，必须通过才能改内容
 
 v0.7.0：Room v4 FSRS 字段；默认 `FsrsScheduler`（ts-fsrs v5.4.2 long-term，`enable_short_term=false`；Again 仍 `dueAt=now`）；自评文案不变；已掌握 `stability >= 21`。回滚：`AppContainer` 改回 `SrsScheduler`，勿删 `MIGRATION_3_4`。
 
-下一步：继续 v0.8：PR-B Onboarding（首启三步引导，规划见 PRD §19.6）→ PR-C 收口 v0.8.0。PR-A 目标+计划已交付。
+下一步：PR-C 收口 v0.8.0：versionName 0.8.0 / versionCode 19 → assembleRelease → 模拟器 release 回归（核对版本号，坑 11）→ tag + GitHub Release + Release Notes。PR-A/PR-B 均已交付。
 
 v0.4.3（中文引擎修复）：用户真机「只读汉字跳过假名 + 不弹引导」——默认引擎是中文引擎，init 成功且 availableLanguages 谎报日语。重构 JapaneseTts：装有 Google TTS（com.google.android.tts）时显式按包名初始化不走默认；可用性用 setLanguage(JAPAN) 返回值实测（MISSING_DATA→数据引导 / NOT_SUPPORTED→引擎引导）；manifest 加 <queries>（Android 11+ 包可见性，漏加会查不到 Google TTS）；点击时 refreshJapaneseStatus 保证下载后立即生效。
 

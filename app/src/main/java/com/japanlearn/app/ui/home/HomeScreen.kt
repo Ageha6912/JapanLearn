@@ -62,6 +62,7 @@ import com.japanlearn.app.data.ThemeMode
 import com.japanlearn.app.data.breakdown
 import com.japanlearn.app.data.local.SentenceEntity
 import com.japanlearn.app.domain.HomeKanaIntro
+import com.japanlearn.app.domain.OnboardingGate
 import com.japanlearn.app.domain.StudyPlanner
 import com.japanlearn.app.ui.components.AppButton
 import com.japanlearn.app.ui.components.SectionCard
@@ -76,6 +77,7 @@ import com.japanlearn.app.ui.motion.StaggerIn
 import com.japanlearn.app.ui.motion.PopupAnchor
 import com.japanlearn.app.ui.motion.TransformCardPopup
 import com.japanlearn.app.ui.motion.pressScale
+import com.japanlearn.app.ui.onboarding.OnboardingOverlay
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -112,6 +114,9 @@ data class HomeUiState(
     val sentenceIndex: Int = 0,
     val kanaIntroDismissed: Boolean = false,
     val goalSummary: GoalSummaryLine? = null,
+    val onboardingDone: Boolean = false,
+    /** 首次收到进度 Flow 后才允许判定引导门槛，避免老用户在计数到达前闪现引导。 */
+    val progressLoaded: Boolean = false,
 )
 
 class HomeViewModel(private val app: AppContainer) : ViewModel() {
@@ -125,7 +130,7 @@ class HomeViewModel(private val app: AppContainer) : ViewModel() {
         }
         collect(app.content.wordCount()) { s, v -> s.copy(totalWords = v) }
         collect(app.content.grammarCount()) { s, v -> s.copy(totalGrammar = v) }
-        collect(app.progress.learnedWordCount()) { s, v -> s.copy(learnedWords = v) }
+        collect(app.progress.learnedWordCount()) { s, v -> s.copy(learnedWords = v, progressLoaded = true) }
         collect(app.progress.learnedGrammarCount()) { s, v -> s.copy(learnedGrammar = v) }
         collect(app.progress.masteredWordCount()) { s, v -> s.copy(masteredWords = v) }
         collect(app.progress.dueWordCount()) { s, v -> s.copy(dueWords = v) }
@@ -141,6 +146,7 @@ class HomeViewModel(private val app: AppContainer) : ViewModel() {
         collect(app.settings.dailyNewWords) { s, v -> s.copy(targetNewWords = v) }
         collect(app.settings.dailyNewGrammar) { s, v -> s.copy(targetNewGrammar = v) }
         collect(app.settings.kanaIntroDismissed) { s, v -> s.copy(kanaIntroDismissed = v) }
+        collect(app.settings.onboardingDone) { s, v -> s.copy(onboardingDone = v) }
         collect(goalSummaryFlow()) { s, v -> s.copy(goalSummary = v) }
         // 今日一句：收集 Room Flow 而非一次性读取——首次启动时内容装载（seed）可能晚于
         // 首页打开，一次性读到空表会把句子永久置空，横条从此消失
@@ -158,6 +164,8 @@ class HomeViewModel(private val app: AppContainer) : ViewModel() {
     fun speak(text: String) = app.tts.speak(text)
 
     fun dismissKanaIntro() = app.settings.setKanaIntroDismissed(true)
+
+    fun completeOnboarding() = app.settings.setOnboardingDone(true)
 
     /** 目标摘要（只读）：按目标级别取内容计数，合成剩余天数与总进度百分比。 */
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -580,6 +588,24 @@ fun HomeScreen(nav: NavHostController) {
                     }
                 }
             }
+        }
+
+        // 首启三步引导：只在「没看过引导且零进度」时全屏覆盖（PRD §19.6）
+        val showOnboarding = state.progressLoaded &&
+            OnboardingGate.shouldShow(state.onboardingDone, state.learnedWords, state.learnedGrammar)
+        var onboardingDismissed by remember { mutableStateOf(false) }
+        if (showOnboarding && !onboardingDismissed) {
+            OnboardingOverlay(
+                onDismiss = {
+                    onboardingDismissed = true
+                    vm.completeOnboarding()
+                },
+                onStartKana = {
+                    onboardingDismissed = true
+                    vm.completeOnboarding()
+                    nav.navigate(Routes.KANA)
+                },
+            )
         }
     }
 }
