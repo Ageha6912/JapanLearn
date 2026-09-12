@@ -10,7 +10,7 @@
 - 需求文档：`PRD.md`（§17 为 v0.1 评审决策记录，**§18 为 v0.2 决策记录**，**§19 为 v0.5–v0.7 决策记录与产品缺口清单**，与正文冲突时以 §17/§18/§19 为准）
 - 优化方案：`OPTIMIZATION.md`（**Accepted**，用户 2026-09-09 确认 Q1–Q3 推荐项；结论已于 2026-09-12 写入 PRD §19）
 - Git 身份（仓库级已配置）：`Ageha <ageha6912@gmail.com>`，勿用其他身份提交
-- 已发布：**v1.2.1**（tag + GitHub Release，正式签名 APK）。`versionName = "1.2.1"` / `versionCode` 24
+- 已发布：**v1.3.0**（tag + GitHub Release，正式签名 APK）。`versionName = "1.3.0"` / `versionCode` 25
 
 ## 2. 环境速查
 
@@ -44,7 +44,7 @@ python tools/validate_content.py    # 内容校验，必须通过才能改内容
 - **发布工程**：R8 minify + 资源收缩（APK 1.5MB）、正式签名接入（keystore）、GitHub Actions 门禁 CI（`.github/workflows/ci.yml`：55 测试 + assembleDebug）
 - 55 项单元测试全绿；PRD §18 决策记录；README 数字已同步
 
-## 4. 当前任务：v1.2.1 已发布（2026-09-12，INTERNET 权限热修复）
+## 4. 当前任务：v1.3.0 已发布（2026-09-12）
 
 ### v0.8 规划（PRD §19.6，grilling 两轮定案）
 - 主题：学习目标系统 + 个性化每日学习计划——级别 + 可选目标日期，倒推夹 5/10/15/20 档位、按周校准；存 SharedPreferences 不动 Room；纯函数 `StudyPlanner` 带测试；`ReviewPlanner`/FSRS 零接触
@@ -193,6 +193,13 @@ python tools/validate_content.py    # 内容校验，必须通过才能改内容
 - UI：按钮三态「思考中… / 回答中… / 发送」；结果卡文本逐步增长（打字机）
 - 全量 223 测全绿；versionName 未动
 
+### PR-C 已发布（2026-09-12）— v1.3.0 收口
+- versionName 1.3.0 / versionCode 25；重新 assembleRelease（坑 5）
+- 模拟器回归：N4 词二批装载（第 1 单元 44 词）✓、N4 第 1 单元语法 7 条（含新增 ～し/～ても/～ほど）✓、AI 配置全流程（预设/Key 遮蔽/保存/已启用态）✓、发送后错误卡显示 ✓
+- **模拟器流式成功路径无法验证**：AVD 流量走宿主代理 Fake-IP（198.18.x），RTT 800ms+ TLS 握手超时——「网络不可用」在此环境属预期。**真实流式效果需用户真机 + 有效 Key 验证**（HANDOFF 留待项）
+- 坑 13 复现：gh/GitHub 网络间歇 reset，重试即可
+- tag v1.3.0 + GitHub Release（JapanLearn-v1.3.0.apk）；截图 `.screenshots/v130_*.png`（未入库）
+
 ### v1.3 PR-B 已交付（2026-09-12）— N4 语法二批 +33
 - 语法 **87 → 120**（N4 37 → 70，每单元 3 → 6-7 条），grammar version 6 → 7
 - 批次 `tools/new_grammar_n4_b3.json`（33 条零撞车，每条 2 例句 + 2 练习题，unit 1–11 每单元恰好 3 条）
@@ -245,7 +252,7 @@ python tools/validate_content.py    # 内容校验，必须通过才能改内容
 
 v0.7.0：Room v4 FSRS 字段；默认 `FsrsScheduler`（ts-fsrs v5.4.2 long-term，`enable_short_term=false`；Again 仍 `dueAt=now`）；自评文案不变；已掌握 `stability >= 21`。回滚：`AppContainer` 改回 `SrsScheduler`，勿删 `MIGRATION_3_4`。
 
-下一步：v1.3 收口：PR-C（versionName 1.3.0 / versionCode 25 → assembleRelease → 模拟器回归（重点：AI 流式打字机 + 语法 120 装载）→ README 增补 → tag + GitHub Release）。PR-A/PR-B 均已交付。
+下一步：等用户真机反馈 v1.3.0 流式体验；v1.4 规划（候选：统计增强、汉字专项、听力句库扩量、AI Prompt 按反馈调优）。规划时照例 grilling 两轮。
 
 v0.4.3（中文引擎修复）：用户真机「只读汉字跳过假名 + 不弹引导」——默认引擎是中文引擎，init 成功且 availableLanguages 谎报日语。重构 JapaneseTts：装有 Google TTS（com.google.android.tts）时显式按包名初始化不走默认；可用性用 setLanguage(JAPAN) 返回值实测（MISSING_DATA→数据引导 / NOT_SUPPORTED→引擎引导）；manifest 加 <queries>（Android 11+ 包可见性，漏加会查不到 Google TTS）；点击时 refreshJapaneseStatus 保证下载后立即生效。
 
