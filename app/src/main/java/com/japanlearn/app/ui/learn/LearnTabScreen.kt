@@ -39,26 +39,30 @@ import androidx.navigation.NavHostController
 import com.japanlearn.app.AppContainer
 import com.japanlearn.app.LocalAppContainer
 import com.japanlearn.app.Routes
+import com.japanlearn.app.domain.CourseCatalog
+import com.japanlearn.app.domain.CoursePointer
+import com.japanlearn.app.domain.CourseUnitProgress
 import com.japanlearn.app.ui.components.AppButton
 import com.japanlearn.app.ui.components.LevelSwitchRow
 import com.japanlearn.app.ui.motion.AnimatedProgressBar
 import com.japanlearn.app.ui.motion.StaggerIn
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 data class LearnUiState(
     val totalKana: Int = 0,
     val studyLevel: String = "N5",
-    /** level -> (总数, 已学数) */
-    val wordStats: Map<String, Pair<Int, Int>> = emptyMap(),
-    val grammarStats: Map<String, Pair<Int, Int>> = emptyMap(),
-    val learnedWords: Int = 0,
-    val learnedGrammar: Int = 0,
+    val unitRows: List<CourseUnitProgress> = emptyList(),
+    val currentUnit: Int = 1,
     val dailyNewWords: Int = 10,
 )
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class LearnViewModel(private val app: AppContainer) : ViewModel() {
     private val _state = MutableStateFlow(LearnUiState())
     val uiState = _state.asStateFlow()
@@ -68,36 +72,20 @@ class LearnViewModel(private val app: AppContainer) : ViewModel() {
             viewModelScope.launch { flow.collect { v -> _state.update { cur -> reducer(cur, v) } } }
         }
         collect(app.content.kanaCount()) { s, v -> s.copy(totalKana = v) }
-        collect(
-            kotlinx.coroutines.flow.combine(
-                app.content.wordCountByLevel("N5"),
-                app.content.learnedWordCountByLevel("N5"),
-                app.content.wordCountByLevel("N4"),
-                app.content.learnedWordCountByLevel("N4"),
-            ) { n5Total, n5Learned, n4Total, n4Learned ->
-                mapOf(
-                    "N5" to (n5Total to n5Learned),
-                    "N4" to (n4Total to n4Learned),
-                )
-            },
-        ) { s, v -> s.copy(wordStats = v) }
-        collect(
-            kotlinx.coroutines.flow.combine(
-                app.content.grammarCountByLevel("N5"),
-                app.content.learnedGrammarCountByLevel("N5"),
-                app.content.grammarCountByLevel("N4"),
-                app.content.learnedGrammarCountByLevel("N4"),
-            ) { n5Total, n5Learned, n4Total, n4Learned ->
-                mapOf(
-                    "N5" to (n5Total to n5Learned),
-                    "N4" to (n4Total to n4Learned),
-                )
-            },
-        ) { s, v -> s.copy(grammarStats = v) }
-        collect(app.progress.learnedWordCount()) { s, v -> s.copy(learnedWords = v) }
-        collect(app.progress.learnedGrammarCount()) { s, v -> s.copy(learnedGrammar = v) }
-        collect(app.settings.dailyNewWords) { s, v -> s.copy(dailyNewWords = v) }
         collect(app.settings.studyLevel) { s, v -> s.copy(studyLevel = v) }
+        collect(app.settings.dailyNewWords) { s, v -> s.copy(dailyNewWords = v) }
+        collect(courseFlow()) { s, (rows, current) -> s.copy(unitRows = rows, currentUnit = current) }
+    }
+
+    /** 当前级别 → 单元进度 + 当前单元（手动覆盖优先，PRD §19.8）。 */
+    private fun courseFlow() = app.settings.studyLevel.flatMapLatest { level ->
+        combine(
+            app.content.unitProgressByLevelFlow(level),
+            app.settings.courseUnitOverride,
+        ) { rows, override ->
+            val mapped = rows.map { CourseUnitProgress(it.unit, it.total, it.learned) }
+            mapped to (CoursePointer.parseOverride(override, level) ?: CoursePointer.currentUnit(mapped))
+        }
     }
 
     fun setLevel(level: String) = app.settings.setStudyLevel(level)
@@ -148,25 +136,15 @@ fun LearnTabScreen(nav: NavHostController) {
                 )
             }
             StaggerIn(2) {
-                val (wTotal, wLearned) = state.wordStats[state.studyLevel] ?: (0 to 0)
+                val row = state.unitRows.find { it.unit == state.currentUnit }
                 LearnEntry(
-                    title = "单词",
-                    subtitle = "${state.studyLevel} 共 $wTotal 个 · 已学 $wLearned",
+                    title = "课程",
+                    subtitle = "${state.studyLevel} 第 ${state.currentUnit} 单元 · " +
+                        "${CourseCatalog.unitTitle(state.currentUnit)} · 已学 ${row?.learned ?: 0}/${row?.total ?: 0}",
                     icon = Icons.AutoMirrored.Filled.MenuBook,
                     tint = MaterialTheme.colorScheme.primary,
-                    progress = if (wTotal > 0) wLearned.toFloat() / wTotal else 0f,
-                    onClick = { nav.navigate(Routes.WORD_LIST) },
-                )
-            }
-            StaggerIn(3) {
-                val (gTotal, gLearned) = state.grammarStats[state.studyLevel] ?: (0 to 0)
-                LearnEntry(
-                    title = "语法",
-                    subtitle = "${state.studyLevel} 共 $gTotal 条 · 已学 $gLearned",
-                    icon = Icons.Outlined.EditNote,
-                    tint = MaterialTheme.colorScheme.tertiary,
-                    progress = if (gTotal > 0) gLearned.toFloat() / gTotal else 0f,
-                    onClick = { nav.navigate(Routes.GRAMMAR_LIST) },
+                    progress = row?.progress ?: 0f,
+                    onClick = { nav.navigate(Routes.COURSE) },
                 )
             }
 

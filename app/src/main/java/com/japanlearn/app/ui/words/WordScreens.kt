@@ -263,14 +263,31 @@ class WordSessionViewModel(
                 refreshNextSteps()
                 return@launch
             }
-            // 等待首次启动的内容装载完成（新词队列按当前学习级别取）
+            // 等待首次启动的内容装载完成（新词按当前课程单元顺序取，PRD §19.8）
             val level = app.settings.studyLevel.value
-            var words = app.content.nextNewWords(effective, level)
+            val overrideUnit = com.japanlearn.app.domain.CoursePointer.parseOverride(
+                app.settings.courseUnitOverride.value, level,
+            )
+            val unit = overrideUnit ?: com.japanlearn.app.domain.CoursePointer.currentUnit(
+                app.content.unitProgressByLevel(level).map {
+                    com.japanlearn.app.domain.CourseUnitProgress(it.unit, it.total, it.learned)
+                },
+            )
+            var words = app.content.nextNewWordsByUnit(effective, level, unit)
             var retries = 0
             while (words.isEmpty() && retries < 20) {
                 kotlinx.coroutines.delay(300)
                 retries++
+                words = app.content.nextNewWordsByUnit(effective, level, unit)
+            }
+            if (words.isEmpty()) {
+                // 覆盖单元已学完或该级别临近完成时回退全池；仍为空则本级别已全部学完
                 words = app.content.nextNewWords(effective, level)
+            }
+            if (words.isEmpty()) {
+                _state.update { it.copy(phase = SessionPhase.DONE) }
+                refreshNextSteps()
+                return@launch
             }
             pool = app.content.wordsAll().first().map { it.toQuizWord() }
             startedAt = System.currentTimeMillis()

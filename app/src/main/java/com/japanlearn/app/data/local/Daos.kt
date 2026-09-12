@@ -7,6 +7,9 @@ import androidx.room.Query
 import androidx.room.Upsert
 import kotlinx.coroutines.flow.Flow
 
+/** 课程单元进度行（PRD §19.8）：unit 维度的总数与已学数。 */
+data class UnitProgressRow(val unit: Int, val total: Int, val learned: Int)
+
 @Dao
 interface WordDao {
     @Query("SELECT * FROM words ORDER BY `order`")
@@ -53,6 +56,34 @@ interface WordDao {
             "WHERE p.dueAt <= :now ORDER BY p.dueAt LIMIT :limit"
     )
     suspend fun dueWords(now: Long, limit: Int): List<WordEntity>
+
+    /** 课程单元进度：unit 维度总数与已学数（PRD §19.8）。 */
+    @Query(
+        "SELECT w.unit AS unit, COUNT(*) AS total, " +
+            "SUM(CASE WHEN p.rowId IS NOT NULL THEN 1 ELSE 0 END) AS learned " +
+            "FROM words w LEFT JOIN user_progress p ON p.contentId = w.id AND p.contentType = 'word' " +
+            "WHERE w.level = :level GROUP BY w.unit ORDER BY w.unit"
+    )
+    fun unitProgressByLevelFlow(level: String): Flow<List<UnitProgressRow>>
+
+    @Query(
+        "SELECT w.unit AS unit, COUNT(*) AS total, " +
+            "SUM(CASE WHEN p.rowId IS NOT NULL THEN 1 ELSE 0 END) AS learned " +
+            "FROM words w LEFT JOIN user_progress p ON p.contentId = w.id AND p.contentType = 'word' " +
+            "WHERE w.level = :level GROUP BY w.unit ORDER BY w.unit"
+    )
+    suspend fun unitProgressByLevel(level: String): List<UnitProgressRow>
+
+    @Query("SELECT * FROM words WHERE level = :level AND unit = :unit ORDER BY `order`")
+    suspend fun byLevelAndUnit(level: String, unit: Int): List<WordEntity>
+
+    /** 当前课程单元的未学新词队列（顺序取，PRD §19.8）。 */
+    @Query(
+        "SELECT * FROM words WHERE level = :level AND unit = :unit AND id NOT IN " +
+            "(SELECT contentId FROM user_progress WHERE contentType = 'word') " +
+            "ORDER BY `order` LIMIT :n"
+    )
+    suspend fun newWordsByUnit(n: Int, level: String, unit: Int): List<WordEntity>
 }
 
 @Dao
@@ -100,6 +131,9 @@ interface GrammarDao {
             "WHERE p.dueAt <= :now ORDER BY p.dueAt LIMIT :limit"
     )
     suspend fun dueGrammar(now: Long, limit: Int): List<GrammarEntity>
+
+    @Query("SELECT * FROM grammar WHERE level = :level AND unit = :unit ORDER BY `order`")
+    suspend fun byLevelAndUnit(level: String, unit: Int): List<GrammarEntity>
 }
 
 @Dao

@@ -71,6 +71,9 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.japanlearn.app.data.ThemeMode
 import com.japanlearn.app.ui.home.HomeScreen
+import com.japanlearn.app.ui.course.CourseCheckpointScreen
+import com.japanlearn.app.ui.course.CourseScreen
+import com.japanlearn.app.ui.course.CourseUnitScreen
 import com.japanlearn.app.ui.kana.KanaQuizScreen
 import com.japanlearn.app.ui.kana.KanaScreen
 import com.japanlearn.app.ui.grammar.GrammarDetailScreen
@@ -113,12 +116,17 @@ object Routes {
     const val STATS = "stats"
     const val GOAL = "goal"
     const val LISTENING = "listening"
+    const val COURSE = "course"
+    const val COURSE_UNIT = "courseUnit/{level}/{unit}"
+    const val COURSE_CHECKPOINT = "courseCheckpoint/{level}/{unit}"
     const val SENTENCE = "sentence/{index}"
 
     fun wordSession(count: Int) = "wordSession/$count"
     fun grammarSession(count: Int) = "grammarSession/$count"
     fun grammarDetail(id: String) = "grammarDetail/$id"
     fun sentence(index: Int) = "sentence/$index"
+    fun courseUnit(level: String, unit: Int) = "courseUnit/$level/$unit"
+    fun courseCheckpoint(level: String, unit: Int) = "courseCheckpoint/$level/$unit"
 
     val TABS = listOf(HOME, LEARN, REVIEW, PROFILE)
 }
@@ -229,6 +237,21 @@ fun MainRoot(navTarget: String? = null) {
             composable(Routes.STATS) { StatsScreen(navController) }
             composable(Routes.GOAL) { GoalScreen(navController) }
             composable(Routes.LISTENING) { ListeningSessionScreen(navController) }
+            composable(Routes.COURSE) { CourseScreen(navController) }
+            composable(Routes.COURSE_UNIT) { entry ->
+                CourseUnitScreen(
+                    navController,
+                    entry.arguments?.getString("level") ?: "N5",
+                    entry.arguments?.getString("unit")?.toIntOrNull() ?: 1,
+                )
+            }
+            composable(Routes.COURSE_CHECKPOINT) { entry ->
+                CourseCheckpointScreen(
+                    navController,
+                    entry.arguments?.getString("level") ?: "N5",
+                    entry.arguments?.getString("unit")?.toIntOrNull() ?: 1,
+                )
+            }
             composable(Routes.SENTENCE) { entry ->
                 SentenceScreen(navController, entry.arguments?.getString("index")?.toIntOrNull() ?: 0)
             }

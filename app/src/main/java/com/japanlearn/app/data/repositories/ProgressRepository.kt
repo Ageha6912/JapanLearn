@@ -7,6 +7,7 @@ import com.japanlearn.app.data.local.ReviewRecordEntity
 import com.japanlearn.app.data.local.UserProgressEntity
 import com.japanlearn.app.data.local.WordEntity
 import com.japanlearn.app.data.local.WrongAnswerEntity
+import com.japanlearn.app.domain.CoursePointer
 import com.japanlearn.app.domain.Mastery
 import com.japanlearn.app.domain.Scheduler
 import com.japanlearn.app.domain.SrsScheduler
@@ -135,6 +136,36 @@ class SettingsRepository(context: Context) {
         goalTierAppliedEpochDay.value = appliedEpochDay
     }
 
+    // ---- 课程单元（PRD §19.8）----
+
+    /** 手动覆盖的当前单元（格式 "N5:3"）；空 = 自动跟随第一个未完成单元。 */
+    val courseUnitOverride = MutableStateFlow(prefs.getString(KEY_COURSE_UNIT, "") ?: "")
+
+    fun setCourseUnitOverride(level: String, unit: Int?) {
+        val value = CoursePointer.formatOverride(level, unit)
+        prefs.edit().putString(KEY_COURSE_UNIT, value).apply()
+        courseUnitOverride.value = value
+    }
+
+    /** 单元检查点最佳成绩（correct to total），无记录返回 null。 */
+    fun checkpointBest(level: String, unit: Int): Pair<Int, Int>? {
+        val raw = prefs.getString(checkpointKey(level, unit), null) ?: return null
+        val parts = raw.split("/")
+        val correct = parts.getOrNull(0)?.toIntOrNull() ?: return null
+        val total = parts.getOrNull(1)?.toIntOrNull() ?: return null
+        return correct to total
+    }
+
+    /** 记录检查点成绩，只保留最佳（按答对数）。 */
+    fun setCheckpointBest(level: String, unit: Int, correct: Int, total: Int) {
+        val best = checkpointBest(level, unit)
+        if (best == null || correct > best.first) {
+            prefs.edit().putString(checkpointKey(level, unit), "$correct/$total").apply()
+        }
+    }
+
+    private fun checkpointKey(level: String, unit: Int) = "checkpoint_best_${level}_$unit"
+
     companion object {
         const val DEFAULT_NEW_WORDS = 10
         const val DEFAULT_NEW_GRAMMAR = 3
@@ -153,6 +184,7 @@ class SettingsRepository(context: Context) {
         private const val KEY_GOAL_LEVEL = "goal_level"
         private const val KEY_GOAL_DATE = "goal_target_epoch_day"
         private const val KEY_GOAL_TIER_APPLIED = "goal_tier_applied_epoch_day"
+        private const val KEY_COURSE_UNIT = "course_unit_override"
         const val DEFAULT_STUDY_LEVEL = "N5"
         val STUDY_LEVELS = listOf("N5", "N4")
     }
@@ -179,6 +211,14 @@ class ContentRepository(private val db: AppDatabase) {
 
     suspend fun nextNewWords(n: Int, level: String): List<WordEntity> = db.wordDao().newWords(n, level)
     suspend fun nextNewGrammar(n: Int, level: String) = db.grammarDao().newGrammar(n, level)
+
+    // ---- 课程单元（PRD §19.8）----
+
+    fun unitProgressByLevelFlow(level: String) = db.wordDao().unitProgressByLevelFlow(level)
+    suspend fun unitProgressByLevel(level: String) = db.wordDao().unitProgressByLevel(level)
+    suspend fun wordsByUnit(level: String, unit: Int) = db.wordDao().byLevelAndUnit(level, unit)
+    suspend fun grammarByUnit(level: String, unit: Int) = db.grammarDao().byLevelAndUnit(level, unit)
+    suspend fun nextNewWordsByUnit(n: Int, level: String, unit: Int) = db.wordDao().newWordsByUnit(n, level, unit)
 }
 
 // ---------------- SRS 进度 / 错题 ----------------
