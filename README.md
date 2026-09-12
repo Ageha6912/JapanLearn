@@ -6,7 +6,7 @@
   <img src="https://img.shields.io/badge/platform-Android%208.0%2B-1B3A5C?logo=android&logoColor=white" alt="Android 8.0 及以上">
   <img src="https://img.shields.io/badge/Kotlin-2.0-7F52FF?logo=kotlin&logoColor=white" alt="Kotlin 2.0">
   <img src="https://img.shields.io/badge/Jetpack%20Compose-Material%203-4285F4?logo=jetpackcompose&logoColor=white" alt="Jetpack Compose Material 3">
-  <img src="https://img.shields.io/badge/tests-125%20passing-4E7D5B" alt="125 项单元测试通过">
+  <img src="https://img.shields.io/badge/tests-190%20passing-4E7D5B" alt="190 项单元测试通过">
   <a href="./LICENSE"><img src="https://img.shields.io/badge/license-MIT-C75B5B" alt="MIT 许可证"></a>
 </p>
 
@@ -16,9 +16,9 @@
 
 ## 这是什么
 
-JapanLearn 是一个**完全离线、无需账号**的日语入门 App，为日语零基础和备考 JLPT N5/N4 的学习者设计。它把一天的学习压缩成一条固定路径：**学几个新词 → 马上做一道练习 → 告诉 App 你记住了多少 → 隔天复习**。整个过程 5–15 分钟，做完就走。
+JapanLearn 是一个**完全离线、无需账号**的日语入门 App，为日语零基础和备考 JLPT N5/N4 的学习者设计。它把一天的学习压缩成一条固定路径：**沿着课程单元学几个新词 → 马上做一道练习 → 告诉 App 你记住了多少 → 隔天复习**。内容按 N5/N4 各 11 个课程单元组织，配目标日期倒推的个性化每日计划与听力专项训练。整个过程 5–15 分钟，做完就走。
 
-产品需求见 [PRD.md](PRD.md)（§17 为 v0.1 评审决策、§18 为 v0.2 决策，与正文冲突处以它们为准）。v0.5+ 优化路线见 [OPTIMIZATION.md](OPTIMIZATION.md)。全部 12 张走查截图见 [`.screenshots/`](./.screenshots/)（含深色模式）。
+产品需求见 [PRD.md](PRD.md)（§17–§19 为各版本评审决策记录，与正文冲突处以它们为准）。全部 12 张走查截图见 [`.screenshots/`](./.screenshots/)（含深色模式）。
 
 ## 为什么不一样
 
@@ -30,14 +30,7 @@ JapanLearn 是一个**完全离线、无需账号**的日语入门 App，为日�
 | 复习量无节制堆积 | 每日复习上限默认 30 条，超出自动顺延，不会压垮用户 |
 | 算法黑箱 | 间隔规则全部公开透明，见下表 |
 
-**SRS 间隔规则**（`SrsScheduler`，纯函数实现，10 项单元测试覆盖）：
-
-| 自评 | 下次出现 |
-|---|---|
-| 不认识 | 本次会话内重新出队 + 记入错题本 |
-| 模糊 | 1 天后 |
-| 熟悉 | max(3 天, 上次间隔 × 1.5) |
-| 熟练 | max(7 天, 上次间隔 × 2)，上限 60 天 |
+**复习调度**：v0.7 起采用 **FSRS 算法**（vendor 精简移植 [ts-fsrs](https://github.com/open-spaced-repetition/ts-fsrs) v5.4.2，long-term 模式），四档中文自评「不认识 / 模糊 / 熟悉 / 熟练」内部映射 Again/Hard/Good/Easy，间隔按记忆稳定性动态计算；「不认识」仍在本次会话内重新出队并记入错题本。调度器为纯函数，全部单元测试覆盖。
 
 <p align="center">
   <img src="./assets/readme/workflow.svg" width="100%" alt="每日学习闭环：今日学习 → 即时练习 → 掌握度自评 → SRS 复习 → 看到进步，第二天继续">
@@ -49,16 +42,19 @@ JapanLearn 是一个**完全离线、无需账号**的日语入门 App，为日�
 |---|---|
 | 🏠 今日学习 | 新词 / 语法 / 待复习聚合，实时进度，连击天数 |
 | 🈁 五十音 | 101 组（清音 / 浊音 / 拗音），罗马音 + 示例词 + 发音，分组测验，题量可选 |
-| 📖 N5/N4 单词 | 804 词（N5 504 + N4 300，11 个分类）：假名、词性、例句，学完即练，列表带掌握度色点 |
-| ✍️ N5/N4 语法 | 87 条（N5 50 + N4 37）：接续方式、说明、例句、配套选择题 |
+| 📚 N5/N4 课程 | 22 个课程单元（N5/N4 各 11 个）：单元内顺序学词 + 配套语法，当前单元自动推进，单元测试 10 题检查点 |
+| 📖 单词 / 语法全库 | 804 词（N5 504 + N4 300）+ 87 条语法：假名、词性、例句、接续说明，列表带掌握度色点，可按单元筛选 |
 | 🔁 SRS 复习 | 到期自动出队，混合单词与语法，限流顺延 |
 | 🔊 听音选词 | 练习中按 30% 概率升级为听音变体（TTS 播放选释义） |
 | ⌨️ 打假名 | 中→日约 20% 改为看中文写读音（假名或罗马音） |
 | 🔔 复习提醒 | 每天 20:00 检查到期内容，有任务才提醒，可开关 |
 | 📝 错题本 | 答错自动收录（含五十音），复习答对自动移除 |
 | 📊 学习统计 | 连击、累计时长、近 7 日柱状图、内容进度 |
-| 🗾 每日一句 | 120 条场景句（餐厅 / 便利店 / 旅游 / 动漫…）带词汇拆解 |
-| 🎯 学习目标 | 每日新词（5/10/15/20）、语法数、复习上限可调 |
+| 🗾 每日一句 | 180 条场景句（日常 / 餐厅 / 便利店 / 购物 / 交通 / 就医…）带词汇拆解 |
+| 🎯 学习目标 | 设 N5/N4 目标与达成日期，按剩余内容量推荐每日新词档位，每周自动校准 |
+| 🎧 听力训练 | 听音辨词 / 听写假名 / 听句选义三题型混合，对错同步错题本 |
+| 🏆 学习成果 | 累计时长、掌握词数、最长连击、单元完成进度、复习正确率一页看全 |
+| ⚙️ 每日任务量 | 新词（5/10/15/20）、语法数、复习上限可调 |
 
 ## 快速开始
 
@@ -68,7 +64,7 @@ JapanLearn 是一个**完全离线、无需账号**的日语入门 App，为日�
 git clone https://github.com/Ageha6912/JapanLearn.git
 cd JapanLearn
 ./gradlew :app:assembleDebug     # 产出 app/build/outputs/apk/debug/app-debug.apk
-./gradlew :app:testDebugUnitTest # 运行单元测试（当前 125 项）
+./gradlew :app:testDebugUnitTest # 运行单元测试（当前 190 项）
 python tools/validate_content.py # 改内容后必须通过
 ```
 
@@ -109,31 +105,32 @@ Kotlin 2.0 · Jetpack Compose (Material 3) · Room (KSP) · Navigation Compose �
 
 ```
 app/src/main/java/com/japanlearn/app/
-├── domain/        # 纯函数业务逻辑：SrsScheduler / QuizGenerator / StreakCalculator / ReviewPlanner
+├── domain/        # 纯函数业务逻辑：FsrsScheduler / StudyPlanner / CoursePointer / QuizGenerator / ListeningQuizGenerator
 ├── data/
 │   ├── content/   # assets JSON 的 DTO + ContentSeedPlanner
 │   ├── local/     # Room 实体 / DAO / 数据库 / 迁移（schema 在 app/schemas）
 │   └── repositories/
-├── ui/            # home / learn / kana / words / grammar / review / stats / profile / sentence
+├── ui/            # home / learn / course / listening / kana / words / grammar / review / stats / profile
 └── util/          # DateProvider（可注入时钟）、JapaneseTts
 ```
 
 ## 测试
 
-125 项单元测试全绿（PRD §17.8 强制要求）。改内容须另跑 `python tools/validate_content.py`（CI 已接入）：
+190 项单元测试全绿（PRD §17.8 强制要求）。改内容须另跑 `python tools/validate_content.py`（CI 已接入）：
 
-- `SrsSchedulerTest`：四级掌握度的间隔/到期时间、间隔递增与 60 天上限、掌握判定
+- `FsrsSchedulerTest` / `StudyPlannerTest`：FSRS 调度、目标倒推推荐档位与周校准
 - `QuizGeneratorTest`：选项数量、含正确答案、不重复、双向词卡、种子可复现、小内容池退化、听音/汉字变体
 - `StreakCalculatorTest`：跨天连击、中断归零、今天未学仍延续
 - `ReviewPlannerTest`：每日复习限流截断与顺延
 - `ContentParsingTest`：内容 JSON schema 解析、假名分组字段与未知字段向前兼容
 - `ContentSeedPlannerTest`：分文件版本、legacy 加总 key、删除差集与空 incoming 拒绝
-- `ContentScaleTest`：真实 JSON 规模 101 / 804 / 80 / 60
-- `AppMigrationsTest`：1→2 / 2→3 SQL 与 schema v3 快照入库
+- `ContentScaleTest`：真实 JSON 规模 101 / 804 / 87 / 180 与 22 个课程单元覆盖
+- `AppMigrationsTest`：v1→v5 迁移 SQL 与 schema 快照入库
 - `ReminderSchedulerTest`：提醒触发时刻计算（当天/顺延/边界）
 - `UiMathTest`：今日进度/柱状图占比/入场级联延迟、orphan 进度不计
 - `FormatTest`：学习时长展示格式（h/m、负数钳制）
-- `BackupFileSchemaTest` / `JapaneseTtsTest` / `ThemeModeTest` / `WidgetMathTest`
+- `CoursePointerTest` / `ListeningQuizGeneratorTest`：当前单元指针、听力三题型配比与回退
+- `BackupFileSchemaTest` / `JapaneseTtsTest` / `ThemeModeTest` / `WidgetMathTest` 等
 
 ## 内容扩充
 

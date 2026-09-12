@@ -12,11 +12,11 @@ BLUE = (27, 58, 92)
 
 PICKS = [
     ("01_home.png", "首页 · 今日学习"),
-    ("03_kana.png", "五十音"),
-    ("04_word_card.png", "单词学习卡"),
-    ("05_quiz.png", "即时练习"),
-    ("07_review.png", "SRS 复习"),
-    ("10_stats.png", "学习统计"),
+    ("02_course.png", "课程单元"),
+    ("03_unit.png", "单元详情"),
+    ("04_checkpoint.png", "单元测试"),
+    ("05_listening.png", "听力训练"),
+    ("06_achievements.png", "学习成果"),
 ]
 
 PHONE_W, PHONE_H = 360, 757  # 源图 1080x2400，先裁掉底部 130px 系统导航栏再等比缩放
