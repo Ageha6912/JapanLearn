@@ -10,7 +10,7 @@
 - 需求文档：`PRD.md`（§17 为 v0.1 评审决策记录，**§18 为 v0.2 决策记录**，**§19 为 v0.5–v0.7 决策记录与产品缺口清单**，与正文冲突时以 §17/§18/§19 为准）
 - 优化方案：`OPTIMIZATION.md`（**Accepted**，用户 2026-09-09 确认 Q1–Q3 推荐项；结论已于 2026-09-12 写入 PRD §19）
 - Git 身份（仓库级已配置）：`Ageha <ageha6912@gmail.com>`，勿用其他身份提交
-- 已发布：**v1.1.0**（tag + GitHub Release，正式签名 APK）。`versionName = "1.1.0"` / `versionCode` 22
+- 已发布：**v1.2.0**（tag + GitHub Release，正式签名 APK）。`versionName = "1.2.0"` / `versionCode` 23
 
 ## 2. 环境速查
 
@@ -44,7 +44,7 @@ python tools/validate_content.py    # 内容校验，必须通过才能改内容
 - **发布工程**：R8 minify + 资源收缩（APK 1.5MB）、正式签名接入（keystore）、GitHub Actions 门禁 CI（`.github/workflows/ci.yml`：55 测试 + assembleDebug）
 - 55 项单元测试全绿；PRD §18 决策记录；README 数字已同步
 
-## 4. 当前任务：v1.1.0 已发布（2026-09-12）
+## 4. 当前任务：v1.2.0 已发布（2026-09-12）
 
 ### v0.8 规划（PRD §19.6，grilling 两轮定案）
 - 主题：学习目标系统 + 个性化每日学习计划——级别 + 可选目标日期，倒推夹 5/10/15/20 档位、按周校准；存 SharedPreferences 不动 Room；纯函数 `StudyPlanner` 带测试；`ReviewPlanner`/FSRS 零接触
@@ -168,6 +168,12 @@ python tools/validate_content.py    # 内容校验，必须通过才能改内容
 - **回归抓到并修复一个真 bug**：AI 助手页发送按钮与输入框重叠（`StaggerIn` 是 Box 布局，两个组件塞进同一 StaggerIn 会叠绘——已在 fix 提交外包 Column；**新增多组件块时不要塞进同一个 StaggerIn**）
 - README 增补 AI 助手行 + 测试数 206；tag v1.1.0 + GitHub Release（JapanLearn-v1.1.0.apk）；截图 `.screenshots/v110_*.png`（未入库）
 
+### v1.2 PR-C 已发布（2026-09-12）— v1.2.0 收口
+- versionName 1.2.0 / versionCode 23；重新 assembleRelease（坑 5）
+- 模拟器回归通过（坑 11 版本号已核对，完整闭环实测）：学习会话答错 + 自评不认识 → 错题入本（复习 Tab 错题本 1 条待攻克 + 突击卡出现）→ 突击会话重出该错题（1/1 全出）→ 答对 → 结算「错题本已全部清空！」——答对移除语义端到端验证
+- README 同步（突击行 + 词库 1104 + 测试 213）；tag v1.2.0 + GitHub Release（JapanLearn-v1.2.0.apk）；截图 `.screenshots/v120_*.png`（未入库）
+- **坐标坑提醒**：模拟器截图是缩略图（900×2000），设备实际 1080×2400——点击坐标必须 ×1.2 换算，或用 `android_ui_describe` 拿真实 bounds
+
 ### v1.2 规划（PRD §19.10，grilling 两轮定案）
 - 主题：错题与 SRS 深度联动——**错题突击会话**（复习 Tab 入口，三类错题各有出题通路：word 混合题型 / kana romaji 四选一 / grammar 自带练习；10 题循环取；recordAuxAnswer 判分：答对移除、答错 +1；不推 SRS dueAt）+ **复习队列错题优先**（dueWords/dueGrammar LEFT JOIN wrong_answers 排序，纯排序可回滚）
 - 统计口径不混：突击时长落 addStudy，对错不进复习正确率
@@ -213,7 +219,7 @@ python tools/validate_content.py    # 内容校验，必须通过才能改内容
 
 v0.7.0：Room v4 FSRS 字段；默认 `FsrsScheduler`（ts-fsrs v5.4.2 long-term，`enable_short_term=false`；Again 仍 `dueAt=now`）；自评文案不变；已掌握 `stability >= 21`。回滚：`AppContainer` 改回 `SrsScheduler`，勿删 `MIGRATION_3_4`。
 
-下一步：v1.2 收口：PR-C（versionName 1.2.0 / versionCode 23 → assembleRelease → 模拟器回归 → README 增补 → tag + GitHub Release）。PR-A/PR-B 均已交付。
+下一步：v1.3 规划（候选：AI 真机反馈后的流式输出/Prompt 调优、统计增强（届时错题维度有数据）、N4 语法二批；听力训练句库扩量随常驻线）。规划时照例 grilling 两轮。
 
 v0.4.3（中文引擎修复）：用户真机「只读汉字跳过假名 + 不弹引导」——默认引擎是中文引擎，init 成功且 availableLanguages 谎报日语。重构 JapaneseTts：装有 Google TTS（com.google.android.tts）时显式按包名初始化不走默认；可用性用 setLanguage(JAPAN) 返回值实测（MISSING_DATA→数据引导 / NOT_SUPPORTED→引擎引导）；manifest 加 <queries>（Android 11+ 包可见性，漏加会查不到 Google TTS）；点击时 refreshJapaneseStatus 保证下载后立即生效。
 
