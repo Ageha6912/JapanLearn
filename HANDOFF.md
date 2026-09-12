@@ -10,7 +10,7 @@
 - 需求文档：`PRD.md`（§17 为 v0.1 评审决策记录，**§18 为 v0.2 决策记录**，**§19 为 v0.5–v0.7 决策记录与产品缺口清单**，与正文冲突时以 §17/§18/§19 为准）
 - 优化方案：`OPTIMIZATION.md`（**Accepted**，用户 2026-09-09 确认 Q1–Q3 推荐项；结论已于 2026-09-12 写入 PRD §19）
 - Git 身份（仓库级已配置）：`Ageha <ageha6912@gmail.com>`，勿用其他身份提交
-- 已发布：**v1.0.0**（tag + GitHub Release，正式签名 APK）。`versionName = "1.0.0"` / `versionCode` 21
+- 已发布：**v1.1.0**（tag + GitHub Release，正式签名 APK）。`versionName = "1.1.0"` / `versionCode` 22
 
 ## 2. 环境速查
 
@@ -44,7 +44,7 @@ python tools/validate_content.py    # 内容校验，必须通过才能改内容
 - **发布工程**：R8 minify + 资源收缩（APK 1.5MB）、正式签名接入（keystore）、GitHub Actions 门禁 CI（`.github/workflows/ci.yml`：55 测试 + assembleDebug）
 - 55 项单元测试全绿；PRD §18 决策记录；README 数字已同步
 
-## 4. 当前任务：v1.0.0 已发布（2026-09-12）
+## 4. 当前任务：v1.1.0 已发布（2026-09-12）
 
 ### v0.8 规划（PRD §19.6，grilling 两轮定案）
 - 主题：学习目标系统 + 个性化每日学习计划——级别 + 可选目标日期，倒推夹 5/10/15/20 档位、按周校准；存 SharedPreferences 不动 Room；纯函数 `StudyPlanner` 带测试；`ReviewPlanner`/FSRS 零接触
@@ -161,6 +161,12 @@ python tools/validate_content.py    # 内容校验，必须通过才能改内容
 - **入口三处（全部 gated by `aiConfigured` 组合流）**：我的 AI 卡「开始对话」、语法详情「问 AI 讲解」（带入 title/meaning/connection）、错题本每条「AI 讲解」（带入 primary）
 - 每次成功调用 `incrementAiCalls(今天)` 落计数；`aiConfigured` 是 SettingsRepository 上的 combine 流，复用注意
 - 本 PR 为纯 UI 层，无新增纯逻辑（发送闸门/额度判定复用已测的 AiQuota/AiConfig）；全量 206 测全绿；versionName 未动
+
+### PR-C 已发布（2026-09-12）— v1.1.0 收口
+- versionName 1.1.0 / versionCode 22；重新 assembleRelease（坑 5）
+- 模拟器回归通过（坑 11 版本号已核对，假 Key 走真实请求）：未配置态（三预设+表单+保存灰）→ 预设填入/Key 遮蔽/模型自动填 → 已配置态（启用徽章/开始对话/限额/隐私/清除）→ 助手页发送 → 「网络不可用或接口无法连接」错误卡实测（模拟器无法连通外网 LLM API 属预期；401 等分支由 AiWireTest 覆盖）
+- **回归抓到并修复一个真 bug**：AI 助手页发送按钮与输入框重叠（`StaggerIn` 是 Box 布局，两个组件塞进同一 StaggerIn 会叠绘——已在 fix 提交外包 Column；**新增多组件块时不要塞进同一个 StaggerIn**）
+- README 增补 AI 助手行 + 测试数 206；tag v1.1.0 + GitHub Release（JapanLearn-v1.1.0.apk）；截图 `.screenshots/v110_*.png`（未入库）
 - 分配结论：预生成音频正式移出 v0.8（无排期可选 PR，门禁声库书面授权）；埋点推迟至内测；内容扩充为常驻并行线；听力训练留 v0.9
 
 ### v0.7.5（已发布）— PR-R51 停写旧 content_version
@@ -185,7 +191,7 @@ python tools/validate_content.py    # 内容校验，必须通过才能改内容
 
 v0.7.0：Room v4 FSRS 字段；默认 `FsrsScheduler`（ts-fsrs v5.4.2 long-term，`enable_short_term=false`；Again 仍 `dueAt=now`）；自评文案不变；已掌握 `stability >= 21`。回滚：`AppContainer` 改回 `SrsScheduler`，勿删 `MIGRATION_3_4`。
 
-下一步：v1.1 收口：PR-C（versionName 1.1.0 / versionCode 22 → assembleRelease → 模拟器回归（配置 Key 走一次真实调用，如无 Key 则验证未配置门控）→ README 增补 AI 助手 → tag + GitHub Release）。PR-A/PR-B 均已交付。
+下一步：v1.2 规划（候选：流式输出增强、错题与 SRS 深度联动、统计增强、N4 词二批内容；AI 助手真机实测待用户提供 Key 后进行）。规划时照例 grilling 两轮。
 
 v0.4.3（中文引擎修复）：用户真机「只读汉字跳过假名 + 不弹引导」——默认引擎是中文引擎，init 成功且 availableLanguages 谎报日语。重构 JapaneseTts：装有 Google TTS（com.google.android.tts）时显式按包名初始化不走默认；可用性用 setLanguage(JAPAN) 返回值实测（MISSING_DATA→数据引导 / NOT_SUPPORTED→引擎引导）；manifest 加 <queries>（Android 11+ 包可见性，漏加会查不到 Google TTS）；点击时 refreshJapaneseStatus 保证下载后立即生效。
 
