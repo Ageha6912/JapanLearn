@@ -283,7 +283,7 @@ fun TtsButton(text: String, onSpeak: (String) -> Unit, modifier: Modifier = Modi
 /** 发音占位骨架 */
 /** 发音不可用时的引导：缺语音数据 → 系统语音数据安装页；无语音引擎 → 引导安装 Google TTS。 */
 @Composable
-private fun VoiceGuideDialog(
+internal fun VoiceGuideDialog(
     kind: com.japanlearn.app.util.JapaneseTts.Action,
     onDismiss: () -> Unit,
 ) {

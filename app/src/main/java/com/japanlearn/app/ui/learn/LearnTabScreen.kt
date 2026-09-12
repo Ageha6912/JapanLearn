@@ -18,6 +18,7 @@ import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.automirrored.outlined.NavigateNext
 import androidx.compose.material.icons.filled.Grade
 import androidx.compose.material.icons.filled.Translate
+import androidx.compose.material.icons.filled.VolumeUp
 import androidx.compose.material.icons.outlined.EditNote
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -170,6 +171,17 @@ fun LearnTabScreen(nav: NavHostController) {
             }
 
             StaggerIn(4) {
+                LearnEntry(
+                    title = "听力训练",
+                    subtitle = "听音辨词 · 听写假名 · 听句选义",
+                    icon = Icons.Filled.VolumeUp,
+                    tint = MaterialTheme.colorScheme.secondary,
+                    progress = null,
+                    onClick = { nav.navigate(Routes.LISTENING) },
+                )
+            }
+
+            StaggerIn(5) {
                 Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     Text("快速开始", style = MaterialTheme.typography.titleMedium)
                     AppButton(

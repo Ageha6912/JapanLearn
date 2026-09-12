@@ -28,7 +28,7 @@
 ```bash
 ./gradlew :app:assembleDebug        # debug APK
 ./gradlew :app:assembleRelease      # 正式签名 APK（keystore 已配置，见第 6 节坑 9）
-./gradlew :app:testDebugUnitTest    # 单元测试（当前 156 项），必须全绿才能交付
+./gradlew :app:testDebugUnitTest    # 单元测试（当前 169 项），必须全绿才能交付
 python tools/validate_content.py    # 内容校验，必须通过才能改内容；CI 已跑
 ```
 
@@ -78,6 +78,15 @@ python tools/validate_content.py    # 内容校验，必须通过才能改内容
 - 联动边界：逐题落统计 + 答错进错题本，**不推进 SRS 调度**
 - 交互：进题自动播一次 + 重播按钮；TTS 不可用走 v0.7.x 引导链；结算复用现有会话结算页
 - 切分：PR-A 听力训练（`ListeningQuizGenerator` 纯函数带测试）→ PR-B 每日一句 120→180 → PR-C 收口 v0.9.0（versionCode 20）；PR-B 素材延迟不阻塞 PR-A
+
+### v0.9 PR-A 已交付（2026-09-12）— 听力训练
+- `domain/ListeningQuizGenerator.kt` 纯函数 + 13 项单测：`ListeningMixPolicy` 配比 40/30/30（听写已学 <5 回退听音辨词、句库空回退）、`buildSession`（听音辨词已学优先排前、听写仅已学词、听句同场景干扰优先）、`dictationQuiz`（不泄露词形，接受假名/romaji）、`sentenceQuiz` 三选一
+- `QuizKind` 新增 `AUDIO_SENTENCE_TO_ZH`（无外部穷尽 when，安全）
+- `ProgressRepository.recordAuxAnswer`：听力对错只同步错题本（答对移除/答错 +1），**不推进 SRS**（§19.7 边界）
+- `ui/listening/ListeningSessionScreen.kt`：LOADING→PICK（题量 5/10/20）→QUIZ→DONE；`QuizView` 复用（audioText 非空自带进题自动播一次 + 重播按钮）；答完出 FeedbackText + 下一题；结算含答对数 + 再来一轮 + 彩带；会话开始即 `decideAction` 检查 TTS，不可用直接弹 `VoiceGuideDialog`（已从 private 改 internal）
+- 统计：会话结束 `addStudy(秒数)` 落时长；不进首页任务卡、不限流
+- 入口：学习 Tab 第 4 张 LearnEntry「听力训练」（VolumeUp 图标）+ 路由 `Routes.LISTENING`
+- 全量 169 测全绿；versionName 未动
 - 分配结论：预生成音频正式移出 v0.8（无排期可选 PR，门禁声库书面授权）；埋点推迟至内测；内容扩充为常驻并行线；听力训练留 v0.9
 
 ### v0.7.5（已发布）— PR-R51 停写旧 content_version
@@ -102,7 +111,7 @@ python tools/validate_content.py    # 内容校验，必须通过才能改内容
 
 v0.7.0：Room v4 FSRS 字段；默认 `FsrsScheduler`（ts-fsrs v5.4.2 long-term，`enable_short_term=false`；Again 仍 `dueAt=now`）；自评文案不变；已掌握 `stability >= 21`。回滚：`AppContainer` 改回 `SrsScheduler`，勿删 `MIGRATION_3_4`。
 
-下一步：实施 v0.9（规划定案见 PRD §19.7 与第 4 节）：PR-A 听力训练 → PR-B 每日一句 180 → PR-C 收口 v0.9.0。
+下一步：v0.9 继续：PR-B 每日一句 120→180（tools 批次管线 + validate + sentences version 升位）→ PR-C 收口 v0.9.0。PR-A 听力训练已交付。
 
 v0.4.3（中文引擎修复）：用户真机「只读汉字跳过假名 + 不弹引导」——默认引擎是中文引擎，init 成功且 availableLanguages 谎报日语。重构 JapaneseTts：装有 Google TTS（com.google.android.tts）时显式按包名初始化不走默认；可用性用 setLanguage(JAPAN) 返回值实测（MISSING_DATA→数据引导 / NOT_SUPPORTED→引擎引导）；manifest 加 <queries>（Android 11+ 包可见性，漏加会查不到 Google TTS）；点击时 refreshJapaneseStatus 保证下载后立即生效。
 

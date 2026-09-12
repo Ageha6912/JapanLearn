@@ -265,6 +265,24 @@ class ProgressRepository(
         )
     }
 
+    /** 听力等辅练的对错只同步错题本，不推进 SRS（PRD §19.7）。 */
+    suspend fun recordAuxAnswer(contentType: String, contentId: String, correct: Boolean) {
+        if (correct) {
+            db.wrongAnswerDao().delete(contentType, contentId)
+            return
+        }
+        val now = dates.nowMillis()
+        val wrong = db.wrongAnswerDao().get(contentType, contentId)
+        db.wrongAnswerDao().upsert(
+            WrongAnswerEntity(
+                contentType = contentType,
+                contentId = contentId,
+                wrongCount = (wrong?.wrongCount ?: 0) + 1,
+                lastWrongAt = now,
+            )
+        )
+    }
+
     fun dueWordCount(): Flow<Int> = db.progressDao().dueWordCount(dates.nowMillis())
     fun dueGrammarCount(): Flow<Int> = db.progressDao().dueGrammarCount(dates.nowMillis())
 

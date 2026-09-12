@@ -5,7 +5,7 @@ import kotlin.random.Random
 enum class QuizKind {
     WORD_JP_TO_CN, AUDIO_WORD_JP_TO_CN, WORD_CN_TO_JP,
     KANA_TO_ROMAJI, GRAMMAR_FILL, KANA_TO_KANJI, KANJI_TO_KANA,
-    WORD_TYPE_KANA,
+    WORD_TYPE_KANA, AUDIO_SENTENCE_TO_ZH,
 }
 
 /**
