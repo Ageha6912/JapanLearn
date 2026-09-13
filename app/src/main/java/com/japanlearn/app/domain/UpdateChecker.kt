@@ -15,16 +15,11 @@ data class ReleaseInfo(
 
 /**
  * 应用内更新检查判定（PRD §19.12）：全部为纯函数，便于单测。
- * 策略：每 24h（按日历日）静默查一次 GitHub releases/latest，有新版才提示，
+ * 策略：每次启动静默查一次 GitHub releases/latest（冷启动频次低，
+ * GitHub 匿名限额 60 次/小时/IP 对单用户绰绰有余），有新版才提示，
  * 用户可跳过当前版本；请求单向拉取，不携带任何用户数据。
  */
 object UpdateChecker {
-
-    /** 距上次检查跨了一个日历日才再查；从未查过（null/0）立即查。 */
-    fun shouldCheck(lastCheckEpochDay: Long?, todayEpochDay: Long): Boolean {
-        if (lastCheckEpochDay == null || lastCheckEpochDay <= 0L) return true
-        return todayEpochDay > lastCheckEpochDay
-    }
 
     /** "v1.3.2" → "1.3.2"；无法解析出数字段时返回 null。 */
     fun parseTag(tag: String): String? {

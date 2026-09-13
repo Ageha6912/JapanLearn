@@ -1340,11 +1340,11 @@ grilling 两轮问答确认，效力等同需求。**规划中途获得用户真
 用户需求「每次发布新版本时给用户推送更新」。**明确不做 FCM 系统推送**：大陆无 GMS 设备收不到、需引入 Firebase + 服务端发推逻辑、无账号体系下 device token 管理为纯负担。采用**应用内检查更新**，形态与用户确认（方案 A）：
 
 - **数据源 = GitHub Releases 本身，发版流程零改动**：启动后 GET `api.github.com/repos/Ageha6912/JapanLearn/releases/latest`，取 `tag_name` / `html_url` / `.apk` 资产直链；照常 `gh release create` 即可，无需维护版本清单文件。
-- **节流**：每 24h（按日历日）最多查一次（`update_last_check_epoch_day`），查询前先落检查戳——当天网络失败也不会每次启动重试打 API。
+- **每次启动都查**：不做时间节流——冷启动频次低，GitHub 匿名限额 60 次/小时/IP 对单用户绰绰有余；换来热修复等紧急版本下一次启动即触达。`HomeViewModel` 挂在首页返回栈条目上，App 存活期内不会重复请求。
 - **失败完全静默**：网络不通 / GitHub 超时（3s+5s）/ 响应异常 → 无提示、无报错、无日志噪音；不产生任何新的「App 不可用」故障面。
 - **提示形态**：首页可关闭横幅「新版本 vX.Y.Z 已发布」；「查看更新」跳系统浏览器打开 Release 页（用户自行下载 APK）；「跳过」记录 `update_skipped_version`，该版本不再提示。**第一版不做自动下载 + 唤起安装器**（需 REQUEST_INSTALL_PACKAGES + FileProvider + 厂商安装审核差异，收益不成比例）。
 - **版本判定**：纯函数 semver 数值比较（缺失段补 0，两位数段按数值不按字符串），`versionCode` 之外的 tag 解析（`v` 前缀容忍，脏 tag 拒绝）。
 - **隐私边界不变**：更新检查是设备发起的单向拉取，请求不携带任何用户数据（无 ID、无统计）；学习数据照旧不出设备；「完全离线可用」叙事保持成立——这是继 AI（19.9）之后第二个可选联网点，且无任何配置门槛。
 - **已知局限与升级路径**：`api.github.com` 大陆可达性一般，静默兜底意味着大陆用户可能较少看到提示；若内测反馈集中，升级为方案 B——仓库内 `latest.json` + jsDelivr CDN（大陆可达性好），代价是发版清单多一步「更新 latest.json 并 push」。
-- **实现**：`domain/UpdateChecker.kt` 纯函数（节流 / parseTag / isNewer / shouldPrompt / parseReleaseResponse）+ `data/update/GithubReleaseFetcher.kt`（短超时单向 GET）+ 首页横幅；判定逻辑 16 项单测。随 v1.4 发布，本版不发。
+- **实现**：`domain/UpdateChecker.kt` 纯函数（parseTag / isNewer / shouldPrompt / parseReleaseResponse）+ `data/update/GithubReleaseFetcher.kt`（短超时单向 GET）+ 首页横幅；判定逻辑 13 项单测。随 v1.4 发布，本版不发。
 

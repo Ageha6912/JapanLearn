@@ -174,12 +174,8 @@ class HomeViewModel(private val app: AppContainer) : ViewModel() {
                 }
             }
         }
-        // 更新检查（PRD §19.12）：每 24h 静默查一次，失败完全无声，有新版才出现横幅
+        // 更新检查（PRD §19.12）：每次启动静默查一次，失败完全无声，有新版才出现横幅
         viewModelScope.launch {
-            val today = app.dateProvider.today().toEpochDay()
-            val last = app.settings.updateLastCheckEpochDay.value
-            if (!UpdateChecker.shouldCheck(last.takeIf { it > 0L }, today)) return@launch
-            app.settings.setUpdateLastCheck(today)
             val body = app.releaseFetcher.fetchLatest() ?: return@launch
             val info = UpdateChecker.parseReleaseResponse(body) ?: return@launch
             val skipped = app.settings.updateSkippedVersion.value.takeIf { it.isNotBlank() }

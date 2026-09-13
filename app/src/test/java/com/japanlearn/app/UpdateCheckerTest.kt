@@ -6,26 +6,8 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
-/** 应用内更新检查（PRD §19.12）：节流、版本比较、提示判定、GitHub 响应解析。 */
+/** 应用内更新检查（PRD §19.12）：版本比较、提示判定、GitHub 响应解析。 */
 class UpdateCheckerTest {
-
-    // ---- shouldCheck（24h 节流，按日历日）----
-
-    @Test
-    fun `从未检查过立即检查`() {
-        assertTrue(UpdateChecker.shouldCheck(null, 100L))
-        assertTrue(UpdateChecker.shouldCheck(0L, 100L))
-    }
-
-    @Test
-    fun `同一天不再检查`() {
-        assertFalse(UpdateChecker.shouldCheck(100L, 100L))
-    }
-
-    @Test
-    fun `跨天再次检查`() {
-        assertTrue(UpdateChecker.shouldCheck(100L, 101L))
-    }
 
     // ---- parseTag ----
 
