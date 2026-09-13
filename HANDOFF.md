@@ -10,8 +10,8 @@
 - 需求文档：`PRD.md`（§17 为 v0.1 评审决策记录，**§18 为 v0.2 决策记录**，**§19 为 v0.5–v0.7 决策记录与产品缺口清单**，与正文冲突时以 §17/§18/§19 为准）
 - 优化方案：`OPTIMIZATION.md`（**Accepted**，用户 2026-09-09 确认 Q1–Q3 推荐项；结论已于 2026-09-12 写入 PRD §19）
 - Git 身份（仓库级已配置）：`Ageha <ageha6912@gmail.com>`，勿用其他身份提交
-- 已发布：**v1.3.2**（tag + GitHub Release，正式签名 APK）
-- **v1.4.0 待发版**（见第 4 节）：统计增强 + N5 语法二批 + 应用内更新检查；`versionName = "1.4.0"` / `versionCode` 28；release APK 已编出，待模拟器回归 + commit/tag/Release
+- 已发布：**v1.4.0**（tag + GitHub Release，正式签名 APK）。`versionName = "1.4.0"` / `versionCode` 28
+- 发布页：https://github.com/Ageha6912/JapanLearn/releases/tag/v1.4.0
 
 ## 2. 环境速查
 
@@ -52,9 +52,9 @@ python tools/validate_content.py    # 内容校验，必须通过才能改内容
 - **发布工程**：R8 minify + 资源收缩（APK 1.5MB）、正式签名接入（keystore）、GitHub Actions 门禁 CI（`.github/workflows/ci.yml`：55 测试 + assembleDebug）
 - 55 项单元测试全绿；PRD §18 决策记录；README 数字已同步
 
-## 4. 当前任务：v1.4.0 已实现待发版（2026-09-12）
+## 4. 当前任务：v1.4.0 已发布（2026-09-12）
 
-### v1.4.0 代码已就绪（PRD §19.13 grilling 两轮定案）
+### v1.4.0 已发布（PRD §19.13 grilling 两轮定案）
 - **主题：统计增强**——统计页升格仪表盘（成果页里程碑叙事不动）
   - 周趋势图：已有 `WeeklyBarChart`，维持
   - **掌握度分档**：`domain/MasteryDistribution.kt` 纯函数，FSRS stability <1 新学 / ≥1 巩固中 / ≥21 已掌握（与 `FsrsScheduler.isMastered` 阈值一致）；UI `MasterySegmentBar` 三色分段条
@@ -64,8 +64,9 @@ python tools/validate_content.py    # 内容校验，必须通过才能改内容
 - **必发件：应用内更新检查**（§19.12）：代码已在树内，随 v1.4.0 首次发出
 - 测试：+ MasteryDistributionTest 6 / WrongPortraitTest 6 / ContentExpansion 断言更新，全量 **257** 全绿；`validate_content.py` 通过
 - versionName **1.4.0** / versionCode **28**；README 已同步（148 语法 / 257 测 / 更新检查与统计新行）
-- **待做**：assembleRelease（坑 5）→ 模拟器回归（坑 11 版本号）→ `web/` 入库 → tag v1.4.0 + GitHub Release
-- **`web/` 仍是 untracked**，收口 commit 一并提交
+- 模拟器回归通过（坑 11 versionName 1.4.0 已核对）：全新安装引导 → 首页（无更新横幅，正常）→ 我的 → 学习统计（掌握度分布/错题画像/内容进度 语法 0/148）
+- tag v1.4.0 + GitHub Release（JapanLearn-v1.4.0.apk）；`web/` 已入库；回归截图 `.screenshots/v140_*.png`（未入库）
+- 更新横幅正向路径待下一次真实发版后自然验证（UpdateChecker 纯函数已覆盖）
 
 ### 未发版改动（2026-09-12）— 应用内更新检查（PRD §19.12）→ 已并入 v1.4.0
 - 用户需求「每次发布新版本时推送更新」，定案**不做 FCM**（大陆无 GMS 收不到 + 需服务端）、采用**应用内检查更新方案 A**：启动静默 GET `api.github.com/repos/Ageha6912/JapanLearn/releases/latest`，发版流程零改动
@@ -299,7 +300,7 @@ python tools/validate_content.py    # 内容校验，必须通过才能改内容
 
 v0.7.0：Room v4 FSRS 字段；默认 `FsrsScheduler`（ts-fsrs v5.4.2 long-term，`enable_short_term=false`；Again 仍 `dueAt=now`）；自评文案不变；已掌握 `stability >= 21`。回滚：`AppContainer` 改回 `SrsScheduler`，勿删 `MIGRATION_3_4`。
 
-下一步：完成 v1.4.0 收口（assembleRelease → 模拟器回归核对 versionName 1.4.0 → web/ 入库 → tag + Release）；等用户真机反馈流式与更新横幅。v1.5 候选：汉字专项、听力句库扩量、AI Prompt 调优。规划时照例 grilling 两轮。
+下一步：等用户真机反馈（流式、更新横幅、统计仪表盘）。v1.5 候选：汉字专项、听力句库扩量、AI Prompt 调优。规划时照例 grilling 两轮。
 
 v0.4.3（中文引擎修复）：用户真机「只读汉字跳过假名 + 不弹引导」——默认引擎是中文引擎，init 成功且 availableLanguages 谎报日语。重构 JapaneseTts：装有 Google TTS（com.google.android.tts）时显式按包名初始化不走默认；可用性用 setLanguage(JAPAN) 返回值实测（MISSING_DATA→数据引导 / NOT_SUPPORTED→引擎引导）；manifest 加 <queries>（Android 11+ 包可见性，漏加会查不到 Google TTS）；点击时 refreshJapaneseStatus 保证下载后立即生效。
 
