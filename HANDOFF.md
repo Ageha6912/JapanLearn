@@ -28,7 +28,7 @@
 ```bash
 ./gradlew :app:assembleDebug        # debug APK
 ./gradlew :app:assembleRelease      # 正式签名 APK（keystore 已配置，见第 6 节坑 9）
-./gradlew :app:testDebugUnitTest    # 单元测试（当前 231 项），必须全绿才能交付
+./gradlew :app:testDebugUnitTest    # 单元测试（当前 247 项），必须全绿才能交付
 python tools/validate_content.py    # 内容校验，必须通过才能改内容；CI 已跑
 ```
 
@@ -52,6 +52,14 @@ python tools/validate_content.py    # 内容校验，必须通过才能改内容
 - 55 项单元测试全绿；PRD §18 决策记录；README 数字已同步
 
 ## 4. 当前任务：v1.3.2 已发布（2026-09-12）
+
+### 未发版改动（2026-09-12）— 应用内更新检查（PRD §19.12）
+- 用户需求「每次发布新版本时推送更新」，定案**不做 FCM**（大陆无 GMS 收不到 + 需服务端）、采用**应用内检查更新方案 A**：启动静默 GET `api.github.com/repos/Ageha6912/JapanLearn/releases/latest`，发版流程零改动
+- 实现：`domain/UpdateChecker.kt` 纯函数（24h 按日历日节流 / parseTag / semver 数值 isNewer / shouldPrompt 含跳过版本 / parseReleaseResponse）+ `data/update/GithubReleaseFetcher.kt`（3s+5s 短超时，任何失败返回 null 静默）+ `SettingsRepository` 两键（`update_last_check_epoch_day` / `update_skipped_version`）+ HomeViewModel init 检查（**查询前先落检查戳**，失败当天不重试）+ 首页可关闭横幅（「查看更新」跳浏览器 Release 页 / 「跳过」记版本）
+- 隐私边界不变：单向拉取不带用户数据（PRD §19.12）；已知局限 = api.github.com 大陆可达性一般，升级路径方案 B（latest.json + jsDelivr）已写入 PRD
+- 测试：UpdateCheckerTest 16 项，全量 247 全绿
+- 模拟器回归：全新安装无崩溃 ✓、启动触发检查（prefs 落检查戳验证 ✓）、无外网静默无横幅 ✓；「有新版出横幅」正向路径由纯函数测试覆盖，待真实新版本发布后真机自然验证
+- **未发版**：versionName 仍 1.3.2，随 v1.4 收口发布
 
 ### v1.3.2 已发布（2026-09-12）— 修复流式回答前出现大量 null
 - 用户真机反馈（截图）：AI 弹窗回答前拼出大量「nullnullnull…」，正文跟在后面

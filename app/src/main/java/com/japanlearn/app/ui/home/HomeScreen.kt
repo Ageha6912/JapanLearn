@@ -57,6 +57,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import com.japanlearn.app.AppContainer
+import com.japanlearn.app.BuildConfig
 import com.japanlearn.app.LocalAppContainer
 import com.japanlearn.app.navigateToTab
 import com.japanlearn.app.Routes
@@ -67,6 +68,7 @@ import com.japanlearn.app.domain.AiMode
 import com.japanlearn.app.domain.HomeKanaIntro
 import com.japanlearn.app.domain.OnboardingGate
 import com.japanlearn.app.domain.StudyPlanner
+import com.japanlearn.app.domain.UpdateChecker
 import com.japanlearn.app.ui.ai.AiAssistantPanel
 import com.japanlearn.app.ui.ai.AiAssistantViewModel
 import com.japanlearn.app.ui.components.AppButton
@@ -122,6 +124,11 @@ data class HomeUiState(
     val onboardingDone: Boolean = false,
     /** AI 助手是否已配置（PRD §19.9：未配置则所有入口隐藏）。 */
     val aiConfigured: Boolean = false,
+    /** 有新版本时非空：检测到的最新版本号与 Release 页链接（PRD §19.12）。 */
+    val updateVersion: String? = null,
+    val updateUrl: String? = null,
+    /** 更新横幅被用户关闭后不再出现（跳过该版本）。 */
+    val updateDismissed: Boolean = false,
     /** 首次收到进度 Flow 后才允许判定引导门槛，避免老用户在计数到达前闪现引导。 */
     val progressLoaded: Boolean = false,
 )
@@ -167,11 +174,36 @@ class HomeViewModel(private val app: AppContainer) : ViewModel() {
                 }
             }
         }
+        // 更新检查（PRD §19.12）：每 24h 静默查一次，失败完全无声，有新版才出现横幅
+        viewModelScope.launch {
+            val today = app.dateProvider.today().toEpochDay()
+            val last = app.settings.updateLastCheckEpochDay.value
+            if (!UpdateChecker.shouldCheck(last.takeIf { it > 0L }, today)) return@launch
+            app.settings.setUpdateLastCheck(today)
+            val body = app.releaseFetcher.fetchLatest() ?: return@launch
+            val info = UpdateChecker.parseReleaseResponse(body) ?: return@launch
+            val skipped = app.settings.updateSkippedVersion.value.takeIf { it.isNotBlank() }
+            if (UpdateChecker.shouldPrompt(info.version, skipped, BuildConfig.VERSION_NAME)) {
+                _state.update {
+                    it.copy(
+                        updateVersion = info.version,
+                        updateUrl = info.releaseUrl.ifEmpty {
+                            info.apkUrl ?: com.japanlearn.app.data.update.GithubReleaseFetcher.RELEASES_PAGE
+                        },
+                    )
+                }
+            }
+        }
     }
 
     fun speak(text: String) = app.tts.speak(text)
 
     fun dismissKanaIntro() = app.settings.setKanaIntroDismissed(true)
+
+    fun dismissUpdate(version: String) {
+        _state.update { it.copy(updateDismissed = true) }
+        app.settings.setUpdateSkippedVersion(version)
+    }
 
     fun completeOnboarding() = app.settings.setOnboardingDone(true)
 
@@ -301,6 +333,41 @@ fun HomeScreen(nav: NavHostController) {
                         .padding(horizontal = 20.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                 ) {
+                // 有新版本：可关闭横幅，「查看更新」跳 Release 页（PRD §19.12）
+                val updateVersion = state.updateVersion
+                if (updateVersion != null && !state.updateDismissed) {
+                    StaggerIn(0) {
+                        val context = LocalContext.current
+                        Surface(
+                            shape = MaterialTheme.shapes.small,
+                            color = MaterialTheme.colorScheme.secondaryContainer,
+                            modifier = Modifier.fillMaxWidth(),
+                        ) {
+                            Row(
+                                Modifier.padding(start = 14.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                Text(
+                                    "新版本 v$updateVersion 已发布",
+                                    style = MaterialTheme.typography.titleSmall,
+                                    color = MaterialTheme.colorScheme.onSecondaryContainer,
+                                    modifier = Modifier.weight(1f),
+                                )
+                                TextButton(onClick = {
+                                    runCatching {
+                                        context.startActivity(
+                                            android.content.Intent(
+                                                android.content.Intent.ACTION_VIEW,
+                                                android.net.Uri.parse(state.updateUrl),
+                                            ),
+                                        )
+                                    }
+                                }) { Text("查看更新") }
+                                TextButton(onClick = { vm.dismissUpdate(updateVersion) }) { Text("跳过") }
+                            }
+                        }
+                    }
+                }
                 if (HomeKanaIntro.shouldShow(state.kanaIntroDismissed)) {
                     StaggerIn(1) {
                         SectionCard {

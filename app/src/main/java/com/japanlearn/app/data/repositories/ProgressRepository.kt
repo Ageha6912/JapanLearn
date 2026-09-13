@@ -206,6 +206,21 @@ class SettingsRepository(context: Context) {
         prefs.edit().putInt("ai_calls_$date", aiCallsToday(date) + 1).apply()
     }
 
+    // ---- 更新检查（PRD §19.12：单向拉取，不含用户数据）----
+
+    val updateLastCheckEpochDay = MutableStateFlow(prefs.getLong(KEY_UPDATE_LAST_CHECK, 0L))
+    val updateSkippedVersion = MutableStateFlow(prefs.getString(KEY_UPDATE_SKIPPED, "") ?: "")
+
+    fun setUpdateLastCheck(epochDay: Long) {
+        prefs.edit().putLong(KEY_UPDATE_LAST_CHECK, epochDay).apply()
+        updateLastCheckEpochDay.value = epochDay
+    }
+
+    fun setUpdateSkippedVersion(version: String) {
+        prefs.edit().putString(KEY_UPDATE_SKIPPED, version).apply()
+        updateSkippedVersion.value = version
+    }
+
     companion object {
         const val DEFAULT_NEW_WORDS = 10
         const val DEFAULT_NEW_GRAMMAR = 3
@@ -229,6 +244,8 @@ class SettingsRepository(context: Context) {
         private const val KEY_AI_API_KEY = "ai_api_key"
         private const val KEY_AI_MODEL = "ai_model"
         private const val KEY_AI_DAILY_LIMIT = "ai_daily_limit"
+        private const val KEY_UPDATE_LAST_CHECK = "update_last_check_epoch_day"
+        private const val KEY_UPDATE_SKIPPED = "update_skipped_version"
         const val DEFAULT_STUDY_LEVEL = "N5"
         val STUDY_LEVELS = listOf("N5", "N4")
     }
