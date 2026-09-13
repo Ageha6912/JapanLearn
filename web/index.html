@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="JapanLearn — 完全离线、无需账号的日语入门 App。N5/N4 课程化 22 单元、1104 词、FSRS 间隔复习、听力专项训练，每天 5–15 分钟形成稳定闭环；AI 助手完全可选。免费下载 Android APK。" />
+  <meta name="theme-color" content="#F7F4EE" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="JapanLearn — 离线也能坚持的日语入门" />
+  <meta property="og:description" content="沿课程单元学新词 → 马上练习 → 自评掌握度 → FSRS 安排隔天复习。完全离线，无需账号，免费开源。" />
+  <meta property="og:locale" content="zh_CN" />
+  <title>JapanLearn — 离线也能坚持的日语入门</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到主要内容</a>
+
+  <header class="site-header" data-header>
+    <div class="container header-inner">
+      <a class="logo" href="#top" aria-label="JapanLearn 首页">
+        <img class="logo-mark" src="assets/icon.svg" width="36" height="36" alt="" />
+        <span class="logo-text">JapanLearn</span>
+      </a>
+
+      <nav class="nav-desktop" aria-label="主导航">
+        <a href="#features">功能</a>
+        <a href="#workflow">工作流</a>
+        <a href="#showcase">界面</a>
+        <a href="#ai">AI 助手</a>
+        <a href="#proof">差异</a>
+        <a href="#faq">FAQ</a>
+      </nav>
+
+      <a class="btn btn-primary header-cta" href="https://github.com/Ageha6912/JapanLearn/releases/latest" target="_blank" rel="noopener noreferrer">
+        下载 APK
+      </a>
+
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="mobile-nav" data-nav-toggle>
+        <span class="sr-only">打开菜单</span>
+        <span class="nav-toggle-bar" aria-hidden="true"></span>
+        <span class="nav-toggle-bar" aria-hidden="true"></span>
+      </button>
+    </div>
+
+    <div class="nav-mobile" id="mobile-nav" data-nav-mobile hidden>
+      <nav aria-label="移动端导航">
+        <a href="#features">功能</a>
+        <a href="#workflow">工作流</a>
+        <a href="#showcase">界面</a>
+        <a href="#ai">AI 助手</a>
+        <a href="#proof">差异</a>
+        <a href="#faq">FAQ</a>
+        <a class="btn btn-primary" href="https://github.com/Ageha6912/JapanLearn/releases/latest" target="_blank" rel="noopener noreferrer">
+          免费下载 APK
+        </a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <!-- Hero -->
+    <section class="hero" id="top">
+      <div class="container hero-grid">
+        <div class="hero-copy">
+          <p class="eyebrow">Android · 完全离线 · 无需账号</p>
+          <h1>把日语入门压成<br /><span class="text-ai">每天 5–15 分钟</span>的固定路径</h1>
+          <p class="lede">
+            JapanLearn 面向 JLPT N5/N4 初学者：沿课程单元学几个新词 → 马上练习 → 告诉 App 你记住了多少 → FSRS 安排隔天复习。
+            内容全部打包进本机，飞行模式也能学完一整轮。
+          </p>
+          <div class="hero-actions">
+            <a class="btn btn-primary btn-lg" href="https://github.com/Ageha6912/JapanLearn/releases/latest" target="_blank" rel="noopener noreferrer">
+              免费下载 APK
+            </a>
+            <a class="btn btn-ghost btn-lg" href="#workflow">看看怎么学</a>
+          </div>
+          <ul class="hero-meta" aria-label="产品要点">
+            <li>v1.3.1 正式签名</li>
+            <li>MIT 开源</li>
+            <li>Android 8.0+</li>
+          </ul>
+        </div>
+
+        <div class="hero-stage">
+          <div class="phone-frame">
+            <div class="phone-notch"></div>
+            <img
+              src="assets/screenshots/home.png"
+              alt="JapanLearn 首页：今日学习任务、入门引导与 1104 词学习进度"
+              width="1080"
+              height="2263"
+              loading="eager"
+            />
+          </div>
+
+          <div class="float-card float-card-a" aria-hidden="true">
+            <span class="float-label">今日新词</span>
+            <strong>10</strong>
+          </div>
+          <div class="float-card float-card-b" aria-hidden="true">
+            <span class="float-label">N5/N4 词库</span>
+            <strong>1104 词</strong>
+          </div>
+          <div class="float-card float-card-c" aria-hidden="true">
+            <span class="float-label">课程单元</span>
+            <strong class="text-shu">22 个</strong>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Trust strip -->
+    <section class="trust" aria-label="核心承诺">
+      <div class="container trust-row">
+        <div class="trust-item"><strong>离线可用</strong><span>内容版本化打包进 APK</span></div>
+        <div class="trust-item"><strong>无账号</strong><span>数据只存本机 Room</span></div>
+        <div class="trust-item"><strong>FSRS 复习</strong><span>按记忆稳定性动态排期</span></div>
+        <div class="trust-item"><strong>算法公开</strong><span>纯函数实现，226 项测试</span></div>
+      </div>
+    </section>
+
+    <!-- Features -->
+    <section class="section" id="features">
+      <div class="container">
+        <header class="section-head reveal">
+          <p class="eyebrow">核心功能</p>
+          <h2>为「每天都能做完」而设计，而不是为功能清单</h2>
+          <p class="section-desc">每一项功能都服务于同一条路径：打开 → 学一点 → 练一点 → 记住掌握度 → 明天继续。</p>
+        </header>
+
+        <div class="feature-grid">
+          <article class="feature-card reveal">
+            <div class="feature-icon" aria-hidden="true">📴</div>
+            <h3>完全离线</h3>
+            <p>五十音、课程、句子随安装包落地。无网络、无登录墙，飞行模式可完整使用。</p>
+          </article>
+          <article class="feature-card reveal">
+            <div class="feature-icon" aria-hidden="true">📚</div>
+            <h3>课程化 N5/N4</h3>
+            <p>22 个课程单元顺序学词 + 配套语法，当前单元自动推进，10 题单元测试做检查点。</p>
+          </article>
+          <article class="feature-card reveal">
+            <div class="feature-icon" aria-hidden="true">🔁</div>
+            <h3>FSRS 间隔复习</h3>
+            <p>移植开源 ts-fsrs：四档自评映射 Again/Hard/Good/Easy，间隔按记忆稳定性逐题计算。</p>
+          </article>
+          <article class="feature-card reveal">
+            <div class="feature-icon" aria-hidden="true">🎧</div>
+            <h3>听力专项训练</h3>
+            <p>听音辨词 / 听写假名 / 听句选义三题型混合，答错自动进错题本。</p>
+          </article>
+          <article class="feature-card reveal">
+            <div class="feature-icon" aria-hidden="true">🎯</div>
+            <h3>目标倒推计划</h3>
+            <p>设 N5/N4 目标与达成日期，App 倒推每日新词档位并每周自动校准，赶不上就如实提醒。</p>
+          </article>
+          <article class="feature-card reveal">
+            <div class="feature-icon" aria-hidden="true">⚡</div>
+            <h3>错题本与错题突击</h3>
+            <p>答错自动收录；错题变练习，答对即清出，每轮 10 题；复习队列中错题优先出队。</p>
+          </article>
+          <article class="feature-card reveal">
+            <div class="feature-icon" aria-hidden="true">🤖</div>
+            <h3>AI 助手（可选）</h3>
+            <p>自备 API Key 直连大模型：语法解释 / 句子纠错 / 翻译，流式打字机输出；不配置则完全隐藏。</p>
+          </article>
+          <article class="feature-card reveal">
+            <div class="feature-icon" aria-hidden="true">📊</div>
+            <h3>统计与学习成果</h3>
+            <p>连击、累计时长、近 7 日柱状图；成果页汇总掌握词数、最长连击与 22 单元完成进度。</p>
+          </article>
+          <article class="feature-card reveal">
+            <div class="feature-icon" aria-hidden="true">🈁</div>
+            <h3>五十音 + 全库</h3>
+            <p>101 组假名分组测验；1104 词 / 120 语法全库检索，假名、词性、例句与掌握度色点。</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Workflow -->
+    <section class="section section-alt" id="workflow">
+      <div class="container">
+        <header class="section-head reveal">
+          <p class="eyebrow">使用场景 / 工作流</p>
+          <h2>一条每日闭环，而不是无限刷题</h2>
+          <p class="section-desc">通勤前、午休、睡前——任选 5–15 分钟，走完一轮就可以关掉 App。</p>
+        </header>
+
+        <ol class="workflow">
+          <li class="workflow-step reveal">
+            <span class="step-num">01</span>
+            <h3>今日学习</h3>
+            <p>按你的目标与当前课程单元取出今日新词、语法与待复习项，进度条实时更新。</p>
+          </li>
+          <li class="workflow-step reveal">
+            <span class="step-num">02</span>
+            <h3>即时练习</h3>
+            <p>学完立刻选择 / 听音 / 打假名。错了自动进错题本，学了就能用。</p>
+          </li>
+          <li class="workflow-step reveal">
+            <span class="step-num">03</span>
+            <h3>掌握自评</h3>
+            <p>四档：不认识 / 模糊 / 熟悉 / 熟练。你告诉 App，它决定下次何时出现。</p>
+          </li>
+          <li class="workflow-step reveal">
+            <span class="step-num">04</span>
+            <h3>隔天复习</h3>
+            <p>FSRS 按记忆稳定性排期；默认最多 30 条，超出顺延，不会一天被压垮。</p>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- Showcase -->
+    <section class="section" id="showcase">
+      <div class="container">
+        <header class="section-head reveal">
+          <p class="eyebrow">产品界面</p>
+          <h2>和纸 × 藍鉄，像工具一样安静</h2>
+          <p class="section-desc">界面与官网同一套和色语言：清晰层级、固定头部、独立滚动，少干扰、多完成。</p>
+        </header>
+
+        <div class="showcase-track" role="list">
+          <figure class="showcase-item reveal" role="listitem">
+            <div class="showcase-phone">
+              <img src="assets/screenshots/home.png" alt="首页：今日任务与入门引导" width="1080" height="2263" loading="lazy" />
+            </div>
+            <figcaption>首页 · 今日任务聚合</figcaption>
+          </figure>
+          <figure class="showcase-item reveal" role="listitem">
+            <div class="showcase-phone">
+              <img src="assets/screenshots/learn.png" alt="学习页：课程、五十音与听力训练入口" width="1080" height="2263" loading="lazy" />
+            </div>
+            <figcaption>学习 · 课程 / 五十音 / 听力</figcaption>
+          </figure>
+          <figure class="showcase-item reveal" role="listitem">
+            <div class="showcase-phone">
+              <img src="assets/screenshots/course.png" alt="课程单元列表：当前单元高亮推进" width="1080" height="2263" loading="lazy" />
+            </div>
+            <figcaption>课程 · 22 单元自动推进</figcaption>
+          </figure>
+          <figure class="showcase-item reveal" role="listitem">
+            <div class="showcase-phone">
+              <img src="assets/screenshots/word.png" alt="单词学习卡：假名、词性、例句与发音" width="1080" height="2263" loading="lazy" />
+            </div>
+            <figcaption>学习卡 · 假名 · 例句 · 发音</figcaption>
+          </figure>
+          <figure class="showcase-item reveal" role="listitem">
+            <div class="showcase-phone">
+              <img src="assets/screenshots/checkpoint.png" alt="单元测试：10 题检查点" width="1080" height="2263" loading="lazy" />
+            </div>
+            <figcaption>单元测试 · 10 题检查点</figcaption>
+          </figure>
+          <figure class="showcase-item reveal" role="listitem">
+            <div class="showcase-phone">
+              <img src="assets/screenshots/listening.png" alt="听力训练：听句子选意思" width="1080" height="2263" loading="lazy" />
+            </div>
+            <figcaption>听力 · 听句选义 / 听音辨词</figcaption>
+          </figure>
+          <figure class="showcase-item reveal" role="listitem">
+            <div class="showcase-phone">
+              <img src="assets/screenshots/review.png" alt="复习页：SRS 队列、错题本与错题突击" width="1080" height="2263" loading="lazy" />
+            </div>
+            <figcaption>复习 · SRS 队列与错题突击</figcaption>
+          </figure>
+          <figure class="showcase-item reveal" role="listitem">
+            <div class="showcase-phone">
+              <img src="assets/screenshots/ai.png" alt="AI 助手弹窗：语法解释、句子纠错与翻译三种模式" width="1080" height="2263" loading="lazy" />
+            </div>
+            <figcaption>AI 助手 · 首页弹窗流式回答</figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <!-- AI assistant -->
+    <section class="section section-alt" id="ai">
+      <div class="container">
+        <header class="section-head reveal">
+          <p class="eyebrow">可选增强</p>
+          <h2>想要 AI 讲解时，它就在右下角</h2>
+          <p class="section-desc">不建后端、不加账号。AI 是唯一可选的在线能力——不配置就完全不存在，学习数据仍然只存本机。</p>
+        </header>
+
+        <div class="ai-grid">
+          <article class="feature-card reveal">
+            <div class="feature-icon" aria-hidden="true">💬</div>
+            <h3>三种模式</h3>
+            <p>语法解释 / 句子纠错 / 翻译。语法详情页与错题本可一键带入教材上下文。</p>
+          </article>
+          <article class="feature-card reveal">
+            <div class="feature-icon" aria-hidden="true">⌨️</div>
+            <h3>流式输出</h3>
+            <p>回答逐字打字机呈现，首字更快；中断保留已收到的部分，离开页面即取消。</p>
+          </article>
+          <article class="feature-card reveal">
+            <div class="feature-icon" aria-hidden="true">🔑</div>
+            <h3>BYOK 直连</h3>
+            <p>填 Base URL / Key / 模型名三字段即可，预设 DeepSeek / GLM / OpenAI；费用由你的 Key 承担。</p>
+          </article>
+          <article class="feature-card reveal">
+            <div class="feature-icon" aria-hidden="true">🔒</div>
+            <h3>隐私默认关</h3>
+            <p>Key 仅存本机、不进备份、不打日志；每日限额 10/20/50/不限可调，首次调用才计数。</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Proof -->
+    <section class="section" id="proof">
+      <div class="container">
+        <header class="section-head reveal">
+          <p class="eyebrow">可验证的产品事实</p>
+          <h2>和常见学习 App 的差别，写在行为上</h2>
+          <p class="section-desc">这里不放虚构用户评价，只列可核对的能力与公开规则。</p>
+        </header>
+
+        <div class="proof-grid">
+          <div class="stat-card reveal">
+            <span class="stat-value">1104</span>
+            <span class="stat-label">N5/N4 单词</span>
+          </div>
+          <div class="stat-card reveal">
+            <span class="stat-value">120</span>
+            <span class="stat-label">N5/N4 语法</span>
+          </div>
+          <div class="stat-card reveal">
+            <span class="stat-value">180</span>
+            <span class="stat-label">每日场景句</span>
+          </div>
+          <div class="stat-card reveal">
+            <span class="stat-value">22</span>
+            <span class="stat-label">课程单元</span>
+          </div>
+        </div>
+
+        <div class="compare reveal">
+          <table>
+            <caption class="sr-only">常见学习 App 与 JapanLearn 对比</caption>
+            <thead>
+              <tr>
+                <th scope="col">常见做法</th>
+                <th scope="col">JapanLearn</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>强制注册登录</td>
+                <td>打开即用，数据存本机，不留个人信息</td>
+              </tr>
+              <tr>
+                <td>需要联网加载课程</td>
+                <td>内容版本化打包，飞行模式可完整使用</td>
+              </tr>
+              <tr>
+                <td>复习量无节制堆积</td>
+                <td>默认每日上限 30 条，超出自动顺延</td>
+              </tr>
+              <tr>
+                <td>间隔算法黑箱</td>
+                <td>FSRS 开源算法，调度器纯函数 + 226 项单元测试</td>
+              </tr>
+              <tr>
+                <td>只有刷选择题</td>
+                <td>听音选词、听写假名、看中文打假名等产出型练习</td>
+              </tr>
+              <tr>
+                <td>AI 功能默认上传数据</td>
+                <td>AI 助手完全可选：不配 Key 则不存在，学习数据永不出设备</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <aside class="srs-panel reveal" aria-labelledby="srs-title">
+          <h3 id="srs-title">FSRS 复习调度（透明可复现）</h3>
+          <ul class="srs-list">
+            <li><strong>四档自评</strong><span>不认识 / 模糊 / 熟悉 / 熟练，内部映射 Again · Hard · Good · Easy</span></li>
+            <li><strong>动态间隔</strong><span>按记忆稳定性逐题计算，而非固定倍率（ts-fsrs v5.4.2 long-term 模式精简移植）</span></li>
+            <li><strong>不认识</strong><span>本次会话内重新出队，并记入错题本</span></li>
+            <li><strong>已掌握</strong><span>记忆稳定性 ≥ 21 判定掌握；调度为纯函数，单元测试全量覆盖</span></li>
+          </ul>
+        </aside>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="section cta-section" id="download">
+      <div class="container">
+        <div class="cta-panel reveal">
+          <div class="cta-copy">
+            <p class="eyebrow eyebrow-on-dark">免费 · 无内购 · 无账号</p>
+            <h2>现在装上，今天就能走完一轮</h2>
+            <p>
+              从 GitHub Releases 下载正式签名 APK。要求 Android 8.0 及以上。
+              MIT 许可，源码与 issue 均在 GitHub 公开。
+            </p>
+            <div class="hero-actions">
+              <a class="btn btn-light btn-lg" href="https://github.com/Ageha6912/JapanLearn/releases/latest" target="_blank" rel="noopener noreferrer">
+                免费下载 APK
+              </a>
+              <a class="btn btn-on-dark btn-lg" href="https://github.com/Ageha6912/JapanLearn" target="_blank" rel="noopener noreferrer">
+                查看源码
+              </a>
+            </div>
+          </div>
+          <ul class="cta-points">
+            <li>v1.3.1 正式签名，可覆盖升级</li>
+            <li>核心功能完全离线，AI 助手可选</li>
+            <li>本地数据可 SAF 备份恢复</li>
+            <li>更新记录见 GitHub Releases</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="section" id="faq">
+      <div class="container narrow">
+        <header class="section-head reveal">
+          <p class="eyebrow">FAQ</p>
+          <h2>常见问题</h2>
+        </header>
+
+        <div class="faq-list">
+          <details class="faq-item reveal">
+            <summary>需要注册账号或联网吗？</summary>
+            <p>不需要。JapanLearn 无账号体系，学习内容与进度都在本机。联网不是使用前提；仅当你主动从浏览器下载更新、访问 GitHub 或使用可选的 AI 助手时才需要网络。</p>
+          </details>
+          <details class="faq-item reveal">
+            <summary>发音是怎么实现的？会额外收费吗？</summary>
+            <p>使用系统日语 TTS，不引入付费语音服务。部分国产 ROM 的默认引擎可能无法正确朗读日语，App 会引导安装/切换 Google TTS，并可在「我的 → 发音」里选择已下载的日语音色。</p>
+          </details>
+          <details class="faq-item reveal">
+            <summary>适合什么水平？能备考 JLPT 吗？</summary>
+            <p>面向零基础到 N5/N4 的入门与巩固：22 个课程单元按主题推进，配目标倒推的每日计划，强调短时高频闭环，不是完整应试课程。N3 及以上、口语精练、听力长文等不在当前范围。</p>
+          </details>
+          <details class="faq-item reveal">
+            <summary>AI 助手会上传我的学习数据吗？</summary>
+            <p>不会主动上传。AI 助手完全可选：不配置 API Key 时所有入口都不出现。配置后走你自己填写的 OpenAI 兼容端点（预设 DeepSeek / GLM / OpenAI），只有你主动发送的内容会发往该端点，费用由你的 Key 承担。Key 仅存本机、不进备份、不打日志，学习进度永远只存本机。</p>
+          </details>
+          <details class="faq-item reveal">
+            <summary>卸载或换机会丢数据吗？</summary>
+            <p>学习进度存在本机数据库。请在「我的」中使用备份导出，在新设备导入。未备份时卸载会丢失记录——请先导出再卸载。</p>
+          </details>
+          <details class="faq-item reveal">
+            <summary>是否收费？有没有广告？</summary>
+            <p>免费且开源（MIT），无内购、无广告、无订阅。下载与使用都不需要付费；AI 助手如使用付费大模型服务，费用由你自己的 API Key 承担，与 App 无关。</p>
+          </details>
+          <details class="faq-item reveal">
+            <summary>如何反馈问题或贡献内容？</summary>
+            <p>到 <a href="https://github.com/Ageha6912/JapanLearn" target="_blank" rel="noopener noreferrer">GitHub 仓库</a> 提 Issue 或 PR。内容以带版本号的 JSON 维护，合并前会跑校验脚本与单元测试。</p>
+          </details>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <a class="logo" href="#top">
+          <img class="logo-mark" src="assets/icon.svg" width="36" height="36" alt="" />
+          <span class="logo-text">JapanLearn</span>
+        </a>
+        <p>离线也能坚持的日语入门工具。</p>
+      </div>
+      <div class="footer-cols">
+        <div>
+          <h3>产品</h3>
+          <a href="#features">功能</a>
+          <a href="#workflow">工作流</a>
+          <a href="#download">下载</a>
+        </div>
+        <div>
+          <h3>资源</h3>
+          <a href="https://github.com/Ageha6912/JapanLearn/releases/latest" target="_blank" rel="noopener noreferrer">Releases</a>
+          <a href="https://github.com/Ageha6912/JapanLearn" target="_blank" rel="noopener noreferrer">源码</a>
+          <a href="https://github.com/Ageha6912/JapanLearn/blob/main/README.md" target="_blank" rel="noopener noreferrer">README</a>
+        </div>
+        <div>
+          <h3>说明</h3>
+          <p class="footer-note">学习数据默认仅存本机，应用不收集账号信息。</p>
+          <p class="footer-note">MIT License</p>
+        </div>
+      </div>
+    </div>
+    <div class="container footer-bottom">
+      <p>© 2026 JapanLearn. 由开源社区维护。</p>
+    </div>
+  </footer>
+
+  <script src="main.js" defer></script>
+</body>
+</html>

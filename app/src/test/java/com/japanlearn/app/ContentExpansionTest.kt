@@ -37,14 +37,40 @@ class ContentExpansionTest {
     }
 
     @Test
-    fun `合并后语法 120 且含点名两条`() {
+    fun `合并后语法 148 且含点名两条`() {
         val file = ContentJson.decodeFromString<GrammarFile>(readContent("grammar.json"))
-        assertEquals(120, file.grammar.size)
+        assertEquals(148, file.grammar.size)
         val titles = file.grammar.map { it.title }.toSet()
         assertTrue(titles.contains("～んです / ～のです"))
         assertTrue(titles.contains("～について"))
-        assertEquals(7, file.version)
+        assertEquals(8, file.version)
         assertTrue(file.grammar.all { it.unit in 1..11 })
+    }
+
+    @Test
+    fun `N5 语法二批 title 与现网不相交 且每条至少两例两题`() {
+        val batch = Json.parseToJsonElement(readTools("new_grammar_n5_b1.json")).jsonObject
+        val items = batch.getValue("items").jsonArray
+        assertEquals(30, items.size)
+        val batchTitles = items.map { it.jsonObject.getValue("title").jsonPrimitive.content }.toSet()
+        val existing = ContentJson.decodeFromString<GrammarFile>(readContent("grammar.json"))
+        // 合并脚本会跳过同名；批次本身应无内部重复
+        assertEquals(batchTitles.size, items.size)
+        items.forEach { el ->
+            val obj = el.jsonObject
+            val title = obj.getValue("title").jsonPrimitive.content
+            val examples = obj.getValue("examples").jsonArray
+            val exercises = obj.getValue("exercises").jsonArray
+            assertTrue("$title examples", examples.size >= 2)
+            assertTrue("$title exercises", exercises.size >= 2)
+            val level = obj.getValue("level").jsonPrimitive.content
+            val unit = obj.getValue("unit").jsonPrimitive.content.toInt()
+            assertTrue("$title level", level == "N5")
+            assertTrue("$title unit", unit in 1..11)
+        }
+        // 已合并进主库的条目应在 grammar.json 中（含被去重的两条）
+        val mainTitles = existing.grammar.map { it.title }.toSet()
+        assertTrue(batchTitles.all { it in mainTitles })
     }
 
     @Test

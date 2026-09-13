@@ -406,6 +406,10 @@ class ProgressRepository(
         db.progressDao().allByType("word").map { rows -> rows.associate { it.contentId to it.mastery } }
     fun masteredWordCount(): Flow<Int> = db.progressDao().masteredWordCount(SrsScheduler.MASTERED_INTERVAL_DAYS)
 
+    /** 已学词的 FSRS stability 列表，供掌握度分档（PRD §19.13）。 */
+    fun wordStabilities(): Flow<List<Double>> =
+        db.progressDao().allByType("word").map { rows -> rows.map { it.stability } }
+
     fun wrongAnswers(): Flow<List<WrongAnswerEntity>> = db.wrongAnswerDao().all()
     fun wrongAnswerCount(): Flow<Int> = db.wrongAnswerDao().count()
 

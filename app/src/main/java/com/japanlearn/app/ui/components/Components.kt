@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -680,6 +681,67 @@ fun WeeklyBarChart(
                     else MaterialTheme.colorScheme.onSurfaceVariant,
                     fontWeight = if (index == highlightIndex) FontWeight.Bold else FontWeight.Medium,
                 )
+            }
+        }
+    }
+}
+
+/**
+ * 掌握度分段条（PRD §19.13）：新学 / 巩固中 / 已掌握 三档水平堆叠。
+ * [fractions] 顺序固定为新学、巩固中、已掌握，各自 0..1。
+ */
+@Composable
+fun MasterySegmentBar(
+    fractions: List<Float>,
+    counts: List<Int>,
+    modifier: Modifier = Modifier,
+) {
+    val jc = japanColors()
+    val colors = listOf(
+        MaterialTheme.colorScheme.primary,
+        jc.masteryFuzzy,
+        jc.masteryMastered,
+    )
+    val labels = listOf("新学", "巩固中", "已掌握")
+    val total = counts.sum()
+    Column(modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        Row(
+            Modifier.fillMaxWidth().height(14.dp)
+                .clip(RoundedCornerShape(7.dp)),
+        ) {
+            fractions.forEachIndexed { index, f ->
+                if (f > 0f) {
+                    Box(
+                        Modifier
+                            .weight(f.coerceAtLeast(0.001f))
+                            .fillMaxHeight()
+                            .background(colors[index]),
+                    )
+                }
+            }
+            if (total == 0) {
+                Box(
+                    Modifier.weight(1f).fillMaxHeight()
+                        .background(MaterialTheme.colorScheme.surfaceVariant),
+                )
+            }
+        }
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+            labels.forEachIndexed { index, label ->
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                ) {
+                    Box(
+                        Modifier.size(8.dp)
+                            .background(colors[index], CircleShape),
+                    )
+                    Text(
+                        "$label ${counts.getOrElse(index) { 0 }}",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
             }
         }
     }

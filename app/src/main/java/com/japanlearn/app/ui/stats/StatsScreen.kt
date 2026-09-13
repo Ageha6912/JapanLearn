@@ -12,11 +12,13 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.LocalFireDepartment
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -28,8 +30,12 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import com.japanlearn.app.AppContainer
 import com.japanlearn.app.LocalAppContainer
+import com.japanlearn.app.Routes
 import com.japanlearn.app.data.local.DailyStudyEntity
+import com.japanlearn.app.domain.MasteryDistribution
+import com.japanlearn.app.domain.WrongPortrait
 import com.japanlearn.app.ui.components.AppTopBar
+import com.japanlearn.app.ui.components.MasterySegmentBar
 import com.japanlearn.app.ui.components.SectionCard
 import com.japanlearn.app.ui.components.StatTile
 import com.japanlearn.app.ui.components.WeeklyBarChart
@@ -38,6 +44,7 @@ import com.japanlearn.app.ui.motion.StaggerIn
 import com.japanlearn.app.util.formatStudyDuration
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -54,6 +61,8 @@ data class StatsUiState(
     val totalGrammar: Int = 0,
     val today: LocalDate = LocalDate.now(),
     val week: List<Pair<LocalDate, DailyStudyEntity?>> = emptyList(),
+    val mastery: MasteryDistribution.Snapshot = MasteryDistribution.Snapshot(),
+    val wrongPortrait: WrongPortrait.Portrait = WrongPortrait.Portrait(),
 )
 
 class StatsViewModel(private val app: AppContainer) : ViewModel() {
@@ -79,6 +88,40 @@ class StatsViewModel(private val app: AppContainer) : ViewModel() {
         collect(app.progress.learnedGrammarCount()) { s, v -> s.copy(learnedGrammar = v) }
         collect(app.content.wordCount()) { s, v -> s.copy(totalWords = v) }
         collect(app.content.grammarCount()) { s, v -> s.copy(totalGrammar = v) }
+
+        collect(app.progress.wordStabilities()) { s, v ->
+            s.copy(mastery = MasteryDistribution.snapshot(v))
+        }
+
+        collect(
+            combine(
+                app.progress.wrongAnswers(),
+                app.content.wordsAll(),
+                app.content.grammarAll(),
+                app.content.kanaAll(),
+            ) { wrong, words, grammar, kana ->
+                val wordById = words.associateBy { it.id }
+                val grammarById = grammar.associateBy { it.id }
+                val kanaById = kana.associateBy { it.id }
+                val entries = wrong.mapNotNull { w ->
+                    val primary = when (w.contentType) {
+                        "word" -> wordById[w.contentId]?.ja
+                        "grammar" -> grammarById[w.contentId]?.title
+                        "kana" -> kanaById[w.contentId]?.hiragana
+                        else -> null
+                    } ?: return@mapNotNull null
+                    WrongPortrait.Entry(
+                        contentType = w.contentType,
+                        contentId = w.contentId,
+                        wrongCount = w.wrongCount,
+                        lastWrongAt = w.lastWrongAt,
+                        primary = primary,
+                    )
+                }
+                val cats = words.map { WrongPortrait.WordMeta(it.id, it.cat) }
+                WrongPortrait.build(entries, cats, topN = 5)
+            },
+        ) { s, v -> s.copy(wrongPortrait = v) }
     }
 
     fun speak(text: String) = app.tts.speak(text)
@@ -95,6 +138,7 @@ fun StatsScreen(nav: NavHostController) {
         weekLabels[(date.dayOfWeek.value - 1).coerceIn(0, 6)] to (record?.studySeconds ?: 0) / 60
     }
     val todayIndex = state.week.indexOfFirst { (date, _) -> date == state.today }.takeIf { it >= 0 }
+    val typeLabel = mapOf("word" to "单词", "grammar" to "语法", "kana" to "五十音")
 
     Scaffold(
         topBar = { AppTopBar("学习统计") { nav.popBackStack() } },
@@ -175,6 +219,88 @@ fun StatsScreen(nav: NavHostController) {
             }
 
             StaggerIn(4) {
+                SectionCard(title = "掌握度分布") {
+                    if (state.mastery.total == 0) {
+                        Text(
+                            "还没有已学单词。开始今日学习后，这里会按 FSRS 稳定度显示新学 / 巩固中 / 已掌握。",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    } else {
+                        MasterySegmentBar(
+                            fractions = state.mastery.fractions(),
+                            counts = listOf(state.mastery.fresh, state.mastery.consolidating, state.mastery.mastered),
+                        )
+                    }
+                }
+            }
+
+            StaggerIn(5) {
+                val portrait = state.wrongPortrait
+                SectionCard(
+                    title = "错题画像",
+                    onClick = if (portrait.total > 0) {
+                        { nav.navigate(Routes.WRONG_ANSWERS) }
+                    } else {
+                        null
+                    },
+                ) {
+                    if (portrait.total == 0) {
+                        Text(
+                            "暂无待攻克错题。练习或复习中答错的题目会汇总到这里。",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    } else {
+                        Text(
+                            "待攻克 ${portrait.total} 条",
+                            style = MaterialTheme.typography.titleSmall,
+                            color = MaterialTheme.colorScheme.secondary,
+                        )
+                        val typeBits = listOf("word", "grammar", "kana").mapNotNull { t ->
+                            val n = portrait.byType[t] ?: return@mapNotNull null
+                            "${typeLabel[t] ?: t} $n"
+                        }
+                        if (typeBits.isNotEmpty()) {
+                            Text(
+                                typeBits.joinToString(" · "),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
+                        if (portrait.topRepeat.isNotEmpty()) {
+                            Text("反复错 Top ${portrait.topRepeat.size}", style = MaterialTheme.typography.titleSmall)
+                            portrait.topRepeat.forEach { item ->
+                                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                                    Text(
+                                        item.primary,
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        modifier = Modifier.weight(1f, fill = false),
+                                    )
+                                    Text(
+                                        "×${item.wrongCount}",
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = MaterialTheme.colorScheme.secondary,
+                                    )
+                                }
+                            }
+                        }
+                        if (portrait.topCategories.isNotEmpty()) {
+                            Text(
+                                "分类热区：" + portrait.topCategories.joinToString(" · ") { "${it.category} ${it.count}" },
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
+                        TextButton(onClick = { nav.navigate(Routes.WRONG_ANSWERS) }) {
+                            Text("打开错题本")
+                            Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null)
+                        }
+                    }
+                }
+            }
+
+            StaggerIn(6) {
                 SectionCard(title = "内容进度") {
                     Text(
                         "单词：已学 ${state.learnedWords} / ${state.totalWords}，已掌握 ${state.masteredWords}",
