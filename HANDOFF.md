@@ -10,10 +10,9 @@
 - 需求文档：`PRD.md`（§17 为 v0.1 评审决策记录，**§18 为 v0.2 决策记录**，**§19 为 v0.5–v0.7 决策记录与产品缺口清单**，与正文冲突时以 §17/§18/§19 为准）
 - 优化方案：`OPTIMIZATION.md`（**Accepted**，用户 2026-09-09 确认 Q1–Q3 推荐项；结论已于 2026-09-12 写入 PRD §19）
 - Git 身份（仓库级已配置）：`Ageha <ageha6912@gmail.com>`，勿用其他身份提交
-- 已发布：**v1.4.0**（tag + GitHub Release，正式签名 APK）。此前最新 Release
-- 发布页：https://github.com/Ageha6912/JapanLearn/releases/tag/v1.4.0
-- **树内待发：v1.6.0**（`versionName = "1.6.0"` / `versionCode` 29）——合并 v1.5 汉字专项 + v1.6 句库扩量 + 发版前联动补丁；**本条更新时尚未 tag/Release**
-- **发版节奏（用户 2026-09-12 定案）**：减少发版次数，多次改动合并后再统一发一次
+- 已发布：**v1.6.0**（tag + GitHub Release，正式签名 APK）。`versionName = "1.6.0"` / `versionCode` 29
+- 发布页：https://github.com/Ageha6912/JapanLearn/releases/tag/v1.6.0
+- **发版节奏（用户 2026-09-12 定案）**：减少发版次数，多次改动合并后再统一发一次；v1.5 汉字专项 + v1.6 句库扩量合并为 v1.6.0 一次发出
 
 ## 2. 环境速查
 
@@ -72,23 +71,18 @@ PRD §19.14 定案；与 v1.6 合并后统一 Release（用户要求减少发版
 - **发布工程**：R8 minify + 资源收缩（APK 1.5MB）、正式签名接入（keystore）、GitHub Actions 门禁 CI（`.github/workflows/ci.yml`：55 测试 + assembleDebug）
 - 55 项单元测试全绿；PRD §18 决策记录；README 数字已同步
 
-## 4. 当前任务：v1.6.0 收口中（2026-09-12）
+## 4. 当前任务：v1.6.0 已发布（2026-09-13）
 
-### 发版策略
-- 用户定案：**减少发版次数**，v1.5 + v1.6 + 联动补丁合并为一次 **v1.6.0 / versionCode 29**
-- `versionName` 已改为 1.6.0；`web/` 页面版本号已同步
-- 待办：assembleRelease → 模拟器回归（坑 11 核对 versionName）→ tag v1.6.0 + GitHub Release
-- 更新横幅正向路径会在该次真实发版后自然验证（v1.4 的 UpdateChecker）
-
-### 本版包含
-1. **v1.5 汉字专项**（PRD §19.14）：397 字库 Room v6、专项会话五题型、学习 Tab 入口、配额折算
-2. **v1.6 听力句库 180→300**（PRD §19.15）：天气/网购/银行新场景
-3. **联动收口**：复习混合队列含汉字、错题本/统计/首页/掌握度/`web/` 同步
+### 发版记录
+- 合并 **v1.5 汉字专项 + v1.6 听力句库 300 条 + 联动收口补丁** 一次发出
+- versionName **1.6.0** / versionCode **29**；assembleRelease 成功
+- 模拟器回归通过：安装包版本核对 1.6.0/29；首页任务卡「汉字 2」；学习 Tab 汉字专项 0/397；会话卡片「私」音训/词例；看字选义出题正常
+- tag v1.6.0 + GitHub Release（JapanLearn-v1.6.0.apk）https://github.com/Ageha6912/JapanLearn/releases/tag/v1.6.0
+- 回归截图 `.screenshots/v160_*.png`（未入库）
 
 ### 待办
-1. ~~assembleRelease + 模拟器回归~~ **已完成（2026-09-13）**：安装包 versionName **1.6.0** / versionCode **29**；首页任务卡含「汉字 2」；学习 Tab 汉字专项 0/397；会话卡片「私」音训/词例/配额 1/2；看字选义出题正常
-2. tag + GitHub Release（JapanLearn-v1.6.0.apk）
-3. 真机验证：汉字专项、流式 AI、更新横幅、统计仪表盘
+1. 真机验证：汉字专项、流式 AI、**更新横幅正向路径**（本次为真实新版本，v1.4 的 UpdateChecker 应提示 1.6.0）、统计仪表盘
+2. 后续候选：N4 汉字批次、学习 Tab 汉字入口真机截图更新 `web/`
 
 ### v1.6 听力句库扩量（PRD §19.15，已入库未发版）
 - 每日一句 / 听句库 **180 → 300**（sentences version 5 → 7）
