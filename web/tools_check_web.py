@@ -38,10 +38,12 @@ def content_stats() -> dict:
     grammar = json.loads((base / "grammar.json").read_text(encoding="utf-8"))
     kana = json.loads((base / "kana.json").read_text(encoding="utf-8"))
     sentences = json.loads((base / "sentences.json").read_text(encoding="utf-8"))
+    kanji = json.loads((base / "kanji.json").read_text(encoding="utf-8"))
     stats["words"] = len(words["words"])
     stats["grammar"] = len(grammar["grammar"])
     stats["kana"] = len(kana["kana"])
     stats["sentences"] = len(sentences["sentences"])
+    stats["kanji"] = len(kanji["kanji"])
     stats["units"] = len({(w["level"], w["unit"]) for w in words["words"]})
     stats["words_version"] = words["version"]
     return stats
@@ -57,8 +59,9 @@ stats = content_stats()
 version = app_version()
 for token, key, label in [
     ("1104", "words", "单词数"),
-    ("120", "grammar", "语法数"),
-    ("180", "sentences", "每日一句数"),
+    ("148", "grammar", "语法数"),
+    ("300", "sentences", "每日一句数"),
+    ("397", "kanji", "汉字专项数"),
     ("101", "kana", "五十音数"),
     ("22", "units", "课程单元数"),
 ]:
@@ -71,9 +74,12 @@ check("v0.7.5" not in html and "v0.7" not in html, "旧版本号 v0.7.x 已清�
 
 print("== stale claims removed ==")
 for stale in [">804<", ">87<", "×1.5", "熟练 ×2", "上限 60 天",
-              "804 词", "语法 87", "每日一句 120", "word-card.png", "stats.png"]:
+              "804 词", "语法 87", "每日一句 120", "语法 120", "120 语法",
+              "180 条", "226 项", "v1.3.1",
+              "word-card.png", "stats.png"]:
     check(stale not in html, f"旧表述「{stale}」已移除")
-for fresh in ["FSRS", "ts-fsrs", "课程单元", "听力", "错题突击", "AI 助手", "流式"]:
+for fresh in ["FSRS", "ts-fsrs", "课程单元", "听力", "错题突击", "AI 助手", "流式",
+              "汉字专项", "397", "300", "148", "275"]:
     check(fresh in html, "新能力「" + fresh + "」已上页")
 
 print("== internal anchors ==")

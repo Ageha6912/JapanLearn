@@ -58,6 +58,19 @@ data class SentenceEntity(
     val order: Int,
 )
 
+/** 汉字库（PRD §19.14）：音训与词例以 JSON 列存储，词例为文本快照。 */
+@Entity(tableName = "kanji")
+data class KanjiEntity(
+    @PrimaryKey val id: String,
+    val char: String,
+    val zh: String,
+    val onJson: String,
+    val kunJson: String,
+    val examplesJson: String,
+    val level: String,
+    val order: Int,
+)
+
 /** 用户学习进度（SRS 状态），contentType: word / grammar / kana */
 @Serializable
 @Entity(

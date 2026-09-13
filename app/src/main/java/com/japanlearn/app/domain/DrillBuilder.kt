@@ -13,7 +13,7 @@ data class DrillEntry(val contentType: String, val contentId: String)
 
 /**
  * 错题突击出题（PRD §19.10）：每轮从错题池洗牌循环取，不足 [count] 全出。
- * word → 混合题型；kana → romaji 四选一；grammar → 自带练习。
+ * word → 混合题型；kana → romaji 四选一；grammar → 自带练习；kanji → 汉字专项混合题（§19.14）。
  * 内容已删除的条目自动跳过。判分由调用方走 recordAuxAnswer（答对移除、答错 +1，不推 SRS）。
  */
 object DrillBuilder {
@@ -23,12 +23,14 @@ object DrillBuilder {
         words: List<QuizWord>,
         kana: List<QuizKana>,
         grammarExercises: Map<String, List<DrillGrammarExercise>>,
+        kanji: List<QuizKanji> = emptyList(),
         count: Int = 10,
         random: Random = Random.Default,
     ): List<DrillQuestion> {
         if (entries.isEmpty() || count <= 0) return emptyList()
         val wordById = words.associateBy { it.id }
         val kanaById = kana.associateBy { it.id }
+        val kanjiById = kanji.associateBy { it.id }
         val generated = entries.mapNotNull { entry ->
             when (entry.contentType) {
                 "word" -> wordById[entry.contentId]?.let { wordQuestion(it, words, random) }
@@ -39,6 +41,7 @@ object DrillBuilder {
                         QuizGenerator.grammarQuiz(ex.question, ex.options, ex.answerIndex, random),
                     )
                 }
+                "kanji" -> kanjiById[entry.contentId]?.let { kanjiQuestion(it, kanji, random) }
                 else -> null
             }
         }.shuffled(random)
@@ -68,4 +71,11 @@ object DrillBuilder {
 
     private fun kanaQuestion(target: QuizKana, pool: List<QuizKana>, random: Random): DrillQuestion =
         DrillQuestion("kana", target.id, QuizGenerator.kanaQuiz(target, pool, random))
+
+    private fun kanjiQuestion(target: QuizKanji, pool: List<QuizKanji>, random: Random): DrillQuestion {
+        val canAudio = target.primaryReading().isNotEmpty()
+        val variant = KanjiQuizVariantPicker.pick(random.nextDouble(), canAudio)
+        val quiz = KanjiQuizGenerator.build(target, pool, variant, random)
+        return DrillQuestion("kanji", target.id, quiz)
+    }
 }

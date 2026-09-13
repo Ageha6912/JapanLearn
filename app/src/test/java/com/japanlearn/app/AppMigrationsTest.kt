@@ -33,6 +33,16 @@ class AppMigrationsTest {
     }
 
     @Test
+    fun `5到6 新建 kanji 表`() {
+        assertTrue(AppMigrations.SQL_5_6_KANJI_TABLE.contains("CREATE TABLE IF NOT EXISTS `kanji`"))
+        assertTrue(AppMigrations.SQL_5_6_KANJI_TABLE.contains("`char` TEXT NOT NULL"))
+        assertTrue(AppMigrations.SQL_5_6_KANJI_TABLE.contains("`onJson` TEXT NOT NULL"))
+        assertTrue(AppMigrations.SQL_5_6_KANJI_TABLE.contains("`kunJson` TEXT NOT NULL"))
+        assertTrue(AppMigrations.SQL_5_6_KANJI_TABLE.contains("`examplesJson` TEXT NOT NULL"))
+        assertTrue(AppMigrations.SQL_5_6_KANJI_TABLE.contains("PRIMARY KEY(`id`)"))
+    }
+
+    @Test
     fun `Room schema v3 快照已入库`() {
         assertTrue(schemaExists("3.json"))
     }
@@ -45,6 +55,11 @@ class AppMigrationsTest {
     @Test
     fun `Room schema v5 快照已入库`() {
         assertTrue(schemaExists("5.json"))
+    }
+
+    @Test
+    fun `Room schema v6 快照已入库`() {
+        assertTrue(schemaExists("6.json"))
     }
 
     private fun schemaExists(name: String): Boolean {

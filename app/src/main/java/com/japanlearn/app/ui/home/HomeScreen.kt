@@ -31,6 +31,7 @@ import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.automirrored.outlined.NavigateNext
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Flag
+import androidx.compose.material.icons.filled.Grade
 import androidx.compose.material.icons.filled.LocalFireDepartment
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Settings
@@ -106,16 +107,21 @@ data class GoalSummaryLine(
 data class HomeUiState(
     val totalWords: Int = 0,
     val totalGrammar: Int = 0,
+    val totalKanji: Int = 0,
     val learnedWords: Int = 0,
     val learnedGrammar: Int = 0,
+    val learnedKanji: Int = 0,
     val masteredWords: Int = 0,
     val dueWords: Int = 0,
     val dueGrammar: Int = 0,
+    val dueKanji: Int = 0,
     val streak: Int = 0,
     val targetNewWords: Int = 10,
     val targetNewGrammar: Int = 3,
+    val targetNewKanji: Int = com.japanlearn.app.domain.StudyPlanner.KANJI_DAILY_DEFAULT,
     val todayNewWords: Int = 0,
     val todayNewGrammar: Int = 0,
+    val todayNewKanji: Int = 0,
     val todayReviews: Int = 0,
     val sentence: SentenceEntity? = null,
     val sentenceIndex: Int = 0,
@@ -144,11 +150,14 @@ class HomeViewModel(private val app: AppContainer) : ViewModel() {
         }
         collect(app.content.wordCount()) { s, v -> s.copy(totalWords = v) }
         collect(app.content.grammarCount()) { s, v -> s.copy(totalGrammar = v) }
+        collect(app.content.kanjiCount()) { s, v -> s.copy(totalKanji = v) }
         collect(app.progress.learnedWordCount()) { s, v -> s.copy(learnedWords = v, progressLoaded = true) }
         collect(app.progress.learnedGrammarCount()) { s, v -> s.copy(learnedGrammar = v) }
+        collect(app.progress.learnedKanjiCount()) { s, v -> s.copy(learnedKanji = v) }
         collect(app.progress.masteredWordCount()) { s, v -> s.copy(masteredWords = v) }
         collect(app.progress.dueWordCount()) { s, v -> s.copy(dueWords = v) }
         collect(app.progress.dueGrammarCount()) { s, v -> s.copy(dueGrammar = v) }
+        collect(app.progress.dueKanjiCount()) { s, v -> s.copy(dueKanji = v) }
         collect(app.stats.weekly()) { s, v -> s.copy(streak = v.streak) }
         collect(app.stats.todayFlow()) { s, v ->
             s.copy(
@@ -157,7 +166,20 @@ class HomeViewModel(private val app: AppContainer) : ViewModel() {
                 todayReviews = v?.reviewsDone ?: 0,
             )
         }
-        collect(app.settings.dailyNewWords) { s, v -> s.copy(targetNewWords = v) }
+        collect(app.settings.dailyNewWords) { s, v ->
+            val hasGoal = app.settings.goalLevel.value != StudyPlanner.LEVEL_NONE
+            s.copy(
+                targetNewWords = v,
+                targetNewKanji = StudyPlanner.kanjiDailyCount(v, hasGoal),
+            )
+        }
+        // 今日新学汉字：progress 表无 Flow 计数，跟 learnedKanji 变化时重取
+        viewModelScope.launch {
+            app.progress.learnedKanjiCount().collect {
+                val todayKanji = app.progress.newKanjiLearnedToday()
+                _state.update { s -> s.copy(todayNewKanji = todayKanji) }
+            }
+        }
         collect(app.settings.dailyNewGrammar) { s, v -> s.copy(targetNewGrammar = v) }
         collect(app.settings.kanaIntroDismissed) { s, v -> s.copy(kanaIntroDismissed = v) }
         collect(app.settings.onboardingDone) { s, v -> s.copy(onboardingDone = v) }
@@ -239,13 +261,16 @@ fun HomeScreen(nav: NavHostController) {
     val wordsRemaining = poolRemaining.coerceAtMost((state.targetNewWords - state.todayNewWords).coerceAtLeast(0))
     val grammarPoolRemaining = (state.totalGrammar - state.learnedGrammar).coerceAtLeast(0)
     val grammarRemaining = grammarPoolRemaining.coerceAtMost((state.targetNewGrammar - state.todayNewGrammar).coerceAtLeast(0))
-    val dueToday = state.dueWords + state.dueGrammar
-    val todayDone = state.todayNewWords + state.todayNewGrammar + state.todayReviews
-    val todayTotal = (state.targetNewWords + state.targetNewGrammar + dueToday).coerceAtLeast(1)
+    val kanjiPoolRemaining = (state.totalKanji - state.learnedKanji).coerceAtLeast(0)
+    val kanjiRemaining = kanjiPoolRemaining.coerceAtMost((state.targetNewKanji - state.todayNewKanji).coerceAtLeast(0))
+    val dueToday = state.dueWords + state.dueGrammar + state.dueKanji
+    val todayDone = state.todayNewWords + state.todayNewGrammar + state.todayNewKanji + state.todayReviews
+    val todayTotal = (state.targetNewWords + state.targetNewGrammar + state.targetNewKanji + dueToday).coerceAtLeast(1)
     val progress = com.japanlearn.app.domain.UiMath.dailyProgress(todayDone, todayTotal)
-    val allDone = !(wordsRemaining > 0 || dueToday > 0)
+    val allDone = !(wordsRemaining > 0 || kanjiRemaining > 0 || dueToday > 0)
 
     val canStartWords = wordsRemaining > 0
+    val canStartKanji = kanjiRemaining > 0
     val canStartReview = dueToday > 0
 
     var showSettings by remember { mutableStateOf(false) }
@@ -401,6 +426,13 @@ fun HomeScreen(nav: NavHostController) {
                             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                                 TaskRow("新词", wordsRemaining, "个", Icons.AutoMirrored.Filled.MenuBook)
                                 TaskRow("语法", grammarRemaining, "条", Icons.Outlined.EditNote, tint = MaterialTheme.colorScheme.tertiary)
+                                TaskRow(
+                                    "汉字",
+                                    kanjiRemaining + state.dueKanji,
+                                    "个",
+                                    Icons.Filled.Grade,
+                                    tint = MaterialTheme.colorScheme.primary,
+                                )
                                 TaskRow("待复习", dueToday, "条", Icons.Filled.Refresh, tint = MaterialTheme.colorScheme.secondary)
                             }
                         }
@@ -446,13 +478,15 @@ fun HomeScreen(nav: NavHostController) {
                         AppButton(
                             text = when {
                                 canStartWords -> "开始今日学习"
+                                canStartKanji -> "去学汉字"
                                 canStartReview -> "开始今日复习"
                                 else -> "今日任务已完成"
                             },
-                            enabled = canStartWords || canStartReview,
+                            enabled = canStartWords || canStartKanji || canStartReview,
                             onClick = {
                                 when {
                                     canStartWords -> nav.navigate(Routes.wordSession(wordsRemaining))
+                                    canStartKanji -> nav.navigate(Routes.KANJI_SESSION)
                                     else -> nav.navigate(Routes.REVIEW_SESSION)
                                 }
                             },
@@ -479,7 +513,7 @@ fun HomeScreen(nav: NavHostController) {
                     }
                 }
 
-                // 内容进度双条
+                // 内容进度
                 StaggerIn(3) {
                     SectionCard(title = "学习进度") {
                         ProgressLine(
@@ -492,6 +526,12 @@ fun HomeScreen(nav: NavHostController) {
                             done = state.learnedGrammar,
                             total = state.totalGrammar,
                             fillColor = MaterialTheme.colorScheme.tertiary,
+                        )
+                        ProgressLine(
+                            label = "汉字",
+                            done = state.learnedKanji,
+                            total = state.totalKanji,
+                            fillColor = MaterialTheme.colorScheme.secondary,
                         )
                         AppButton(
                             text = "查看学习统计",

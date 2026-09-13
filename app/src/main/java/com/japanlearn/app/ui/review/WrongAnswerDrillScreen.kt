@@ -25,8 +25,10 @@ import com.japanlearn.app.AppContainer
 import com.japanlearn.app.LocalAppContainer
 import com.japanlearn.app.data.content.ContentJson
 import com.japanlearn.app.data.content.Exercise
+import com.japanlearn.app.data.kunReadings
 import com.japanlearn.app.data.local.KanaEntity
 import com.japanlearn.app.data.local.WordEntity
+import com.japanlearn.app.data.onReadings
 import com.japanlearn.app.domain.DrillBuilder
 import com.japanlearn.app.domain.DrillEntry
 import com.japanlearn.app.domain.DrillGrammarExercise
@@ -86,6 +88,15 @@ class WrongAnswerDrillViewModel(private val app: AppContainer) : ViewModel() {
                 .map { DrillEntry(it.contentType, it.contentId) }
             val words = app.content.wordsAll().first().map { it.toQuizWord() }
             val kana = app.content.kanaAll().first().map { it.toQuizKana() }
+            val kanji = app.content.kanjiAll().first().map {
+                com.japanlearn.app.domain.QuizKanji(
+                    id = it.id,
+                    char = it.char,
+                    zh = it.zh,
+                    on = it.onReadings(),
+                    kun = it.kunReadings(),
+                )
+            }
             val wrongIds = entries.filter { it.contentType == "grammar" }.map { it.contentId }.toSet()
             val grammarExercises = if (wrongIds.isEmpty()) {
                 emptyMap()
@@ -94,7 +105,7 @@ class WrongAnswerDrillViewModel(private val app: AppContainer) : ViewModel() {
                     .filter { it.id in wrongIds }
                     .associate { g -> g.id to parseExercises(g.exercisesJson) }
             }
-            val questions = DrillBuilder.build(entries, words, kana, grammarExercises, count = 10)
+            val questions = DrillBuilder.build(entries, words, kana, grammarExercises, kanji, count = 10)
             if (questions.isEmpty()) {
                 _state.update { it.copy(phase = DrillPhase.DONE, remainingWrong = 0) }
                 return@launch

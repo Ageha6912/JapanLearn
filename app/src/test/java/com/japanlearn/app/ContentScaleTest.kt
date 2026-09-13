@@ -3,6 +3,7 @@ package com.japanlearn.app
 import com.japanlearn.app.data.content.ContentJson
 import com.japanlearn.app.data.content.GrammarFile
 import com.japanlearn.app.data.content.KanaFile
+import com.japanlearn.app.data.content.KanjiFile
 import com.japanlearn.app.data.content.SentencesFile
 import com.japanlearn.app.data.content.WordsFile
 import org.junit.Assert.assertEquals
@@ -35,9 +36,17 @@ class ContentScaleTest {
     }
 
     @Test
-    fun `sentences json 180`() {
+    fun `sentences json 300`() {
         val file = ContentJson.decodeFromString<SentencesFile>(readContent("sentences.json"))
-        assertEquals(180, file.sentences.size)
+        assertEquals(300, file.sentences.size)
+    }
+
+    @Test
+    fun `kanji json 约 300 以上 N5 汉字`() {
+        val file = ContentJson.decodeFromString<KanjiFile>(readContent("kanji.json"))
+        assertTrue(file.kanji.size >= 300)
+        assertTrue(file.kanji.all { it.level == "N5" })
+        assertTrue(file.kanji.all { it.examples.isNotEmpty() })
     }
 
     @Test

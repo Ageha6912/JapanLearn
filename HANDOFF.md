@@ -10,8 +10,10 @@
 - 需求文档：`PRD.md`（§17 为 v0.1 评审决策记录，**§18 为 v0.2 决策记录**，**§19 为 v0.5–v0.7 决策记录与产品缺口清单**，与正文冲突时以 §17/§18/§19 为准）
 - 优化方案：`OPTIMIZATION.md`（**Accepted**，用户 2026-09-09 确认 Q1–Q3 推荐项；结论已于 2026-09-12 写入 PRD §19）
 - Git 身份（仓库级已配置）：`Ageha <ageha6912@gmail.com>`，勿用其他身份提交
-- 已发布：**v1.4.0**（tag + GitHub Release，正式签名 APK）。`versionName = "1.4.0"` / `versionCode` 28
+- 已发布：**v1.4.0**（tag + GitHub Release，正式签名 APK）。此前最新 Release
 - 发布页：https://github.com/Ageha6912/JapanLearn/releases/tag/v1.4.0
+- **树内待发：v1.6.0**（`versionName = "1.6.0"` / `versionCode` 29）——合并 v1.5 汉字专项 + v1.6 句库扩量 + 发版前联动补丁；**本条更新时尚未 tag/Release**
+- **发版节奏（用户 2026-09-12 定案）**：减少发版次数，多次改动合并后再统一发一次
 
 ## 2. 环境速查
 
@@ -29,13 +31,31 @@
 ```bash
 ./gradlew :app:assembleDebug        # debug APK
 ./gradlew :app:assembleRelease      # 正式签名 APK（keystore 已配置，见第 6 节坑 9）
-./gradlew :app:testDebugUnitTest    # 单元测试（当前 244 项），必须全绿才能交付
+./gradlew :app:testDebugUnitTest    # 单元测试（当前 275 项），必须全绿才能交付
 python tools/validate_content.py    # 内容校验，必须通过才能改内容；CI 已跑
+python tools/count_tests.py         # 统计 test-results XML 中的测试总数
 ```
 
 ## 3. 已完成
 
-### 宣传网页同步 v1.3.1（2026-09-12）
+### v1.5 汉字专项——代码已入库，**未发版**（2026-09-12）
+
+PRD §19.14 定案；与 v1.6 合并后统一 Release（用户要求减少发版次数）。`versionName` 仍 1.4.0 / versionCode 28。
+
+- **内容**：`assets/content/kanji.json` **397** 条 N5 汉字（音读/训读分列 + 词例文本快照）；生产脚本 `tools/extract_kanji_n5.py`（词库抽字 + 人工审定表）；`validate_content.py` 已扩展音训/字形/词例规则
+- **数据**：Room **v5→v6** 新增 `kanji` 表；进度复用 `user_progress`/`wrong_answers`（`contentType=kanji`）；`ContentSeedPlanner`/`ContentLoader` 五文件独立版本
+- **功能**：
+  - 学习 Tab「汉字专项」入口
+  - `KanjiSessionScreen`：卡片学（字/音训/释义/词例/TTS）→ 五种选择题（看字选义/看义选字/看字选读音/看读音选字/听音选字）→ 自评进 FSRS
+  - `KanjiQuizGenerator` 纯函数：读音题排除同读音干扰项；听音优先训读
+  - 每日新学配额：`StudyPlanner.kanjiDailyCount` 按目标档位折算 1–4，无目标默认 2；按 `progress.learnedAt` 统计，不抢词/语法额度
+  - 首页任务卡「汉字」行；词学完后 CTA 可直达汉字
+  - 错题突击支持 kanji；学习成果页已学/已掌握汉字
+  - 备份天然覆盖（全量 progress/wrong_answers）
+- **测试**：+ `KanjiQuizGeneratorTest` 10 / StudyPlanner 汉字配额 2 / SeedPlanner・Parsing・Scale・Migrations 断言更新，全量 **275** 全绿；`validate_content.py` 通过
+- README 已同步（275 测 / 汉字专项行 / kanji.json / 路线图）；**未改 versionName，未 tag，未 Release**
+
+### v1.4.0 已发布（2026-09-12）
 - `web/`（**整个目录仍未提交进 git**，untracked）内容从 v0.7.5 时代一次性同步到 v1.3.1：版本号/正式签名、FSRS 描述替换旧固定倍率规则（模糊1d/熟悉×1.5/熟练×2 上限60天）、数字 804→1104 词 / 87→120 语法 / 120→180 每日一句 / 22 课程单元、新增课程化/听力训练/学习目标/错题突击/学习成果功能卡与独立「AI 助手（可选）」区块（BYOK/流式/隐私默认关）+ AI 隐私 FAQ、对比表加 AI 行
 - 截图全部换 v1.3.1 时代源图：`web/tools_refresh_shots.py` PICKS 改为 v131_release_home_fab / v131_learn_tab / v131_course_unit / v100_02_word_session_unit1 / v100_07_checkpoint / v090_04_listening_quiz / v120_05_review_tab / v131_release_popup（ achievements/stats 现有截图带旧数字 804，弃用）
 - 新增 `web/tools_check_web.py`（63 项一致性校验：页面数字 vs 内容 JSON、versionName vs 页面、旧表述清除、锚点/资源/外链），全绿；页面数字今后改动先跑它
@@ -52,7 +72,51 @@ python tools/validate_content.py    # 内容校验，必须通过才能改内容
 - **发布工程**：R8 minify + 资源收缩（APK 1.5MB）、正式签名接入（keystore）、GitHub Actions 门禁 CI（`.github/workflows/ci.yml`：55 测试 + assembleDebug）
 - 55 项单元测试全绿；PRD §18 决策记录；README 数字已同步
 
-## 4. 当前任务：v1.4.0 已发布（2026-09-12）
+## 4. 当前任务：v1.6.0 收口中（2026-09-12）
+
+### 发版策略
+- 用户定案：**减少发版次数**，v1.5 + v1.6 + 联动补丁合并为一次 **v1.6.0 / versionCode 29**
+- `versionName` 已改为 1.6.0；`web/` 页面版本号已同步
+- 待办：assembleRelease → 模拟器回归（坑 11 核对 versionName）→ tag v1.6.0 + GitHub Release
+- 更新横幅正向路径会在该次真实发版后自然验证（v1.4 的 UpdateChecker）
+
+### 本版包含
+1. **v1.5 汉字专项**（PRD §19.14）：397 字库 Room v6、专项会话五题型、学习 Tab 入口、配额折算
+2. **v1.6 听力句库 180→300**（PRD §19.15）：天气/网购/银行新场景
+3. **联动收口**：复习混合队列含汉字、错题本/统计/首页/掌握度/`web/` 同步
+
+### 待办
+1. ~~assembleRelease + 模拟器回归~~ **已完成（2026-09-13）**：安装包 versionName **1.6.0** / versionCode **29**；首页任务卡含「汉字 2」；学习 Tab 汉字专项 0/397；会话卡片「私」音训/词例/配额 1/2；看字选义出题正常
+2. tag + GitHub Release（JapanLearn-v1.6.0.apk）
+3. 真机验证：汉字专项、流式 AI、更新横幅、统计仪表盘
+
+### v1.6 听力句库扩量（PRD §19.15，已入库未发版）
+- 每日一句 / 听句库 **180 → 300**（sentences version 5 → 7）
+- 新场景 **天气 / 网购 / 银行**（各约 25 条）+ 约 50 条补工作/就医/学校/旅游/日常
+- `validate_content.py` SCENES 白名单已扩展；批次 `tools/new_sentences_b4.json` + `new_sentences_b4b.json`
+- 纯内容：不改听力出题逻辑；`ContentScaleTest` / `ContentExpansionTest` 断言已更新
+- 全量 **275** 测全绿；validate 通过
+
+### 发版前补丁（2026-09-12，汉字联动收口）
+v1.5 初版只接了「学」侧，下列缺口已补齐：
+- **复习会话并入到期汉字**（`ReviewItem.KanjiItem` + `KanjiQuizGenerator`），此前 due 汉字永远进不了 SRS 复习
+- 复习 Tab 今日复习卡显示「汉字」到期数
+- 错题本展示汉字条目（字形 + 释义）
+- 统计页：错题画像类型含汉字、内容进度加汉字行、**掌握度分档并入汉字**（`wordStabilities + kanjiStabilities`）
+- 首页：学习进度加汉字进度条；今日新学汉字随 `learnedKanji` 变化重取（原先只在 init 读一次）
+- 清理 `KanjiSession` 死代码；`VolumeUp` 改 AutoMirrored
+- **`web/` 宣传页同步到 v1.4.0 树内状态**：148 语法 / 397 汉字 / 300 场景句 / 275 测；新增汉字专项功能卡；`tools_check_web.py` 扩 kanji 与新数字校验，全绿
+
+### 待办
+1. 模拟器 release 回归（汉字专项入口/会话、复习混合队列、每日一句新场景）
+2. 合并发版：versionName 1.6.0 / versionCode 29 → assembleRelease → tag + GitHub Release（届时 `web/` 版本号再改 v1.6.0）
+3. 真机验证：汉字专项、流式 AI、更新横幅、统计仪表盘
+4. 可选再攒：N4 汉字批次；学习 Tab 截图补汉字入口真机图
+
+### v1.5 汉字专项摘要（已入库）
+详见上文「已完成」小节与 PRD §19.14。
+
+## 5. 历史版本（摘要，细节见各节）
 
 ### v1.4.0 已发布（PRD §19.13 grilling 两轮定案）
 - **主题：统计增强**——统计页升格仪表盘（成果页里程碑叙事不动）

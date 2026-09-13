@@ -59,6 +59,8 @@ data class StatsUiState(
     val totalWords: Int = 0,
     val learnedGrammar: Int = 0,
     val totalGrammar: Int = 0,
+    val learnedKanji: Int = 0,
+    val totalKanji: Int = 0,
     val today: LocalDate = LocalDate.now(),
     val week: List<Pair<LocalDate, DailyStudyEntity?>> = emptyList(),
     val mastery: MasteryDistribution.Snapshot = MasteryDistribution.Snapshot(),
@@ -88,8 +90,14 @@ class StatsViewModel(private val app: AppContainer) : ViewModel() {
         collect(app.progress.learnedGrammarCount()) { s, v -> s.copy(learnedGrammar = v) }
         collect(app.content.wordCount()) { s, v -> s.copy(totalWords = v) }
         collect(app.content.grammarCount()) { s, v -> s.copy(totalGrammar = v) }
+        collect(app.progress.learnedKanjiCount()) { s, v -> s.copy(learnedKanji = v) }
+        collect(app.content.kanjiCount()) { s, v -> s.copy(totalKanji = v) }
 
-        collect(app.progress.wordStabilities()) { s, v ->
+        collect(
+            combine(app.progress.wordStabilities(), app.progress.kanjiStabilities()) { words, kanji ->
+                words + kanji
+            },
+        ) { s, v ->
             s.copy(mastery = MasteryDistribution.snapshot(v))
         }
 
@@ -99,15 +107,18 @@ class StatsViewModel(private val app: AppContainer) : ViewModel() {
                 app.content.wordsAll(),
                 app.content.grammarAll(),
                 app.content.kanaAll(),
-            ) { wrong, words, grammar, kana ->
+                app.content.kanjiAll(),
+            ) { wrong, words, grammar, kana, kanji ->
                 val wordById = words.associateBy { it.id }
                 val grammarById = grammar.associateBy { it.id }
                 val kanaById = kana.associateBy { it.id }
+                val kanjiById = kanji.associateBy { it.id }
                 val entries = wrong.mapNotNull { w ->
                     val primary = when (w.contentType) {
                         "word" -> wordById[w.contentId]?.ja
                         "grammar" -> grammarById[w.contentId]?.title
                         "kana" -> kanaById[w.contentId]?.hiragana
+                        "kanji" -> kanjiById[w.contentId]?.char
                         else -> null
                     } ?: return@mapNotNull null
                     WrongPortrait.Entry(
@@ -138,7 +149,7 @@ fun StatsScreen(nav: NavHostController) {
         weekLabels[(date.dayOfWeek.value - 1).coerceIn(0, 6)] to (record?.studySeconds ?: 0) / 60
     }
     val todayIndex = state.week.indexOfFirst { (date, _) -> date == state.today }.takeIf { it >= 0 }
-    val typeLabel = mapOf("word" to "单词", "grammar" to "语法", "kana" to "五十音")
+    val typeLabel = mapOf("word" to "单词", "grammar" to "语法", "kana" to "五十音", "kanji" to "汉字")
 
     Scaffold(
         topBar = { AppTopBar("学习统计") { nav.popBackStack() } },
@@ -222,7 +233,7 @@ fun StatsScreen(nav: NavHostController) {
                 SectionCard(title = "掌握度分布") {
                     if (state.mastery.total == 0) {
                         Text(
-                            "还没有已学单词。开始今日学习后，这里会按 FSRS 稳定度显示新学 / 巩固中 / 已掌握。",
+                            "还没有已学单词或汉字。开始今日学习后，这里会按 FSRS 稳定度显示新学 / 巩固中 / 已掌握。",
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
@@ -257,7 +268,7 @@ fun StatsScreen(nav: NavHostController) {
                             style = MaterialTheme.typography.titleSmall,
                             color = MaterialTheme.colorScheme.secondary,
                         )
-                        val typeBits = listOf("word", "grammar", "kana").mapNotNull { t ->
+                        val typeBits = listOf("word", "grammar", "kana", "kanji").mapNotNull { t ->
                             val n = portrait.byType[t] ?: return@mapNotNull null
                             "${typeLabel[t] ?: t} $n"
                         }
@@ -308,6 +319,10 @@ fun StatsScreen(nav: NavHostController) {
                     )
                     Text(
                         "语法：已学 ${state.learnedGrammar} / ${state.totalGrammar}",
+                        style = MaterialTheme.typography.bodyLarge,
+                    )
+                    Text(
+                        "汉字：已学 ${state.learnedKanji} / ${state.totalKanji}",
                         style = MaterialTheme.typography.bodyLarge,
                     )
                 }

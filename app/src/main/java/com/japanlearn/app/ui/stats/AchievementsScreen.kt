@@ -42,6 +42,9 @@ data class AchievementsUiState(
     val totalWords: Int = 0,
     val masteredWords: Int = 0,
     val learnedGrammar: Int = 0,
+    val learnedKanji: Int = 0,
+    val totalKanji: Int = 0,
+    val masteredKanji: Int = 0,
     val streak: Int = 0,
     val longestStreak: Int = 0,
     val completedUnits: Int = 0,
@@ -67,6 +70,9 @@ class AchievementsViewModel(private val app: AppContainer) : ViewModel() {
                     totalWords = app.content.wordCount().first(),
                     masteredWords = app.progress.masteredWordCount().first(),
                     learnedGrammar = app.progress.learnedGrammarCount().first(),
+                    learnedKanji = app.progress.learnedKanjiCount().first(),
+                    totalKanji = app.content.kanjiCount().first(),
+                    masteredKanji = app.progress.masteredKanjiCount().first(),
                     streak = weekly.streak,
                     longestStreak = StreakCalculator.longestStreak(app.stats.allStudyDates()),
                     completedUnits = app.stats.completedUnitCount(),
@@ -128,6 +134,23 @@ fun AchievementsScreen(nav: NavHostController) {
                                 modifier = Modifier.weight(1f),
                                 accent = MaterialTheme.colorScheme.tertiary,
                                 numericValue = state.learnedGrammar,
+                            )
+                        }
+                        Spacer(Modifier.height(10.dp))
+                        Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                            StatTile(
+                                value = "${state.learnedKanji}",
+                                label = "已学汉字 / ${state.totalKanji}",
+                                modifier = Modifier.weight(1f),
+                                accent = MaterialTheme.colorScheme.secondary,
+                                numericValue = state.learnedKanji,
+                            )
+                            StatTile(
+                                value = "${state.masteredKanji}",
+                                label = "已掌握汉字",
+                                modifier = Modifier.weight(1f),
+                                accent = MaterialTheme.colorScheme.secondary,
+                                numericValue = state.masteredKanji,
                             )
                         }
                     }

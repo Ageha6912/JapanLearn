@@ -1,22 +1,24 @@
 package com.japanlearn.app.data.content
 
-enum class ContentKind { KANA, WORDS, GRAMMAR, SENTENCES }
+enum class ContentKind { KANA, WORDS, GRAMMAR, SENTENCES, KANJI }
 
 data class ContentVersions(
     val kana: Int,
     val words: Int,
     val grammar: Int,
     val sentences: Int,
+    val kanji: Int = 0,
 ) {
-    fun total(): Int = kana + words + grammar + sentences
+    fun total(): Int = kana + words + grammar + sentences + kanji
 
     companion object {
-        val ZERO = ContentVersions(0, 0, 0, 0)
+        val ZERO = ContentVersions(0, 0, 0, 0, 0)
 
         const val KEY_KANA = "content_version_kana"
         const val KEY_WORDS = "content_version_words"
         const val KEY_GRAMMAR = "content_version_grammar"
         const val KEY_SENTENCES = "content_version_sentences"
+        const val KEY_KANJI = "content_version_kanji"
         /** 0.4.x 加总 key。只读用于升级判定；0.7.5 起不再写入，装载成功后删除。 */
         const val LEGACY_TOTAL = "content_version"
 
@@ -25,6 +27,7 @@ data class ContentVersions(
             words = get(KEY_WORDS)?.toIntOrNull() ?: 0,
             grammar = get(KEY_GRAMMAR)?.toIntOrNull() ?: 0,
             sentences = get(KEY_SENTENCES)?.toIntOrNull() ?: 0,
+            kanji = get(KEY_KANJI)?.toIntOrNull() ?: 0,
         )
     }
 }
@@ -36,7 +39,7 @@ data class ContentVersions(
 object ContentSeedPlanner {
 
     /**
-     * 仅当「有加总 key 且四把新 key 全缺」时视为 0.4.x 安装，强制四文件重装。
+     * 仅当「有加总 key 且分文件 key 全缺」时视为 0.4.x 安装，强制全文件重装。
      * 双写安装（新旧 key 并存）不得走这条。
      */
     fun hasLegacyTotalOnly(legacyTotal: String?, perFileKana: String?): Boolean =
@@ -53,6 +56,7 @@ object ContentSeedPlanner {
             if (installed.words != incoming.words) add(ContentKind.WORDS)
             if (installed.grammar != incoming.grammar) add(ContentKind.GRAMMAR)
             if (installed.sentences != incoming.sentences) add(ContentKind.SENTENCES)
+            if (installed.kanji != incoming.kanji) add(ContentKind.KANJI)
         }
     }
 

@@ -15,10 +15,10 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.MenuBook
+import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.material.icons.automirrored.outlined.NavigateNext
 import androidx.compose.material.icons.filled.Grade
 import androidx.compose.material.icons.filled.Translate
-import androidx.compose.material.icons.filled.VolumeUp
 import androidx.compose.material.icons.outlined.EditNote
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -60,6 +60,9 @@ data class LearnUiState(
     val unitRows: List<CourseUnitProgress> = emptyList(),
     val currentUnit: Int = 1,
     val dailyNewWords: Int = 10,
+    val kanjiLearned: Int = 0,
+    val kanjiTotal: Int = 0,
+    val kanjiDaily: Int = com.japanlearn.app.domain.StudyPlanner.KANJI_DAILY_DEFAULT,
 )
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -73,7 +76,15 @@ class LearnViewModel(private val app: AppContainer) : ViewModel() {
         }
         collect(app.content.kanaCount()) { s, v -> s.copy(totalKana = v) }
         collect(app.settings.studyLevel) { s, v -> s.copy(studyLevel = v) }
-        collect(app.settings.dailyNewWords) { s, v -> s.copy(dailyNewWords = v) }
+        collect(app.settings.dailyNewWords) { s, v ->
+            val hasGoal = app.settings.goalLevel.value != com.japanlearn.app.domain.StudyPlanner.LEVEL_NONE
+            s.copy(
+                dailyNewWords = v,
+                kanjiDaily = com.japanlearn.app.domain.StudyPlanner.kanjiDailyCount(v, hasGoal),
+            )
+        }
+        collect(app.content.kanjiCount()) { s, v -> s.copy(kanjiTotal = v) }
+        collect(app.progress.learnedKanjiCount()) { s, v -> s.copy(kanjiLearned = v) }
         collect(courseFlow()) { s, (rows, current) -> s.copy(unitRows = rows, currentUnit = current) }
     }
 
@@ -148,11 +159,22 @@ fun LearnTabScreen(nav: NavHostController) {
                 )
             }
 
+            StaggerIn(3) {
+                LearnEntry(
+                    title = "汉字专项",
+                    subtitle = "音训 · 词例 · 已学 ${state.kanjiLearned}/${state.kanjiTotal} · 今日约 ${state.kanjiDaily} 字",
+                    icon = Icons.Filled.Grade,
+                    tint = MaterialTheme.colorScheme.tertiary,
+                    progress = if (state.kanjiTotal > 0) state.kanjiLearned.toFloat() / state.kanjiTotal else 0f,
+                    onClick = { nav.navigate(Routes.KANJI_SESSION) },
+                )
+            }
+
             StaggerIn(4) {
                 LearnEntry(
                     title = "听力训练",
                     subtitle = "听音辨词 · 听写假名 · 听句选义",
-                    icon = Icons.Filled.VolumeUp,
+                    icon = Icons.AutoMirrored.Filled.VolumeUp,
                     tint = MaterialTheme.colorScheme.secondary,
                     progress = null,
                     onClick = { nav.navigate(Routes.LISTENING) },

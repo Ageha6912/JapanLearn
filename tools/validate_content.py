@@ -18,8 +18,16 @@ CATEGORIES = {"人物", "数字", "时间", "食物", "地点", "物品", "动�
 CAT_UNIT = {c: i + 1 for i, c in enumerate(sorted(CATEGORIES, key=["人物", "数字", "时间", "食物", "地点", "物品", "动作", "形容词", "副词", "自然", "身体"].index))}
 UNITS_PER_LEVEL = 11
 KANA_GROUPS = {"seion", "dakuon", "youon"}
-SCENES = {"日常聊天", "餐厅", "便利店", "旅游", "学校", "工作", "动漫 / 娱乐", "购物", "交通", "就医"}
+SCENES = {
+    "日常聊天", "餐厅", "便利店", "旅游", "学校", "工作", "动漫 / 娱乐",
+    "购物", "交通", "就医",
+    # v1.6（§19.15）
+    "天气", "网购", "银行",
+}
 LEVELS = {"N5", "N4"}
+KANJI_ON_RE = re.compile(r"^[ァ-ヶー]+$")  # 片假名 + 长音符
+KANJI_KUN_RE = re.compile(r"^[ぁ-ゖー]+$")  # 平假名 + 长音符
+KANJI_CHAR_RE = re.compile(r"^[一-鿿]$")  # 单个汉字
 
 errors: list[str] = []
 
@@ -146,14 +154,63 @@ def validate_sentences(data):
     print(f"sentences: {len(data['sentences'])} 条 ✓")
 
 
+def validate_kanji(data):
+    if not data:
+        return
+    seen_ids, seen_chars = set(), {}
+    for k in data["kanji"]:
+        kid = k.get("id", "?")
+        if kid in seen_ids:
+            err(f"kanji 重复 id: {kid}")
+        seen_ids.add(kid)
+        ch = k.get("char", "")
+        if not KANJI_CHAR_RE.match(ch):
+            err(f"kanji {kid}: 字形异常 {ch!r}")
+        if ch in seen_chars:
+            err(f"kanji 字形重复: {ch} ({seen_chars[ch]} / {kid})")
+        seen_chars[ch] = kid
+        if k.get("level") not in LEVELS:
+            err(f"kanji {kid} {ch}: 非法级别 {k.get('level')!r}")
+        on, kun = k.get("on") or [], k.get("kun") or []
+        if not on and not kun:
+            err(f"kanji {kid} {ch}: 音读与训读不能同时为空")
+        for r in on:
+            if not KANJI_ON_RE.match(r):
+                err(f"kanji {kid} {ch}: 音读应为片假名 {r!r}")
+        for r in kun:
+            if not KANJI_KUN_RE.match(r):
+                err(f"kanji {kid} {ch}: 训读应为平假名 {r!r}")
+        examples = k.get("examples") or []
+        if not examples:
+            err(f"kanji {kid} {ch}: 无词例")
+        for ex in examples:
+            for f in ("ja", "kana", "zh"):
+                if not str(ex.get(f, "")).strip():
+                    err(f"kanji {kid} {ch}: 词例字段 {f} 为空")
+            if not KANA_RE.match(ex.get("kana", "")):
+                err(f"kanji {kid} {ch}: 词例假名异常 {ex.get('kana')!r}")
+    non_empty(data["kanji"], "id", ["char", "zh"], "kanji")
+    levels = {}
+    for k in data["kanji"]:
+        levels[k.get("level")] = levels.get(k.get("level"), 0) + 1
+    print(f"kanji: {len(data['kanji'])} 条 ✓  级别 {levels}")
+
+
 def main():
     kana = load("kana.json")
     words = load("words.json")
     grammar = load("grammar.json")
     sentences = load("sentences.json")
+    kanji = load("kanji.json")
 
     versions = {}
-    for name, d in [("kana", kana), ("words", words), ("grammar", grammar), ("sentences", sentences)]:
+    for name, d in [
+        ("kana", kana),
+        ("words", words),
+        ("grammar", grammar),
+        ("sentences", sentences),
+        ("kanji", kanji),
+    ]:
         if d is not None:
             v = d.get("version")
             if not isinstance(v, int):
@@ -164,6 +221,7 @@ def main():
     validate_words(words, kana)
     validate_grammar(grammar)
     validate_sentences(sentences)
+    validate_kanji(kanji)
 
     if errors:
         print(f"\n✗ {len(errors)} 个问题：")

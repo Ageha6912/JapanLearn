@@ -6,6 +6,7 @@ import com.japanlearn.app.data.content.Example
 import com.japanlearn.app.data.content.Exercise
 import com.japanlearn.app.data.content.GrammarFile
 import com.japanlearn.app.data.content.KanaFile
+import com.japanlearn.app.data.content.KanjiFile
 import com.japanlearn.app.data.content.SentencesFile
 import com.japanlearn.app.data.content.WordItem
 import com.japanlearn.app.data.content.WordsFile
@@ -131,6 +132,35 @@ class ContentParsingTest {
         val breakdown: List<Breakdown> = s.breakdown
         assertEquals(2, breakdown.size)
         assertEquals("ちょっと", breakdown[0].t)
+    }
+
+    @Test
+    fun `解析汉字数据 音训分列与词例快照`() {
+        val json = """
+            {"version":1,"kanji":[
+              {"id":"k001","char":"日","zh":"日；太阳","on":["ニチ","ジツ"],"kun":["ひ","か"],
+               "level":"N5","examples":[{"ja":"日本","kana":"にほん","zh":"日本"}]}
+            ]}
+        """.trimIndent()
+        val file = ContentJson.decodeFromString<KanjiFile>(json)
+        val k = file.kanji.single()
+        assertEquals("日", k.char)
+        assertEquals(listOf("ニチ", "ジツ"), k.on)
+        assertEquals(listOf("ひ", "か"), k.kun)
+        assertEquals("N5", k.level)
+        assertEquals(1, k.examples.size)
+        assertEquals("にほん", k.examples[0].kana)
+    }
+
+    @Test
+    fun `解析汉字数据 音训可为空列表`() {
+        val json = """
+            {"version":1,"kanji":[
+              {"id":"k002","char":"込","zh":"进","kun":["こ"], "examples":[{"ja":"込む","kana":"こむ","zh":"拥挤"}]}
+            ]}
+        """.trimIndent()
+        val file = ContentJson.decodeFromString<KanjiFile>(json)
+        assertTrue(file.kanji.single().on.isEmpty())
     }
 
     @Test

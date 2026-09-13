@@ -11,6 +11,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -62,6 +63,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.japanlearn.app.domain.Mastery
@@ -110,8 +112,17 @@ fun AppButton(
             .pressScale(interaction, pressedScale = 0.98f),
         shape = MaterialTheme.shapes.medium,
         colors = ButtonDefaults.buttonColors(),
+        // 收紧水平内边距，避免并排按钮里中文长文案被挤到换行
+        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
     ) {
-        Text(text = text, style = MaterialTheme.typography.labelLarge, fontSize = 16.sp)
+        Text(
+            text = text,
+            style = MaterialTheme.typography.labelLarge,
+            fontSize = 16.sp,
+            maxLines = 1,
+            softWrap = false,
+            overflow = TextOverflow.Ellipsis,
+        )
     }
 }
 

@@ -11,13 +11,14 @@ import androidx.room.RoomDatabase
         GrammarEntity::class,
         KanaEntity::class,
         SentenceEntity::class,
+        KanjiEntity::class,
         UserProgressEntity::class,
         ReviewRecordEntity::class,
         DailyStudyEntity::class,
         WrongAnswerEntity::class,
         MetaEntity::class,
     ],
-    version = 5,
+    version = 6,
     exportSchema = true,
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -25,6 +26,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun grammarDao(): GrammarDao
     abstract fun kanaDao(): KanaDao
     abstract fun sentenceDao(): SentenceDao
+    abstract fun kanjiDao(): KanjiDao
     abstract fun progressDao(): ProgressDao
     abstract fun reviewRecordDao(): ReviewRecordDao
     abstract fun dailyStudyDao(): DailyStudyDao
@@ -39,6 +41,7 @@ abstract class AppDatabase : RoomDatabase() {
                     AppMigrations.MIGRATION_2_3,
                     AppMigrations.MIGRATION_3_4,
                     AppMigrations.MIGRATION_4_5,
+                    AppMigrations.MIGRATION_5_6,
                 )
                 .build()
     }

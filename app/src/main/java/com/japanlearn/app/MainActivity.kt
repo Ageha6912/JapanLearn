@@ -77,6 +77,7 @@ import com.japanlearn.app.ui.course.CourseScreen
 import com.japanlearn.app.ui.course.CourseUnitScreen
 import com.japanlearn.app.ui.kana.KanaQuizScreen
 import com.japanlearn.app.ui.kana.KanaScreen
+import com.japanlearn.app.ui.kanji.KanjiSessionScreen
 import com.japanlearn.app.ui.grammar.GrammarDetailScreen
 import com.japanlearn.app.ui.grammar.GrammarListScreen
 import com.japanlearn.app.ui.grammar.GrammarSessionScreen
@@ -126,6 +127,7 @@ object Routes {
     const val ACHIEVEMENTS = "achievements"
     const val AI_ASSISTANT = "aiAssistant?mode={mode}&input={input}&context={context}"
     const val SENTENCE = "sentence/{index}"
+    const val KANJI_SESSION = "kanjiSession"
 
     fun wordSession(count: Int) = "wordSession/$count"
     fun grammarSession(count: Int) = "grammarSession/$count"
@@ -273,6 +275,7 @@ fun MainRoot(navTarget: String? = null) {
             }
             composable(Routes.GOAL) { GoalScreen(navController) }
             composable(Routes.LISTENING) { ListeningSessionScreen(navController) }
+            composable(Routes.KANJI_SESSION) { KanjiSessionScreen(navController) }
             composable(Routes.COURSE) { CourseScreen(navController) }
             composable(Routes.COURSE_UNIT) { entry ->
                 CourseUnitScreen(
@@ -305,6 +308,7 @@ private data class TabItem(
 /** 底部导航：胶囊指示器弹性展开 + 图标缩放，选中/未选中使用成对填充/描边图标。 */
 @Composable
 private fun JapanBottomBar(navController: NavHostController, currentRoute: String?) {
+    val reduceMotion = rememberReducedMotion()
     val items = listOf(
         TabItem(Routes.HOME, "首页", Icons.Filled.Home, Icons.Outlined.Home),
         TabItem(Routes.LEARN, "学习", Icons.Filled.School, Icons.Outlined.School),
@@ -321,14 +325,28 @@ private fun JapanBottomBar(navController: NavHostController, currentRoute: Strin
         ) {
             items.forEach { item ->
                 val selected = currentRoute == item.route
+                // 指示器不要过冲：springBouncy 在 1→0 时会冲过 0 再弹回，
+                // 配合「indicator>0.01 才绘制」会让胶囊反复显隐；Box 高度
+                // 又随胶囊有无在 24/30 间跳，表现为原 Tab 上下闪两下。
                 val indicator by androidx.compose.animation.core.animateFloatAsState(
                     targetValue = if (selected) 1f else 0f,
-                    animationSpec = MotionTokens.springBouncy(),
+                    animationSpec = if (reduceMotion) {
+                        androidx.compose.animation.core.snap()
+                    } else {
+                        androidx.compose.animation.core.spring(
+                            dampingRatio = androidx.compose.animation.core.Spring.DampingRatioNoBouncy,
+                            stiffness = androidx.compose.animation.core.Spring.StiffnessMediumLow,
+                        )
+                    },
                     label = "tabIndicator",
                 )
                 val iconScale by androidx.compose.animation.core.animateFloatAsState(
                     targetValue = if (selected) 1.12f else 1f,
-                    animationSpec = MotionTokens.springBouncy(),
+                    animationSpec = if (reduceMotion) {
+                        androidx.compose.animation.core.snap()
+                    } else {
+                        MotionTokens.springBouncy()
+                    },
                     label = "tabIconScale",
                 )
                 Box(Modifier.weight(1f), contentAlignment = Alignment.Center) {
@@ -342,12 +360,17 @@ private fun JapanBottomBar(navController: NavHostController, currentRoute: Strin
                             }
                             .padding(horizontal = 12.dp, vertical = 8.dp),
                     ) {
-                        Box(contentAlignment = Alignment.Center) {
-                            if (indicator > 0.01f) {
+                        // 固定高度，胶囊显隐不再改动布局高度
+                        Box(
+                            contentAlignment = Alignment.Center,
+                            modifier = Modifier.height(30.dp),
+                        ) {
+                            val pill = indicator.coerceIn(0f, 1f)
+                            if (pill > 0.01f) {
                                 Surface(
-                                    color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = indicator),
+                                    color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = pill),
                                     shape = RoundedCornerShape(100),
-                                    modifier = Modifier.size(width = 46.dp * indicator.coerceIn(0.3f, 1f), height = 30.dp),
+                                    modifier = Modifier.size(width = 46.dp * pill, height = 30.dp),
                                 ) {}
                             }
                             Icon(

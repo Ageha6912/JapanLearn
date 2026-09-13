@@ -251,20 +251,26 @@ class ContentRepository(private val db: AppDatabase) {
     fun wordsAll() = db.wordDao().all()
     fun grammarAll() = db.grammarDao().all()
     fun sentencesAll() = db.sentenceDao().all()
+    fun kanjiAll() = db.kanjiDao().all()
 
     fun wordCount() = db.wordDao().countFlow()
     fun grammarCount() = db.grammarDao().countFlow()
     fun kanaCount() = db.kanaDao().countFlow()
+    fun kanjiCount() = db.kanjiDao().countFlow()
     fun wordCountByLevel(level: String) = db.wordDao().countByLevelFlow(level)
     fun grammarCountByLevel(level: String) = db.grammarDao().countByLevelFlow(level)
+    fun kanjiCountByLevel(level: String) = db.kanjiDao().countByLevelFlow(level)
     fun learnedWordCountByLevel(level: String) = db.wordDao().learnedCountByLevelFlow(level)
     fun learnedGrammarCountByLevel(level: String) = db.grammarDao().learnedCountByLevelFlow(level)
+    fun learnedKanjiCountByLevel(level: String) = db.kanjiDao().learnedCountByLevelFlow(level)
 
     suspend fun wordById(id: String): WordEntity? = db.wordDao().byId(id)
     suspend fun grammarById(id: String) = db.grammarDao().byId(id)
+    suspend fun kanjiById(id: String) = db.kanjiDao().byId(id)
 
     suspend fun nextNewWords(n: Int, level: String): List<WordEntity> = db.wordDao().newWords(n, level)
     suspend fun nextNewGrammar(n: Int, level: String) = db.grammarDao().newGrammar(n, level)
+    suspend fun nextNewKanji(n: Int, level: String = "N5") = db.kanjiDao().newKanji(n, level)
 
     // ---- 课程单元（PRD §19.8）----
 
@@ -379,9 +385,11 @@ class ProgressRepository(
 
     fun dueWordCount(): Flow<Int> = db.progressDao().dueWordCount(dates.nowMillis())
     fun dueGrammarCount(): Flow<Int> = db.progressDao().dueGrammarCount(dates.nowMillis())
+    fun dueKanjiCount(): Flow<Int> = db.progressDao().dueKanjiCount(dates.nowMillis())
 
     suspend fun dueWords(limit: Int): List<WordEntity> = db.wordDao().dueWords(dates.nowMillis(), limit)
     suspend fun dueGrammar(limit: Int) = db.grammarDao().dueGrammar(dates.nowMillis(), limit)
+    suspend fun dueKanji(limit: Int) = db.kanjiDao().dueKanji(dates.nowMillis(), limit)
 
     suspend fun reviewsDoneToday(): Int {
         val dayStart = dates.today().atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
@@ -396,6 +404,14 @@ class ProgressRepository(
 
     fun learnedWordCount(): Flow<Int> = db.progressDao().countWordFlow()
     fun learnedGrammarCount(): Flow<Int> = db.progressDao().countGrammarFlow()
+    fun learnedKanjiCount(): Flow<Int> = db.progressDao().countKanjiFlow()
+    fun masteredKanjiCount(): Flow<Int> = db.progressDao().masteredKanjiCount(SrsScheduler.MASTERED_INTERVAL_DAYS)
+
+    /** 今日已新学汉字数（按 progress.learnedAt，PRD §19.14）。 */
+    suspend fun newKanjiLearnedToday(): Int {
+        val dayStart = dates.today().atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
+        return db.progressDao().countKanjiLearnedSince(dayStart)
+    }
 
     /** 某类内容已学过的 id 集合（用于按级别统计已学数）。 */
     fun learnedIds(type: String): Flow<Set<String>> =
@@ -409,6 +425,10 @@ class ProgressRepository(
     /** 已学词的 FSRS stability 列表，供掌握度分档（PRD §19.13）。 */
     fun wordStabilities(): Flow<List<Double>> =
         db.progressDao().allByType("word").map { rows -> rows.map { it.stability } }
+
+    /** 已学汉字的 FSRS stability 列表，与词合并进掌握度分档（PRD §19.15 补丁）。 */
+    fun kanjiStabilities(): Flow<List<Double>> =
+        db.progressDao().allByType("kanji").map { rows -> rows.map { it.stability } }
 
     fun wrongAnswers(): Flow<List<WrongAnswerEntity>> = db.wrongAnswerDao().all()
     fun wrongAnswerCount(): Flow<Int> = db.wrongAnswerDao().count()

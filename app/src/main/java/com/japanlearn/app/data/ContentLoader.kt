@@ -12,11 +12,13 @@ import com.japanlearn.app.data.content.Example
 import com.japanlearn.app.data.content.Exercise
 import com.japanlearn.app.data.content.GrammarFile
 import com.japanlearn.app.data.content.KanaFile
+import com.japanlearn.app.data.content.KanjiFile
 import com.japanlearn.app.data.content.SentencesFile
 import com.japanlearn.app.data.content.WordsFile
 import com.japanlearn.app.data.local.AppDatabase
 import com.japanlearn.app.data.local.GrammarEntity
 import com.japanlearn.app.data.local.KanaEntity
+import com.japanlearn.app.data.local.KanjiEntity
 import com.japanlearn.app.data.local.MetaEntity
 import com.japanlearn.app.data.local.SentenceEntity
 import com.japanlearn.app.data.local.WordEntity
@@ -45,7 +47,14 @@ class ContentLoader(
         val words = ContentJson.decodeFromString<WordsFile>(readAsset("words.json"))
         val grammar = ContentJson.decodeFromString<GrammarFile>(readAsset("grammar.json"))
         val sentences = ContentJson.decodeFromString<SentencesFile>(readAsset("sentences.json"))
-        val incoming = ContentVersions(kana.version, words.version, grammar.version, sentences.version)
+        val kanji = ContentJson.decodeFromString<KanjiFile>(readAsset("kanji.json"))
+        val incoming = ContentVersions(
+            kana = kana.version,
+            words = words.version,
+            grammar = grammar.version,
+            sentences = sentences.version,
+            kanji = kanji.version,
+        )
 
         db.withTransaction {
             val legacy = db.metaDao().get(ContentVersions.LEGACY_TOTAL)
@@ -56,6 +65,7 @@ class ContentLoader(
                 words = db.metaDao().get(ContentVersions.KEY_WORDS)?.toIntOrNull() ?: 0,
                 grammar = db.metaDao().get(ContentVersions.KEY_GRAMMAR)?.toIntOrNull() ?: 0,
                 sentences = db.metaDao().get(ContentVersions.KEY_SENTENCES)?.toIntOrNull() ?: 0,
+                kanji = db.metaDao().get(ContentVersions.KEY_KANJI)?.toIntOrNull() ?: 0,
             )
             val kinds = ContentSeedPlanner.kindsToReload(installed, incoming, hasLegacyTotalOnly)
             if (kinds.isNotEmpty()) {
@@ -65,11 +75,13 @@ class ContentLoader(
                 if (ContentKind.KANA in kinds) reloadKana(kana)
                 if (ContentKind.GRAMMAR in kinds) reloadGrammar(grammar)
                 if (ContentKind.SENTENCES in kinds) reloadSentences(sentences)
+                if (ContentKind.KANJI in kinds) reloadKanji(kanji)
 
                 db.metaDao().upsert(MetaEntity(ContentVersions.KEY_KANA, incoming.kana.toString()))
                 db.metaDao().upsert(MetaEntity(ContentVersions.KEY_WORDS, incoming.words.toString()))
                 db.metaDao().upsert(MetaEntity(ContentVersions.KEY_GRAMMAR, incoming.grammar.toString()))
                 db.metaDao().upsert(MetaEntity(ContentVersions.KEY_SENTENCES, incoming.sentences.toString()))
+                db.metaDao().upsert(MetaEntity(ContentVersions.KEY_KANJI, incoming.kanji.toString()))
             }
             // PR-R51：停写旧加总 key。升级判定已在上面读完；写入新 key 后删除残留。
             // 无内容变更时也要删，清理 0.5.x 双写留下的旧 key。
@@ -145,6 +157,25 @@ class ContentLoader(
         if (toDrop.isNotEmpty()) db.sentenceDao().deleteByIds(toDrop)
     }
 
+    private suspend fun reloadKanji(file: KanjiFile) {
+        val entities = file.kanji.mapIndexed { i, k ->
+            KanjiEntity(
+                id = k.id, char = k.char, zh = k.zh,
+                onJson = ContentJson.encodeToString(k.on),
+                kunJson = ContentJson.encodeToString(k.kun),
+                examplesJson = ContentJson.encodeToString(k.examples),
+                level = k.level, order = i,
+            )
+        }
+        require(entities.isNotEmpty()) { "kanji.json has no items" }
+        db.kanjiDao().insertAll(entities)
+        val existing = db.kanjiDao().allOnce().map { it.id }.toSet()
+        val incomingIds = entities.map { it.id }.toSet()
+        require(incomingIds.size == entities.size) { "kanji.json has duplicate ids" }
+        val toDrop = ContentSeedPlanner.idsToDelete(existing, incomingIds)
+        if (toDrop.isNotEmpty()) db.kanjiDao().deleteByIds(toDrop)
+    }
+
     companion object {
         const val TAG = "ContentLoader"
         const val KEY_CONTENT_VERSION = ContentVersions.LEGACY_TOTAL
@@ -155,3 +186,7 @@ class ContentLoader(
 fun GrammarEntity.examples(): List<Example> = ContentJson.decodeFromString(examplesJson)
 fun GrammarEntity.exercises(): List<Exercise> = ContentJson.decodeFromString(exercisesJson)
 fun SentenceEntity.breakdown(): List<Breakdown> = ContentJson.decodeFromString(breakdownJson)
+fun KanjiEntity.onReadings(): List<String> = ContentJson.decodeFromString(onJson)
+fun KanjiEntity.kunReadings(): List<String> = ContentJson.decodeFromString(kunJson)
+fun KanjiEntity.examples(): List<com.japanlearn.app.data.content.KanjiExample> =
+    ContentJson.decodeFromString(examplesJson)

@@ -15,6 +15,23 @@ object StudyPlanner {
     /** 周校准周期：距上次自动应用推荐 ≥ 7 天才再次自动应用。 */
     const val RECALIBRATE_AFTER_DAYS = 7L
 
+    /** 未设学习目标时的每日新学汉字数（PRD §19.14）。 */
+    const val KANJI_DAILY_DEFAULT = 2
+
+    /**
+     * 每日新学汉字数：按词/语法目标档位折算 1–4，不与词/语法抢同一额度。
+     * 档位 5/10/15/20 → 汉字 1/2/3/4；无目标时固定 [KANJI_DAILY_DEFAULT]。
+     */
+    fun kanjiDailyCount(dailyWordTier: Int, hasGoal: Boolean): Int {
+        if (!hasGoal) return KANJI_DAILY_DEFAULT
+        return when {
+            dailyWordTier <= DAILY_TIERS.first() -> 1
+            dailyWordTier <= 10 -> 2
+            dailyWordTier <= 15 -> 3
+            else -> 4
+        }
+    }
+
     /** 目标倒推结果。 */
     data class Plan(
         /** 距目标日剩余天数；未设日期为 null，目标日当天及以后 ≤ 0。 */

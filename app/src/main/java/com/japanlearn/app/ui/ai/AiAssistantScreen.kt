@@ -22,6 +22,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -222,7 +223,15 @@ fun AiAssistantPanel(
                             FilterChip(
                                 selected = state.mode == mode,
                                 onClick = { onMode(mode) },
-                                label = { Text(mode.label) },
+                                label = {
+                                    Text(
+                                        mode.label,
+                                        maxLines = 1,
+                                        softWrap = false,
+                                        overflow = TextOverflow.Ellipsis,
+                                    )
+                                },
+                                modifier = Modifier.weight(1f),
                             )
                         }
                     }

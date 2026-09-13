@@ -182,6 +182,56 @@ interface SentenceDao {
 }
 
 @Dao
+interface KanjiDao {
+    @Query("SELECT * FROM kanji ORDER BY `order`")
+    fun all(): Flow<List<KanjiEntity>>
+
+    @Query("SELECT * FROM kanji ORDER BY `order`")
+    suspend fun allOnce(): List<KanjiEntity>
+
+    @Query("SELECT * FROM kanji WHERE id = :id")
+    suspend fun byId(id: String): KanjiEntity?
+
+    @Query("SELECT COUNT(*) FROM kanji")
+    suspend fun count(): Int
+
+    @Query("SELECT COUNT(*) FROM kanji")
+    fun countFlow(): Flow<Int>
+
+    @Query("SELECT COUNT(*) FROM kanji WHERE level = :level")
+    fun countByLevelFlow(level: String): Flow<Int>
+
+    @Query(
+        "SELECT COUNT(*) FROM kanji k " +
+            "INNER JOIN user_progress p ON p.contentId = k.id AND p.contentType = 'kanji' " +
+            "WHERE k.level = :level",
+    )
+    fun learnedCountByLevelFlow(level: String): Flow<Int>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAll(items: List<KanjiEntity>)
+
+    @Query("DELETE FROM kanji WHERE id IN (:ids)")
+    suspend fun deleteByIds(ids: List<String>)
+
+    @Query(
+        "SELECT * FROM kanji WHERE level = :level AND id NOT IN " +
+            "(SELECT contentId FROM user_progress WHERE contentType = 'kanji') " +
+            "ORDER BY `order` LIMIT :n",
+    )
+    suspend fun newKanji(n: Int, level: String = "N5"): List<KanjiEntity>
+
+    /** SRS 到期队列（§19.14）：错题优先，其余按到期时间。 */
+    @Query(
+        "SELECT k.* FROM kanji k JOIN user_progress p ON p.contentId = k.id AND p.contentType = 'kanji' " +
+            "LEFT JOIN wrong_answers wa ON wa.contentId = k.id AND wa.contentType = 'kanji' " +
+            "WHERE p.dueAt <= :now " +
+            "ORDER BY CASE WHEN wa.contentId IS NOT NULL THEN 0 ELSE 1 END, p.dueAt LIMIT :limit",
+    )
+    suspend fun dueKanji(now: Long, limit: Int): List<KanjiEntity>
+}
+
+@Dao
 interface ProgressDao {
     @Query("SELECT * FROM user_progress WHERE contentType = :type AND contentId = :contentId")
     suspend fun get(type: String, contentId: String): UserProgressEntity?
@@ -236,6 +286,31 @@ interface ProgressDao {
             "WHERE p.contentType = 'grammar'",
     )
     fun countGrammarFlow(): Flow<Int>
+
+    @Query(
+        "SELECT COUNT(*) FROM user_progress p " +
+            "INNER JOIN kanji k ON k.id = p.contentId " +
+            "WHERE p.contentType = 'kanji' AND p.dueAt <= :now",
+    )
+    fun dueKanjiCount(now: Long): Flow<Int>
+
+    @Query(
+        "SELECT COUNT(*) FROM user_progress p " +
+            "INNER JOIN kanji k ON k.id = p.contentId " +
+            "WHERE p.contentType = 'kanji'",
+    )
+    fun countKanjiFlow(): Flow<Int>
+
+    @Query(
+        "SELECT COUNT(*) FROM user_progress p " +
+            "INNER JOIN kanji k ON k.id = p.contentId " +
+            "WHERE p.contentType = 'kanji' AND p.stability >= :threshold",
+    )
+    fun masteredKanjiCount(threshold: Int): Flow<Int>
+
+    /** 当日新学汉字数：以首次 applyReview 写入的 learnedAt 起算（PRD §19.14）。 */
+    @Query("SELECT COUNT(*) FROM user_progress WHERE contentType = 'kanji' AND learnedAt >= :from")
+    suspend fun countKanjiLearnedSince(from: Long): Int
 }
 
 @Dao

@@ -74,10 +74,10 @@ class ContentExpansionTest {
     }
 
     @Test
-    fun `每日一句 180`() {
+    fun `每日一句 300`() {
         val file = ContentJson.decodeFromString<SentencesFile>(readContent("sentences.json"))
-        assertEquals(180, file.sentences.size)
-        assertEquals(5, file.version)
+        assertEquals(300, file.sentences.size)
+        assertEquals(7, file.version)
     }
 
     private fun readContent(name: String): String {

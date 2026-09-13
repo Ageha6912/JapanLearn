@@ -61,4 +61,16 @@ object AppMigrations {
             db.execSQL(SQL_4_5_GRAMMAR_UNIT)
         }
     }
+
+    // v6（PRD §19.14 汉字专项）：新增 kanji 表；进度仍挂 user_progress 的 contentType=kanji
+    const val SQL_5_6_KANJI_TABLE =
+        "CREATE TABLE IF NOT EXISTS `kanji` (`id` TEXT NOT NULL, `char` TEXT NOT NULL, `zh` TEXT NOT NULL, " +
+            "`onJson` TEXT NOT NULL, `kunJson` TEXT NOT NULL, `examplesJson` TEXT NOT NULL, " +
+            "`level` TEXT NOT NULL, `order` INTEGER NOT NULL, PRIMARY KEY(`id`))"
+
+    val MIGRATION_5_6 = object : Migration(5, 6) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL(SQL_5_6_KANJI_TABLE)
+        }
+    }
 }

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="JapanLearn — 完全离线、无需账号的日语入门 App。N5/N4 课程化 22 单元、1104 词、FSRS 间隔复习、听力专项训练，每天 5–15 分钟形成稳定闭环；AI 助手完全可选。免费下载 Android APK。" />
+  <meta name="description" content="JapanLearn — 完全离线、无需账号的日语入门 App。N5/N4 课程化 22 单元、1104 词、397 汉字专项、FSRS 间隔复习、听力训练与 300 条场景句，每天 5–15 分钟形成稳定闭环；AI 助手完全可选。免费下载 Android APK。" />
   <meta name="theme-color" content="#F7F4EE" />
   <meta property="og:type" content="website" />
   <meta property="og:title" content="JapanLearn — 离线也能坚持的日语入门" />
@@ -78,7 +78,7 @@
             <a class="btn btn-ghost btn-lg" href="#workflow">看看怎么学</a>
           </div>
           <ul class="hero-meta" aria-label="产品要点">
-            <li>v1.3.1 正式签名</li>
+            <li>v1.6.0 正式签名</li>
             <li>MIT 开源</li>
             <li>Android 8.0+</li>
           </ul>
@@ -118,7 +118,7 @@
         <div class="trust-item"><strong>离线可用</strong><span>内容版本化打包进 APK</span></div>
         <div class="trust-item"><strong>无账号</strong><span>数据只存本机 Room</span></div>
         <div class="trust-item"><strong>FSRS 复习</strong><span>按记忆稳定性动态排期</span></div>
-        <div class="trust-item"><strong>算法公开</strong><span>纯函数实现，226 项测试</span></div>
+        <div class="trust-item"><strong>算法公开</strong><span>纯函数实现，275 项测试</span></div>
       </div>
     </section>
 
@@ -150,7 +150,12 @@
           <article class="feature-card reveal">
             <div class="feature-icon" aria-hidden="true">🎧</div>
             <h3>听力专项训练</h3>
-            <p>听音辨词 / 听写假名 / 听句选义三题型混合，答错自动进错题本。</p>
+            <p>听音辨词 / 听写假名 / 听句选义三题型混合，答错自动进错题本；场景句库 300 条。</p>
+          </article>
+          <article class="feature-card reveal">
+            <div class="feature-icon" aria-hidden="true">🈷️</div>
+            <h3>汉字专项</h3>
+            <p>N5 核心 397 字：音读/训读分列 + 词例；卡片学 → 五种选择题（含听音选字）→ 自评进 FSRS，配额按目标档位折算。</p>
           </article>
           <article class="feature-card reveal">
             <div class="feature-icon" aria-hidden="true">🎯</div>
@@ -170,12 +175,12 @@
           <article class="feature-card reveal">
             <div class="feature-icon" aria-hidden="true">📊</div>
             <h3>统计与学习成果</h3>
-            <p>连击、累计时长、近 7 日柱状图；成果页汇总掌握词数、最长连击与 22 单元完成进度。</p>
+            <p>连击、累计时长、近 7 日柱状图、掌握度分档与错题画像；成果页汇总掌握词/汉字、最长连击与 22 单元进度。</p>
           </article>
           <article class="feature-card reveal">
             <div class="feature-icon" aria-hidden="true">🈁</div>
             <h3>五十音 + 全库</h3>
-            <p>101 组假名分组测验；1104 词 / 120 语法全库检索，假名、词性、例句与掌握度色点。</p>
+            <p>101 组假名分组测验；1104 词 / 148 语法全库检索，假名、词性、例句与掌握度色点。</p>
           </article>
         </div>
       </div>
@@ -194,7 +199,7 @@
           <li class="workflow-step reveal">
             <span class="step-num">01</span>
             <h3>今日学习</h3>
-            <p>按你的目标与当前课程单元取出今日新词、语法与待复习项，进度条实时更新。</p>
+            <p>按你的目标与当前课程单元取出今日新词、语法、汉字与待复习项，进度条实时更新。</p>
           </li>
           <li class="workflow-step reveal">
             <span class="step-num">02</span>
@@ -233,9 +238,9 @@
           </figure>
           <figure class="showcase-item reveal" role="listitem">
             <div class="showcase-phone">
-              <img src="assets/screenshots/learn.png" alt="学习页：课程、五十音与听力训练入口" width="1080" height="2263" loading="lazy" />
+              <img src="assets/screenshots/learn.png" alt="学习页：课程、五十音、汉字专项与听力训练入口" width="1080" height="2263" loading="lazy" />
             </div>
-            <figcaption>学习 · 课程 / 五十音 / 听力</figcaption>
+            <figcaption>学习 · 课程 / 五十音 / 汉字 / 听力</figcaption>
           </figure>
           <figure class="showcase-item reveal" role="listitem">
             <div class="showcase-phone">
@@ -326,11 +331,15 @@
             <span class="stat-label">N5/N4 单词</span>
           </div>
           <div class="stat-card reveal">
-            <span class="stat-value">120</span>
+            <span class="stat-value">148</span>
             <span class="stat-label">N5/N4 语法</span>
           </div>
           <div class="stat-card reveal">
-            <span class="stat-value">180</span>
+            <span class="stat-value">397</span>
+            <span class="stat-label">N5 汉字专项</span>
+          </div>
+          <div class="stat-card reveal">
+            <span class="stat-value">300</span>
             <span class="stat-label">每日场景句</span>
           </div>
           <div class="stat-card reveal">
@@ -363,7 +372,7 @@
               </tr>
               <tr>
                 <td>间隔算法黑箱</td>
-                <td>FSRS 开源算法，调度器纯函数 + 226 项单元测试</td>
+                <td>FSRS 开源算法，调度器纯函数 + 275 项单元测试</td>
               </tr>
               <tr>
                 <td>只有刷选择题</td>
@@ -410,7 +419,7 @@
             </div>
           </div>
           <ul class="cta-points">
-            <li>v1.3.1 正式签名，可覆盖升级</li>
+            <li>v1.6.0 正式签名，可覆盖升级</li>
             <li>核心功能完全离线，AI 助手可选</li>
             <li>本地数据可 SAF 备份恢复</li>
             <li>更新记录见 GitHub Releases</li>

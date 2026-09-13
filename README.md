@@ -3,10 +3,11 @@
 </p>
 
 <p align="center">
+  <img src="https://img.shields.io/badge/release-v1.6.0-1B3A5C" alt="当前发布 v1.6.0">
   <img src="https://img.shields.io/badge/platform-Android%208.0%2B-1B3A5C?logo=android&logoColor=white" alt="Android 8.0 及以上">
   <img src="https://img.shields.io/badge/Kotlin-2.0-7F52FF?logo=kotlin&logoColor=white" alt="Kotlin 2.0">
   <img src="https://img.shields.io/badge/Jetpack%20Compose-Material%203-4285F4?logo=jetpackcompose&logoColor=white" alt="Jetpack Compose Material 3">
-  <img src="https://img.shields.io/badge/tests-257%20passing-4E7D5B" alt="257 项单元测试通过">
+  <img src="https://img.shields.io/badge/tests-275%20passing-4E7D5B" alt="275 项单元测试通过">
   <a href="./LICENSE"><img src="https://img.shields.io/badge/license-MIT-C75B5B" alt="MIT 许可证"></a>
 </p>
 
@@ -40,7 +41,7 @@ JapanLearn 是一个**完全离线、无需账号**的日语入门 App，为日�
 
 | 模块 | 说明 |
 |---|---|
-| 🏠 今日学习 | 新词 / 语法 / 待复习聚合，实时进度，连击天数 |
+| 🏠 今日学习 | 新词 / 语法 / 汉字 / 待复习聚合，实时进度，连击天数 |
 | 🈁 五十音 | 101 组（清音 / 浊音 / 拗音），罗马音 + 示例词 + 发音，分组测验，题量可选 |
 | 📚 N5/N4 课程 | 22 个课程单元（N5/N4 各 11 个）：单元内顺序学词 + 配套语法，当前单元自动推进，单元测试 10 题检查点 |
 | 📖 单词 / 语法全库 | 1104 词（N5 504 + N4 600）+ 148 条语法（N5 78 + N4 70）：假名、词性、例句、接续说明，列表带掌握度色点，可按单元筛选 |
@@ -51,10 +52,11 @@ JapanLearn 是一个**完全离线、无需账号**的日语入门 App，为日�
 | 📝 错题本 | 答错自动收录（含五十音与听力/检查点），复习答对自动移除 |
 | ⚡ 错题突击 | 把错题变成练习：答对即清出，每轮 10 题；复习队列中错题优先出队 |
 | 📊 学习统计 | 连击、累计时长、近 7 日柱状图、FSRS 掌握度分档、错题画像、内容进度 |
-| 🗾 每日一句 | 180 条场景句（日常 / 餐厅 / 便利店 / 购物 / 交通 / 就医…）带词汇拆解 |
+| 🗾 每日一句 | 300 条场景句（日常 / 餐厅 / 便利店 / 购物 / 交通 / 就医 / 天气 / 网购 / 银行…）带词汇拆解 |
 | 🎯 学习目标 | 设 N5/N4 目标与达成日期，按剩余内容量推荐每日新词档位，每周自动校准 |
 | 🎧 听力训练 | 听音辨词 / 听写假名 / 听句选义三题型混合，对错同步错题本 |
-| 🏆 学习成果 | 累计时长、掌握词数、最长连击、单元完成进度、复习正确率一页看全 |
+| 🈷️ 汉字专项 | N5 核心汉字库（音读/训读分列 + 词例）：卡片学 → 五种选择题（含听音选字）→ 自评进 FSRS；每日配额按目标档位折算 1–4 |
+| 🏆 学习成果 | 累计时长、掌握词数、已学汉字、最长连击、单元完成进度、复习正确率一页看全 |
 | 🤖 AI 助手（可选） | 自备 API Key 直连大模型：语法解释 / 句子纠错 / 翻译，流式打字机输出；Key 仅存本机，不配则完全隐藏，每日限额可调 |
 | 📦 应用内更新检查 | 启动静默检查 GitHub Releases，有新版时首页横幅提示，可跳过该版本；失败完全静默 |
 | ⚙️ 每日任务量 | 新词（5/10/15/20）、语法数、复习上限可调 |
@@ -67,7 +69,7 @@ JapanLearn 是一个**完全离线、无需账号**的日语入门 App，为日�
 git clone https://github.com/Ageha6912/JapanLearn.git
 cd JapanLearn
 ./gradlew :app:assembleDebug     # 产出 app/build/outputs/apk/debug/app-debug.apk
-./gradlew :app:testDebugUnitTest # 运行单元测试（当前 257 项）
+./gradlew :app:testDebugUnitTest # 运行单元测试（当前 275 项）
 python tools/validate_content.py # 改内容后必须通过
 ```
 
@@ -108,7 +110,7 @@ Kotlin 2.0 · Jetpack Compose (Material 3) · Room (KSP) · Navigation Compose �
 
 ```
 app/src/main/java/com/japanlearn/app/
-├── domain/        # 纯函数业务逻辑：FsrsScheduler / StudyPlanner / CoursePointer / QuizGenerator / ListeningQuizGenerator
+├── domain/        # 纯函数业务逻辑：FsrsScheduler / StudyPlanner / CoursePointer / QuizGenerator / KanjiQuizGenerator / ListeningQuizGenerator
 ├── data/
 │   ├── content/   # assets JSON 的 DTO + ContentSeedPlanner
 │   ├── local/     # Room 实体 / DAO / 数据库 / 迁移（schema 在 app/schemas）
@@ -119,16 +121,16 @@ app/src/main/java/com/japanlearn/app/
 
 ## 测试
 
-257 项单元测试全绿（PRD §17.8 强制要求）。改内容须另跑 `python tools/validate_content.py`（CI 已接入）：
+275 项单元测试全绿（PRD §17.8 强制要求）。改内容须另跑 `python tools/validate_content.py`（CI 已接入）：
 
-- `FsrsSchedulerTest` / `StudyPlannerTest`：FSRS 调度、目标倒推推荐档位与周校准
-- `QuizGeneratorTest`：选项数量、含正确答案、不重复、双向词卡、种子可复现、小内容池退化、听音/汉字变体
+- `FsrsSchedulerTest` / `StudyPlannerTest`：FSRS 调度、目标倒推推荐档位与周校准、汉字每日配额折算
+- `QuizGeneratorTest` / `KanjiQuizGeneratorTest`：选项数量、含正确答案、不重复、双向词卡、种子可复现、小内容池退化、听音/汉字变体、汉字专项五题型与同读音干扰排除
 - `StreakCalculatorTest`：跨天连击、中断归零、今天未学仍延续
 - `ReviewPlannerTest`：每日复习限流截断与顺延
-- `ContentParsingTest`：内容 JSON schema 解析、假名分组字段与未知字段向前兼容
+- `ContentParsingTest`：内容 JSON schema 解析、假名分组字段、汉字音训分列与未知字段向前兼容
 - `ContentSeedPlannerTest`：分文件版本、legacy 加总 key、删除差集与空 incoming 拒绝
-- `ContentScaleTest`：真实 JSON 规模 101 / 804 / 87 / 180 与 22 个课程单元覆盖
-- `AppMigrationsTest`：v1→v5 迁移 SQL 与 schema 快照入库
+- `ContentScaleTest`：真实 JSON 规模 101 / 1104 / 148 / 300 / 397 与 22 个课程单元覆盖
+- `AppMigrationsTest`：v1→v6 迁移 SQL 与 schema 快照入库
 - `ReminderSchedulerTest`：提醒触发时刻计算（当天/顺延/边界）
 - `UiMathTest`：今日进度/柱状图占比/入场级联延迟、orphan 进度不计
 - `FormatTest`：学习时长展示格式（h/m、负数钳制）
@@ -137,7 +139,7 @@ app/src/main/java/com/japanlearn/app/
 
 ## 内容扩充
 
-课程内容是 4 个带版本号的 JSON 文件，位于 `app/src/main/assets/content/`。追加内容后递增对应文件的 `version`，App 启动时按文件独立重装（学习进度不受影响）：
+课程内容是 5 个带版本号的 JSON 文件，位于 `app/src/main/assets/content/`。追加内容后递增对应文件的 `version`，App 启动时按文件独立重装（学习进度不受影响）：
 
 | 文件 | 内容 | 关键字段 |
 |---|---|---|
@@ -145,8 +147,9 @@ app/src/main/java/com/japanlearn/app/
 | `words.json` | 单词（N5/N4） | `ja / kana / romaji / zh / pos / cat / example / level` |
 | `grammar.json` | 语法（N5/N4） | `title / meaning / connection / explanation / examples / exercises / level` |
 | `sentences.json` | 每日一句 | `scene / ja / zh / breakdown[]` |
+| `kanji.json` | 汉字专项（N5） | `char / zh / on[] / kun[] / examples[]` |
 
-追加语法：`python tools/merge_grammar.py new_grammar_n4_b2.json`。追加每日一句：`python tools/merge_sentences.py new_sentences_b2.json`。合并后必须跑 `python tools/validate_content.py`。
+追加语法：`python tools/merge_grammar.py new_grammar_n4_b2.json`。汉字批次：`python tools/extract_kanji_n5.py`。合并后必须跑 `python tools/validate_content.py`。
 
 ## 路线图
 
@@ -158,9 +161,14 @@ app/src/main/java/com/japanlearn/app/
 - [x] v0.6.1 打假名题 + 按词性干扰项
 - [x] v0.7.0 FSRS 间隔复习（自评按钮文案不变）
 - [x] v0.7.1 点击发音 TTS（日语本地 voice + 媒体音轨）
+- [x] v1.0 课程化 + 学习成果页
+- [x] v1.1 AI 助手（BYOK）
+- [x] v1.2 错题突击 + 队列加权
+- [x] v1.3 AI 流式输出
+- [x] v1.4 统计仪表盘 + 应用内更新检查
+- [x] v1.5 汉字专项（代码已入库，待与后续版本合并发版）
+- [x] v1.6 听力句库 180→300（天气/网购/银行新场景，待合并发版）
 - [ ] 登录与多设备同步（可选，非默认路径）
-- [ ] SRS 升级为 FSRS 算法（v0.7）
-- [ ] AI 日语助手（翻译 / 语法解释 / 纠错，走自建后端）
 
 ## 许可证
 

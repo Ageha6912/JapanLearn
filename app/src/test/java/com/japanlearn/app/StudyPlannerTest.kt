@@ -114,4 +114,18 @@ class StudyPlannerTest {
     fun `满七天重新校准`() {
         assertTrue(StudyPlanner.shouldRecalibrate(lastAppliedEpochDay = 93, todayEpochDay = 100))
     }
+
+    @Test
+    fun `汉字每日配额 无目标默认 2`() {
+        assertEquals(2, StudyPlanner.kanjiDailyCount(dailyWordTier = 10, hasGoal = false))
+        assertEquals(StudyPlanner.KANJI_DAILY_DEFAULT, StudyPlanner.kanjiDailyCount(20, hasGoal = false))
+    }
+
+    @Test
+    fun `汉字每日配额 按档位折算 1 到 4`() {
+        assertEquals(1, StudyPlanner.kanjiDailyCount(5, hasGoal = true))
+        assertEquals(2, StudyPlanner.kanjiDailyCount(10, hasGoal = true))
+        assertEquals(3, StudyPlanner.kanjiDailyCount(15, hasGoal = true))
+        assertEquals(4, StudyPlanner.kanjiDailyCount(20, hasGoal = true))
+    }
 }

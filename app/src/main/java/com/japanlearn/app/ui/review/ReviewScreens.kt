@@ -23,6 +23,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.filled.Bolt
+import androidx.compose.material.icons.filled.Grade
 import androidx.compose.material.icons.filled.Inventory2
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.outlined.EditNote
@@ -48,12 +49,18 @@ import com.japanlearn.app.LocalAppContainer
 import com.japanlearn.app.Routes
 import com.japanlearn.app.data.examples
 import com.japanlearn.app.data.exercises
+import com.japanlearn.app.data.kunReadings
 import com.japanlearn.app.data.local.GrammarEntity
+import com.japanlearn.app.data.local.KanjiEntity
 import com.japanlearn.app.data.local.WordEntity
+import com.japanlearn.app.data.onReadings
+import com.japanlearn.app.domain.KanjiQuizGenerator
 import com.japanlearn.app.domain.KanjiQuizPolicy
+import com.japanlearn.app.domain.KanjiQuizVariantPicker
 import com.japanlearn.app.domain.Mastery
 import com.japanlearn.app.domain.Quiz
 import com.japanlearn.app.domain.QuizGenerator
+import com.japanlearn.app.domain.QuizKanji
 import com.japanlearn.app.domain.QuizVariantPicker
 import com.japanlearn.app.domain.QuizWord
 import com.japanlearn.app.domain.ReviewPlanner
@@ -86,6 +93,7 @@ import kotlinx.coroutines.launch
 data class ReviewHomeUiState(
     val dueWords: Int = 0,
     val dueGrammar: Int = 0,
+    val dueKanji: Int = 0,
     val reviewsDoneToday: Int = 0,
     val dailyCap: Int = 30,
     val wrongCount: Int = 0,
@@ -101,6 +109,7 @@ class ReviewHomeViewModel(private val app: AppContainer) : ViewModel() {
         }
         collect(app.progress.dueWordCount()) { s, v -> s.copy(dueWords = v) }
         collect(app.progress.dueGrammarCount()) { s, v -> s.copy(dueGrammar = v) }
+        collect(app.progress.dueKanjiCount()) { s, v -> s.copy(dueKanji = v) }
         collect(app.progress.wrongAnswerCount()) { s, v -> s.copy(wrongCount = v) }
         collect(app.settings.dailyReviewCap) { s, v -> s.copy(dailyCap = v) }
         collect(app.progress.reviewsDoneTodayFlow()) { s, v -> s.copy(reviewsDoneToday = v) }
@@ -115,7 +124,7 @@ fun ReviewHomeScreen(nav: NavHostController) {
     val vm: ReviewHomeViewModel = androidx.lifecycle.viewmodel.compose.viewModel { ReviewHomeViewModel(app) }
     val state by vm.uiState.collectAsStateWithLifecycle()
     val remaining = ReviewPlanner.remainingToday(state.reviewsDoneToday, state.dailyCap)
-    val dueTotal = state.dueWords + state.dueGrammar
+    val dueTotal = state.dueWords + state.dueGrammar + state.dueKanji
 
     Scaffold { padding ->
         Column(
@@ -154,6 +163,7 @@ fun ReviewHomeScreen(nav: NavHostController) {
                     }
                     TaskRow("单词", state.dueWords, "条", Icons.AutoMirrored.Filled.MenuBook)
                     TaskRow("语法", state.dueGrammar, "条", Icons.Outlined.EditNote, tint = MaterialTheme.colorScheme.tertiary)
+                    TaskRow("汉字", state.dueKanji, "条", Icons.Filled.Grade, tint = MaterialTheme.colorScheme.secondary)
                     TaskRow("今日已复习", state.reviewsDoneToday, "条", Icons.Filled.Refresh, tint = MaterialTheme.colorScheme.onSurfaceVariant)
                     AppButton(
                         text = when {
@@ -231,11 +241,12 @@ fun ReviewHomeScreen(nav: NavHostController) {
     }
 }
 
-// ---------------- 复习会话（SRS 到期项，混合单词与语法） ----------------
+// ---------------- 复习会话（SRS 到期项，混合单词 / 语法 / 汉字） ----------------
 
 sealed interface ReviewItem {
     data class WordItem(val word: WordEntity) : ReviewItem
     data class GrammarItem(val grammar: GrammarEntity) : ReviewItem
+    data class KanjiItem(val kanji: KanjiEntity) : ReviewItem
 }
 
 data class ReviewSessionUiState(
@@ -263,14 +274,18 @@ class ReviewSessionViewModel(private val app: AppContainer) : ViewModel() {
             val done = app.progress.reviewsDoneToday()
             val remaining = ReviewPlanner.remainingToday(done, cap)
             listPool = app.content.wordsAll().first().map { it.toQuizWord() }
+            kanjiPool = app.content.kanjiAll().first().map { it.toQuizKanji() }
             if (remaining == 0) {
                 _state.update { it.copy(phase = SessionPhase.DONE) }
                 return@launch
             }
             val words = app.progress.dueWords(remaining)
-            val grammar = app.progress.dueGrammar(remaining - words.size)
+            val grammar = app.progress.dueGrammar((remaining - words.size).coerceAtLeast(0))
+            val kanji = app.progress.dueKanji((remaining - words.size - grammar.size).coerceAtLeast(0))
             startedAt = System.currentTimeMillis()
-            val items = words.map { ReviewItem.WordItem(it) } + grammar.map { ReviewItem.GrammarItem(it) }
+            val items = words.map { ReviewItem.WordItem(it) } +
+                grammar.map { ReviewItem.GrammarItem(it) } +
+                kanji.map { ReviewItem.KanjiItem(it) }
             _state.update {
                 it.copy(
                     phase = if (items.isEmpty()) SessionPhase.DONE else SessionPhase.QUIZ,
@@ -307,6 +322,13 @@ class ReviewSessionViewModel(private val app: AppContainer) : ViewModel() {
             val ex = item.grammar.exercises().first()
             QuizGenerator.grammarQuiz(ex.question, ex.options, ex.answer)
         }
+        is ReviewItem.KanjiItem -> {
+            val target = item.kanji.toQuizKanji()
+            val canAudio = target.primaryReading().isNotEmpty()
+            val variant = KanjiQuizVariantPicker.pick(kotlin.random.Random.nextDouble(), canAudio)
+            val pool = kanjiPool.filter { it.id != target.id }
+            KanjiQuizGenerator.build(target, pool.ifEmpty { kanjiPool }, variant)
+        }
     }
 
     private fun poolOf(excludeId: String): List<QuizWord> {
@@ -315,11 +337,13 @@ class ReviewSessionViewModel(private val app: AppContainer) : ViewModel() {
             when (item) {
                 is ReviewItem.WordItem -> item.word.toQuizWord()
                 is ReviewItem.GrammarItem -> null
+                is ReviewItem.KanjiItem -> null
             }
         } + listPool.filter { it.id != excludeId }
     }
 
     private var listPool: List<QuizWord> = emptyList()
+    private var kanjiPool: List<QuizKanji> = emptyList()
 
     val current: ReviewItem? get() = _state.value.items.getOrNull(_state.value.index)
 
@@ -361,6 +385,7 @@ class ReviewSessionViewModel(private val app: AppContainer) : ViewModel() {
             when (item) {
                 is ReviewItem.WordItem -> app.progress.applyReview("word", item.word.id, mastery)
                 is ReviewItem.GrammarItem -> app.progress.applyReview("grammar", item.grammar.id, mastery)
+                is ReviewItem.KanjiItem -> app.progress.applyReview("kanji", item.kanji.id, mastery)
             }
             app.stats.addStudy(0, reviewsDone = 1)
             _state.update { s ->
@@ -387,6 +412,14 @@ class ReviewSessionViewModel(private val app: AppContainer) : ViewModel() {
 
 private fun WordEntity.toQuizWord() =
     QuizWord(id, ja, kana, zh, pos, cat, romaji)
+
+private fun KanjiEntity.toQuizKanji() = QuizKanji(
+    id = id,
+    char = char,
+    zh = zh,
+    on = onReadings(),
+    kun = kunReadings(),
+)
 
 @Composable
 fun ReviewSessionScreen(nav: NavHostController) {
@@ -517,7 +550,8 @@ class WrongAnswersViewModel(private val app: AppContainer) : ViewModel() {
         app.content.wordsAll(),
         app.content.grammarAll(),
         app.content.kanaAll(),
-    ) { wrong, words, grammar, kana ->
+        app.content.kanjiAll(),
+    ) { wrong, words, grammar, kana, kanji ->
         wrong.mapNotNull { w ->
             when (w.contentType) {
                 "word" -> words.find { it.id == w.contentId }?.let {
@@ -528,6 +562,9 @@ class WrongAnswersViewModel(private val app: AppContainer) : ViewModel() {
                 }
                 "kana" -> kana.find { it.id == w.contentId }?.let {
                     WrongDisplay("kana", it.id, it.hiragana, "读作 ${it.romaji}", w.wrongCount)
+                }
+                "kanji" -> kanji.find { it.id == w.contentId }?.let {
+                    WrongDisplay("kanji", it.id, it.char, it.zh, w.wrongCount)
                 }
                 else -> null
             }

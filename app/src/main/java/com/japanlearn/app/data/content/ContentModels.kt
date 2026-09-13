@@ -60,5 +60,24 @@ data class SentenceItem(val id: String, val scene: String, val ja: String, val z
 @Serializable
 data class Breakdown(val t: String, val zh: String)
 
+/** 汉字词例快照（PRD §19.14）：不外键关联词库，防删词断链。 */
+@Serializable
+data class KanjiExample(val ja: String, val kana: String, val zh: String)
+
+@Serializable
+data class KanjiFile(val version: Int, val kanji: List<KanjiItem>)
+
+/** 音读 on 为片假名列表，训读 kun 为平假名列表，均可空但至少一类非空。 */
+@Serializable
+data class KanjiItem(
+    val id: String,
+    val char: String,
+    val zh: String,
+    val on: List<String> = emptyList(),
+    val kun: List<String> = emptyList(),
+    val level: String = "N5",
+    val examples: List<KanjiExample> = emptyList(),
+)
+
 /** 解析容错：忽略未知字段，防止内容新增字段导致旧版本崩溃。 */
 val ContentJson = Json { ignoreUnknownKeys = true }

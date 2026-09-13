@@ -10,25 +10,32 @@ import org.junit.Test
 
 class ContentSeedPlannerTest {
 
-    private val incoming = ContentVersions(kana = 2, words = 6, grammar = 4, sentences = 2)
+    private val incoming = ContentVersions(kana = 2, words = 6, grammar = 4, sentences = 2, kanji = 1)
 
     @Test
-    fun `四文件版本全相等 不重装`() {
+    fun `五文件版本全相等 不重装`() {
         val kinds = ContentSeedPlanner.kindsToReload(incoming, incoming, hasLegacyTotalOnly = false)
         assertTrue(kinds.isEmpty())
     }
 
     @Test
     fun `加总相同但单文件不同 只重装变化文件`() {
-        // 2+6+4+2 = 14，2+7+3+2 = 14
-        val installed = ContentVersions(kana = 2, words = 6, grammar = 4, sentences = 2)
-        val bumped = ContentVersions(kana = 2, words = 7, grammar = 3, sentences = 2)
+        val installed = ContentVersions(kana = 2, words = 6, grammar = 4, sentences = 2, kanji = 1)
+        val bumped = ContentVersions(kana = 2, words = 7, grammar = 3, sentences = 2, kanji = 1)
         val kinds = ContentSeedPlanner.kindsToReload(installed, bumped, hasLegacyTotalOnly = false)
         assertEquals(setOf(ContentKind.WORDS, ContentKind.GRAMMAR), kinds)
     }
 
     @Test
-    fun `首次安装 全 0 无 legacy 四文件全重装`() {
+    fun `汉字版本变化只重装汉字`() {
+        val installed = ContentVersions(kana = 2, words = 6, grammar = 4, sentences = 2, kanji = 1)
+        val bumped = installed.copy(kanji = 2)
+        val kinds = ContentSeedPlanner.kindsToReload(installed, bumped, hasLegacyTotalOnly = false)
+        assertEquals(setOf(ContentKind.KANJI), kinds)
+    }
+
+    @Test
+    fun `首次安装 全 0 无 legacy 全文件重装`() {
         val kinds = ContentSeedPlanner.kindsToReload(
             ContentVersions.ZERO,
             incoming,
@@ -38,7 +45,7 @@ class ContentSeedPlannerTest {
     }
 
     @Test
-    fun `仅有加总 key 无分文件 key 视为旧安装 四文件全重装`() {
+    fun `仅有加总 key 无分文件 key 视为旧安装 全文件重装`() {
         assertTrue(ContentSeedPlanner.hasLegacyTotalOnly("14", perFileKana = null))
         val kinds = ContentSeedPlanner.kindsToReload(incoming, incoming, hasLegacyTotalOnly = true)
         assertEquals(ContentKind.entries.toSet(), kinds)
@@ -66,15 +73,16 @@ class ContentSeedPlannerTest {
     }
 
     @Test
-    fun `fromMeta 读四把新 key`() {
+    fun `fromMeta 读五把新 key`() {
         val meta = mapOf(
             ContentVersions.KEY_KANA to "2",
             ContentVersions.KEY_WORDS to "6",
             ContentVersions.KEY_GRAMMAR to "4",
             ContentVersions.KEY_SENTENCES to "2",
+            ContentVersions.KEY_KANJI to "1",
         )
         assertEquals(incoming, ContentVersions.fromMeta { meta[it] })
-        assertEquals(14, incoming.total())
+        assertEquals(15, incoming.total())
     }
 
     @Test
