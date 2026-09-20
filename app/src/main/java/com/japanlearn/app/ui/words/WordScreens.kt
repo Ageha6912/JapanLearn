@@ -74,6 +74,7 @@ import com.japanlearn.app.ui.components.SectionCard
 import com.japanlearn.app.ui.components.SessionPhase
 import com.japanlearn.app.ui.components.TtsButton
 import com.japanlearn.app.ui.motion.ConfettiBurst
+import com.japanlearn.app.ui.motion.FeedbackReveal
 import com.japanlearn.app.ui.motion.MotionTokens
 import com.japanlearn.app.ui.motion.StaggerIn
 import com.japanlearn.app.ui.motion.rememberReducedMotion
@@ -465,13 +466,15 @@ fun WordSessionScreen(nav: NavHostController, count: Int) {
                                 val answered = if (quiz.isTypeAnswer) state.typedResult != null else state.selected != null
                                 if (answered) {
                                     val correct = if (quiz.isTypeAnswer) state.typedResult == true else state.selected == quiz.answerIndex
-                                    com.japanlearn.app.ui.review.FeedbackText(correct = correct, answerText = quiz.answerText)
-                                    Text(
-                                        "这个单词你掌握了吗？",
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    )
-                                    MasteryRow { vm.rate(it) }
+                                    FeedbackReveal {
+                                        com.japanlearn.app.ui.review.FeedbackText(correct = correct, answerText = quiz.answerText)
+                                        Text(
+                                            "这个单词你掌握了吗？",
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        )
+                                        MasteryRow { vm.rate(it) }
+                                    }
                                 }
                             }
                         }

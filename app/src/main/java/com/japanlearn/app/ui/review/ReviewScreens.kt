@@ -78,6 +78,7 @@ import com.japanlearn.app.ui.components.SessionPhase
 import com.japanlearn.app.ui.components.TaskRow
 import com.japanlearn.app.ui.motion.AnimatedCounterText
 import com.japanlearn.app.ui.motion.ConfettiBurst
+import com.japanlearn.app.ui.motion.FeedbackReveal
 import com.japanlearn.app.ui.motion.MotionTokens
 import com.japanlearn.app.ui.motion.StaggerIn
 import com.japanlearn.app.ui.motion.rememberReducedMotion
@@ -477,13 +478,15 @@ fun ReviewSessionScreen(nav: NavHostController) {
                                 val answered = if (quiz.isTypeAnswer) state.typedResult != null else state.selected != null
                                 if (answered) {
                                     val correct = if (quiz.isTypeAnswer) state.typedResult == true else state.selected == quiz.answerIndex
-                                    FeedbackText(correct = correct, answerText = quiz.answerText)
-                                    Text(
-                                        "现在感觉掌握了吗？",
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    )
-                                    MasteryRow { vm.rate(it) }
+                                    FeedbackReveal {
+                                        FeedbackText(correct = correct, answerText = quiz.answerText)
+                                        Text(
+                                            "现在感觉掌握了吗？",
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        )
+                                        MasteryRow { vm.rate(it) }
+                                    }
                                 }
                             }
                         }

@@ -11,7 +11,35 @@ import android.speech.tts.TextToSpeech
 import android.speech.tts.UtteranceProgressListener
 import android.speech.tts.Voice
 import android.util.Log
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import java.util.Locale
+
+/**
+ * 发音状态跟踪：由 TTS 引擎回调驱动的真假切换，供 UI 做「正在发音」的状态提示。
+ * 独立成类是为了能在 JVM 单元测试里直接驱动状态机。
+ */
+class SpeakingTracker {
+    private val _speaking = MutableStateFlow(false)
+
+    /** 是否有语句正在播报。 */
+    val speaking: StateFlow<Boolean> = _speaking
+
+    /** 一条语句开始播报。 */
+    fun onStart() {
+        _speaking.value = true
+    }
+
+    /** 播报落定：正常结束、出错或被打断都算。 */
+    fun onSettled() {
+        _speaking.value = false
+    }
+
+    /** 引擎重建 / 关闭时归零，避免状态悬挂在 true。 */
+    fun reset() {
+        _speaking.value = false
+    }
+}
 
 /**
  * 系统日语 TTS。
@@ -50,6 +78,11 @@ class JapaneseTts(private val context: Context) {
     private var tts: TextToSpeech? = null
     private var pending: String? = null
     private var japaneseVoice: Voice? = null
+
+    private val speakingTracker = SpeakingTracker()
+
+    /** 是否有语句正在播报（发音按钮据此做主色 + 呼吸提示）。 */
+    val speaking: StateFlow<Boolean> get() = speakingTracker.speaking
 
     @Volatile
     private var generation = 0
@@ -95,22 +128,31 @@ class JapaneseTts(private val context: Context) {
     private val utteranceListener = object : UtteranceProgressListener() {
         override fun onStart(utteranceId: String?) {
             Log.i(TAG, "utterance start id=$utteranceId")
+            speakingTracker.onStart()
         }
 
         override fun onDone(utteranceId: String?) {
             Log.i(TAG, "utterance done id=$utteranceId")
+            speakingTracker.onSettled()
             abandonFocus()
         }
 
         @Deprecated("Deprecated in Java")
         override fun onError(utteranceId: String?) {
             Log.w(TAG, "utterance error id=$utteranceId")
+            speakingTracker.onSettled()
             abandonFocus()
         }
 
         override fun onError(utteranceId: String?, errorCode: Int) {
             Log.w(TAG, "utterance error id=$utteranceId code=$errorCode")
+            speakingTracker.onSettled()
             abandonFocus()
+        }
+
+        override fun onStop(utteranceId: String?, interrupted: Boolean) {
+            Log.i(TAG, "utterance stop id=$utteranceId interrupted=$interrupted")
+            speakingTracker.onSettled()
         }
     }
 
@@ -121,6 +163,7 @@ class JapaneseTts(private val context: Context) {
     fun retryInit() {
         Log.i(TAG, "retry init")
         pending = null
+        speakingTracker.reset()
         state = State.WAITING
         japaneseVoice = null
         japaneseStatus = TextToSpeech.LANG_NOT_SUPPORTED
@@ -266,6 +309,7 @@ class JapaneseTts(private val context: Context) {
 
     fun shutdown() {
         generation++
+        speakingTracker.reset()
         tts?.stop()
         tts?.shutdown()
         tts = null

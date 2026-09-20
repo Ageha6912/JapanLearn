@@ -51,6 +51,7 @@ import com.japanlearn.app.ui.components.QuizView
 import com.japanlearn.app.ui.components.SectionCard
 import com.japanlearn.app.ui.motion.AnimatedProgressBar
 import com.japanlearn.app.ui.motion.ConfettiBurst
+import com.japanlearn.app.ui.motion.FeedbackReveal
 import com.japanlearn.app.ui.motion.StaggerIn
 import com.japanlearn.app.ui.review.FeedbackText
 import com.japanlearn.app.ui.review.LoadingPlaceholder
@@ -596,11 +597,13 @@ fun CourseCheckpointScreen(nav: NavHostController, level: String, unit: Int) {
                             if (answered) {
                                 val correct =
                                     if (quiz.isTypeAnswer) state.typedResult == true else state.selected == quiz.answerIndex
-                                FeedbackText(correct = correct, answerText = quiz.answerText)
-                                AppButton(
-                                    text = if (state.index + 1 >= state.questions.size) "看结果" else "下一题",
-                                    onClick = { vm.next() },
-                                )
+                                FeedbackReveal {
+                                    FeedbackText(correct = correct, answerText = quiz.answerText)
+                                    AppButton(
+                                        text = if (state.index + 1 >= state.questions.size) "看结果" else "下一题",
+                                        onClick = { vm.next() },
+                                    )
+                                }
                             }
                         }
                     }

@@ -1,6 +1,7 @@
 package com.japanlearn.app.ui.components
 
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
@@ -74,7 +75,9 @@ import com.japanlearn.app.ui.motion.rememberReducedMotion
 import com.japanlearn.app.ui.motion.shake
 import com.japanlearn.app.ui.motion.shimmerBrush
 import com.japanlearn.app.ui.theme.japanColors
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 /** 学习会话的阶段，单词/语法/复习会话共用。 */
 enum class SessionPhase { LOADING, CARD, QUIZ, DONE }
@@ -246,6 +249,26 @@ fun TtsButton(text: String, onSpeak: (String) -> Unit, modifier: Modifier = Modi
     guideKind?.let { kind ->
         VoiceGuideDialog(kind = kind, onDismiss = { guideKind = null })
     }
+    // 发音中的状态提示：喇叭轻微呼吸 + 主色。TTS 有初始化延迟，让「点了、在响」可被看见。
+    val speaking by app.tts.speaking.collectAsStateWithLifecycle()
+    val reduceMotion = rememberReducedMotion()
+    val pulseScale = remember { Animatable(1f) }
+    LaunchedEffect(speaking, reduceMotion) {
+        if (speaking && !reduceMotion) {
+            while (true) {
+                pulseScale.animateTo(
+                    MotionTokens.TTS_PULSE_MAX_SCALE,
+                    tween(MotionTokens.TTS_PULSE_HALF_CYCLE_MS, easing = MotionTokens.Emphasized),
+                )
+                pulseScale.animateTo(
+                    1f,
+                    tween(MotionTokens.TTS_PULSE_HALF_CYCLE_MS, easing = MotionTokens.Emphasized),
+                )
+            }
+        } else {
+            pulseScale.snapTo(1f)
+        }
+    }
     FilledTonalIconButton(
         onClick = {
             val state = app.tts.currentState()
@@ -285,10 +308,17 @@ fun TtsButton(text: String, onSpeak: (String) -> Unit, modifier: Modifier = Modi
         modifier = modifier.pressScale(interaction, 0.9f),
         colors = androidx.compose.material3.IconButtonDefaults.filledTonalIconButtonColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer,
-            contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+            contentColor = if (speaking) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onPrimaryContainer,
         ),
     ) {
-        Icon(Icons.Filled.VolumeUp, contentDescription = "播放发音")
+        Icon(
+            Icons.Filled.VolumeUp,
+            contentDescription = "播放发音",
+            modifier = Modifier.graphicsLayer {
+                scaleX = pulseScale.value
+                scaleY = pulseScale.value
+            },
+        )
     }
 }
 
@@ -581,13 +611,36 @@ fun QuizView(
                     modifier = Modifier.weight(1f),
                 )
                 if (answered && isAnswer) {
-                    Icon(Icons.Filled.Check, contentDescription = "正确", tint = fg)
+                    VerdictIcon(Icons.Filled.Check, "正确", fg)
                 } else if (answered && isSelected) {
-                    Icon(Icons.Filled.Close, contentDescription = "错误", tint = fg)
+                    VerdictIcon(Icons.Filled.Close, "错误", fg)
                 }
             }
         }
     }
+}
+
+/** 判定图标入场：0.6→1 springSnappy + 120ms 淡入，只走绘制层，不打扰仍在过渡的底色；减弱动态时直接显示。 */
+@Composable
+private fun VerdictIcon(icon: ImageVector, description: String, tint: Color) {
+    val reduce = rememberReducedMotion()
+    val scale = remember { Animatable(if (reduce) 1f else MotionTokens.VERDICT_ICON_SCALE_FROM) }
+    val fade = remember { Animatable(if (reduce) 1f else 0f) }
+    LaunchedEffect(Unit) {
+        if (reduce) return@LaunchedEffect
+        launch { scale.animateTo(1f, MotionTokens.springSnappy()) }
+        launch { fade.animateTo(1f, tween(MotionTokens.VERDICT_ICON_FADE_MS)) }
+    }
+    Icon(
+        icon,
+        contentDescription = description,
+        tint = tint,
+        modifier = Modifier.graphicsLayer {
+            scaleX = scale.value
+            scaleY = scale.value
+            alpha = fade.value
+        },
+    )
 }
 
 /** 掌握程度四档自评（PRD §7.7）：语义色 + 表情图标 + 按压反馈 */

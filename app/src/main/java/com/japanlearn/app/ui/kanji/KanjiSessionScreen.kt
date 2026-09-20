@@ -54,6 +54,7 @@ import com.japanlearn.app.ui.components.SectionCard
 import com.japanlearn.app.ui.components.SessionPhase
 import com.japanlearn.app.ui.components.TtsButton
 import com.japanlearn.app.ui.motion.ConfettiBurst
+import com.japanlearn.app.ui.motion.FeedbackReveal
 import com.japanlearn.app.ui.motion.MotionTokens
 import com.japanlearn.app.ui.motion.rememberReducedMotion
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -248,16 +249,18 @@ fun KanjiSessionScreen(nav: NavHostController) {
                                 )
                                 if (state.selected != null) {
                                     val correct = state.selected == quiz.answerIndex
-                                    com.japanlearn.app.ui.review.FeedbackText(
-                                        correct = correct,
-                                        answerText = quiz.answerText,
-                                    )
-                                    Text(
-                                        "这个汉字你掌握了吗？",
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    )
-                                    MasteryRow { vm.rate(it) }
+                                    FeedbackReveal {
+                                        com.japanlearn.app.ui.review.FeedbackText(
+                                            correct = correct,
+                                            answerText = quiz.answerText,
+                                        )
+                                        Text(
+                                            "这个汉字你掌握了吗？",
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        )
+                                        MasteryRow { vm.rate(it) }
+                                    }
                                 }
                             }
                         }

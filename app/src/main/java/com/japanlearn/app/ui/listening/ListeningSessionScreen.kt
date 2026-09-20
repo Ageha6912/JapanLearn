@@ -37,6 +37,7 @@ import com.japanlearn.app.ui.components.SectionCard
 import com.japanlearn.app.ui.components.AppTopBar
 import com.japanlearn.app.ui.components.VoiceGuideDialog
 import com.japanlearn.app.ui.motion.ConfettiBurst
+import com.japanlearn.app.ui.motion.FeedbackReveal
 import com.japanlearn.app.ui.motion.StaggerIn
 import com.japanlearn.app.ui.review.FeedbackText
 import com.japanlearn.app.ui.review.LoadingPlaceholder
@@ -274,11 +275,13 @@ fun ListeningSessionScreen(nav: NavHostController) {
                             if (answered) {
                                 val correct =
                                     if (question.quiz.isTypeAnswer) state.typedResult == true else state.selected == question.quiz.answerIndex
-                                FeedbackText(correct = correct, answerText = question.quiz.answerText)
-                                AppButton(
-                                    text = if (state.index + 1 >= state.questions.size) "看结果" else "下一题",
-                                    onClick = { vm.next() },
-                                )
+                                FeedbackReveal {
+                                    FeedbackText(correct = correct, answerText = question.quiz.answerText)
+                                    AppButton(
+                                        text = if (state.index + 1 >= state.questions.size) "看结果" else "下一题",
+                                        onClick = { vm.next() },
+                                    )
+                                }
                             }
                         }
                     }

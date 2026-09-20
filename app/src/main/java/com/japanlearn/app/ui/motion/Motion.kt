@@ -17,7 +17,10 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -62,6 +65,17 @@ object MotionTokens {
     const val ENTER_DURATION = 480
     const val STAGGER_STEP_MS = 55L
     const val MAX_STAGGER_STEPS = 8
+
+    /** 判题反馈块入场：核心循环每天数十次，预算从紧（UI 标准 300ms 以内）。 */
+    const val FEEDBACK_REVEAL_DURATION_MS = 240
+
+    /** 判定图标入场起点与淡入：小件快速确认，不从 0 缩放、不做过冲。 */
+    const val VERDICT_ICON_SCALE_FROM = 0.6f
+    const val VERDICT_ICON_FADE_MS = 120
+
+    /** TTS 发音中的呼吸脉冲：高频使用，幅度压到近乎不可察。 */
+    const val TTS_PULSE_MAX_SCALE = 1.06f
+    const val TTS_PULSE_HALF_CYCLE_MS = 600
 }
 
 /** 跟随系统的「减弱动态效果」无障碍设置（动画时长缩放为 0）。 */
@@ -104,6 +118,38 @@ fun StaggerIn(
             translationY = (1f - p) * 24.dp.toPx()
         },
     ) { content() }
+}
+
+/**
+ * 判题反馈块入场：淡入 + 自下方轻微上移就位，快而轻。
+ * 用于答题后出现的「对错判定 + 下一题 / 掌握度自评」区域——全 App 频率最高的
+ * 状态变化，只走 transform/alpha 绘制层；减弱动态时直接显示。
+ * 内容排在 14dp 间距的 Column 里，与会话屏滚动列的节奏一致。
+ */
+@Composable
+fun FeedbackReveal(
+    modifier: Modifier = Modifier,
+    content: @Composable ColumnScope.() -> Unit,
+) {
+    val reduce = rememberReducedMotion()
+    val progress = remember { Animatable(if (reduce) 1f else 0f) }
+    LaunchedEffect(reduce) {
+        if (progress.value < 1f) {
+            progress.animateTo(
+                1f,
+                tween(MotionTokens.FEEDBACK_REVEAL_DURATION_MS, easing = MotionTokens.EmphasizedDecelerate),
+            )
+        }
+    }
+    Box(
+        modifier = modifier.graphicsLayer {
+            val p = progress.value
+            alpha = p
+            translationY = (1f - p) * 16.dp.toPx()
+        },
+    ) {
+        Column(verticalArrangement = Arrangement.spacedBy(14.dp), content = content)
+    }
 }
 
 /** 按压缩放：物理按压感。与 clickable(shared interactionSource) 搭配使用。 */

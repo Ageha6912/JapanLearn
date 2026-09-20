@@ -56,6 +56,7 @@ import com.japanlearn.app.ui.components.SectionCard
 import com.japanlearn.app.ui.components.SessionPhase
 import com.japanlearn.app.ui.components.TtsButton
 import com.japanlearn.app.ui.motion.ConfettiBurst
+import com.japanlearn.app.ui.motion.FeedbackReveal
 import com.japanlearn.app.ui.motion.MotionTokens
 import com.japanlearn.app.ui.motion.StaggerIn
 import com.japanlearn.app.ui.motion.rememberReducedMotion
@@ -246,20 +247,22 @@ fun GrammarDetailScreen(nav: NavHostController, grammarId: String) {
                             QuizView(quiz, state.selected, onSelect = { vm.onSelect(it) })
                             if (state.selected != null) {
                                 val correct = state.selected == quiz.answerIndex
-                                com.japanlearn.app.ui.review.FeedbackText(correct = correct, answerText = quiz.answerText)
-                                state.exercise?.let {
+                                FeedbackReveal {
+                                    com.japanlearn.app.ui.review.FeedbackText(correct = correct, answerText = quiz.answerText)
+                                    state.exercise?.let {
+                                        Text(
+                                            it.explanation,
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        )
+                                    }
                                     Text(
-                                        it.explanation,
+                                        "这条语法你掌握了吗？",
                                         style = MaterialTheme.typography.bodyMedium,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     )
+                                    MasteryRow { vm.rate(it) }
                                 }
-                                Text(
-                                    "这条语法你掌握了吗？",
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                )
-                                MasteryRow { vm.rate(it) }
                             }
                         }
                     }
@@ -439,13 +442,15 @@ fun GrammarSessionScreen(nav: NavHostController, count: Int) {
                                 QuizView(quiz, state.selected, onSelect = { vm.onSelect(it) })
                                 if (state.selected != null) {
                                     val correct = state.selected == quiz.answerIndex
-                                    com.japanlearn.app.ui.review.FeedbackText(correct = correct, answerText = quiz.answerText)
-                                    state.exercise?.let {
-                                        Text(
-                                            it.explanation,
-                                            style = MaterialTheme.typography.bodyMedium,
-                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                        )
+                                    FeedbackReveal {
+                                        com.japanlearn.app.ui.review.FeedbackText(correct = correct, answerText = quiz.answerText)
+                                        state.exercise?.let {
+                                            Text(
+                                                it.explanation,
+                                                style = MaterialTheme.typography.bodyMedium,
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                            )
+                                        }
                                     }
                                 }
                             }
