@@ -55,7 +55,7 @@ JapanLearn 是一个**完全离线、无需账号**的日语入门 App，为日�
 | 🗾 每日一句 | 300 条场景句（日常 / 餐厅 / 便利店 / 购物 / 交通 / 就医 / 天气 / 网购 / 银行…）带词汇拆解 |
 | 🎯 学习目标 | 设 N5/N4 目标与达成日期，按剩余内容量推荐每日新词档位，每周自动校准 |
 | 🎧 听力训练 | 听音辨词 / 听写假名 / 听句选义三题型混合，对错同步错题本 |
-| 🈷️ 汉字专项 | N5 核心汉字库（音读/训读分列 + 词例）：卡片学 → 五种选择题（含听音选字）→ 自评进 FSRS；每日配额按目标档位折算 1–4 |
+| 🈷️ 汉字专项 | N5 397 + N4 200 汉字库（音读/训读分列 + 词例，跟学习级别取新字）：卡片学 → 五种选择题（含听音选字）→ 自评进 FSRS；每日配额按目标档位折算 1–4 |
 | 🏆 学习成果 | 累计时长、掌握词数、已学汉字、最长连击、单元完成进度、复习正确率一页看全 |
 | 🤖 AI 助手（可选） | 自备 API Key 直连大模型：语法解释 / 句子纠错 / 翻译，流式打字机输出；Key 仅存本机，不配则完全隐藏，每日限额可调 |
 | 📦 应用内更新检查 | 启动静默检查 GitHub Releases，有新版时首页横幅提示，可跳过该版本；失败完全静默 |
@@ -129,7 +129,7 @@ app/src/main/java/com/japanlearn/app/
 - `ReviewPlannerTest`：每日复习限流截断与顺延
 - `ContentParsingTest`：内容 JSON schema 解析、假名分组字段、汉字音训分列与未知字段向前兼容
 - `ContentSeedPlannerTest`：分文件版本、legacy 加总 key、删除差集与空 incoming 拒绝
-- `ContentScaleTest`：真实 JSON 规模 101 / 1104 / 148 / 300 / 397 与 22 个课程单元覆盖
+- `ContentScaleTest`：真实 JSON 规模 101 / 1104 / 148 / 300 / 597（N5 397 + N4 200）与 22 个课程单元覆盖
 - `AppMigrationsTest`：v1→v6 迁移 SQL 与 schema 快照入库
 - `ReminderSchedulerTest`：提醒触发时刻计算（当天/顺延/边界）
 - `UiMathTest`：今日进度/柱状图占比/入场级联延迟、orphan 进度不计
@@ -147,9 +147,9 @@ app/src/main/java/com/japanlearn/app/
 | `words.json` | 单词（N5/N4） | `ja / kana / romaji / zh / pos / cat / example / level` |
 | `grammar.json` | 语法（N5/N4） | `title / meaning / connection / explanation / examples / exercises / level` |
 | `sentences.json` | 每日一句 | `scene / ja / zh / breakdown[]` |
-| `kanji.json` | 汉字专项（N5） | `char / zh / on[] / kun[] / examples[]` |
+| `kanji.json` | 汉字专项（N5/N4） | `char / zh / on[] / kun[] / examples[] / level` |
 
-追加语法：`python tools/merge_grammar.py new_grammar_n4_b2.json`。汉字批次：`python tools/extract_kanji_n5.py`。合并后必须跑 `python tools/validate_content.py`。
+追加语法：`python tools/merge_grammar.py new_grammar_n4_b2.json`。汉字批次：N5 `python tools/extract_kanji_n5.py`，N4 `python tools/extract_kanji_n4.py`。合并后必须跑 `python tools/validate_content.py`。
 
 ## 路线图
 
@@ -166,8 +166,9 @@ app/src/main/java/com/japanlearn/app/
 - [x] v1.2 错题突击 + 队列加权
 - [x] v1.3 AI 流式输出
 - [x] v1.4 统计仪表盘 + 应用内更新检查
-- [x] v1.5 汉字专项（代码已入库，待与后续版本合并发版）
-- [x] v1.6 听力句库 180→300（天气/网购/银行新场景，待合并发版）
+- [x] v1.5 汉字专项（已随 v1.6.0 发布）
+- [x] v1.6 听力句库 180→300 + N5 汉字（v1.6.0）
+- [x] N4 汉字批次 200 字 + 级别跟随学习级别（PRD §19.16，代码已入库，未发版）
 - [ ] 登录与多设备同步（可选，非默认路径）
 
 ## 许可证

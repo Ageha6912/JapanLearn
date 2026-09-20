@@ -506,7 +506,15 @@ fun ProfileScreen(nav: NavHostController) {
                         val selectedName = state.ttsVoiceName.ifEmpty {
                             state.ttsVoices.maxByOrNull { it.quality }?.name ?: ""
                         }
-                        state.ttsVoices.forEach { voice ->
+                        val selectedVoice = state.ttsVoices.firstOrNull { it.name == selectedName }
+                            ?: state.ttsVoices.maxByOrNull { it.quality }
+                        var showAllVoices by remember { mutableStateOf(false) }
+                        val voicesToShow = if (showAllVoices) {
+                            state.ttsVoices
+                        } else {
+                            listOfNotNull(selectedVoice)
+                        }
+                        voicesToShow.forEach { voice ->
                             Row(
                                 Modifier.fillMaxWidth(),
                                 verticalAlignment = Alignment.CenterVertically,
@@ -520,6 +528,11 @@ fun ProfileScreen(nav: NavHostController) {
                                     style = MaterialTheme.typography.bodyLarge,
                                     modifier = Modifier.weight(1f),
                                 )
+                            }
+                        }
+                        if (state.ttsVoices.size > 1) {
+                            TextButton(onClick = { showAllVoices = !showAllVoices }) {
+                                Text(if (showAllVoices) "收起音色列表" else "显示全部音色（${state.ttsVoices.size}）")
                             }
                         }
                     }

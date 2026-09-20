@@ -71,7 +71,7 @@ PRD §19.14 定案；与 v1.6 合并后统一 Release（用户要求减少发版
 - **发布工程**：R8 minify + 资源收缩（APK 1.5MB）、正式签名接入（keystore）、GitHub Actions 门禁 CI（`.github/workflows/ci.yml`：55 测试 + assembleDebug）
 - 55 项单元测试全绿；PRD §18 决策记录；README 数字已同步
 
-## 4. 当前任务：v1.6.0 已发布（2026-09-13）
+## 4. 当前任务：v1.6.0 已发布（2026-09-13）；下一主题已定案未开工
 
 ### 发版记录
 - 合并 **v1.5 汉字专项 + v1.6 听力句库 300 条 + 联动收口补丁** 一次发出
@@ -80,9 +80,24 @@ PRD §19.14 定案；与 v1.6 合并后统一 Release（用户要求减少发版
 - tag v1.6.0 + GitHub Release（JapanLearn-v1.6.0.apk）https://github.com/Ageha6912/JapanLearn/releases/tag/v1.6.0
 - 回归截图 `.screenshots/v160_*.png`（未入库）
 
+### 下一主题（已 grilling 定案，**已实现未发版**）：N4 汉字批次 — PRD **§19.16**
+- 主题：N4 首批 **200 字**接入汉字专项；不改 schema；级别跟 `studyLevel`；复习不区分级别
+- **已实现**：
+  - 内容：`tools/extract_kanji_n4.py`（复用 N5 审定 90 字 + 新审定 110 字）→ `kanji.json` **N5 397 + N4 200 = 597**，version 1→2；批次 `tools/new_kanji_n4.json`；validate 通过
+  - 功能：`KanjiSession` 取新字 `nextNewKanji(n, studyLevel)`；学习 Tab 汉字进度按级别；统计「内容进度」汉字 N5/N4 两行；入口文案带级别
+  - 测试：ContentScale 断言 597/397/200；全量 **275** 全绿
+  - README 已同步（597 汉字 / extract_kanji_n4 / 路线图）
+- **做完不单独发版**，继续攒；搭车「我的」页发音卡片收起
+- 切分：PR-A 内容 ✓ → PR-B 功能 ✓ → PR-C 文档 ✓（versionName 未改）
+
 ### 待办
-1. 真机验证：汉字专项、流式 AI、**更新横幅正向路径**（本次为真实新版本，v1.4 的 UpdateChecker 应提示 1.6.0）、统计仪表盘
-2. 后续候选：N4 汉字批次、学习 Tab 汉字入口真机截图更新 `web/`
+1. 真机验证 v1.6.0：汉字专项、流式 AI、**更新横幅正向路径**、统计仪表盘
+2. 学习 Tab 汉字入口真机截图更新 `web/`（可选；`web/` 数字尚未同步 597）
+3. 继续攒下一主题后统一发版（届时再改 versionName）
+
+### 未发版本地改动（v1.6.0 之后，攒下一版）
+- **N4 汉字批次**（PRD §19.16，已实现，见上）
+- **「我的」页发音卡片收起**：`ProfileScreen` 默认只显示当前选中音色；「显示全部音色（N）」/「收起音色列表」；仅 1 个音色不显示展开按钮
 
 ### v1.6 听力句库扩量（PRD §19.15，已入库未发版）
 - 每日一句 / 听句库 **180 → 300**（sentences version 5 → 7）

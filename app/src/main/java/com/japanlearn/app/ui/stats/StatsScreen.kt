@@ -61,6 +61,10 @@ data class StatsUiState(
     val totalGrammar: Int = 0,
     val learnedKanji: Int = 0,
     val totalKanji: Int = 0,
+    val learnedKanjiN5: Int = 0,
+    val totalKanjiN5: Int = 0,
+    val learnedKanjiN4: Int = 0,
+    val totalKanjiN4: Int = 0,
     val today: LocalDate = LocalDate.now(),
     val week: List<Pair<LocalDate, DailyStudyEntity?>> = emptyList(),
     val mastery: MasteryDistribution.Snapshot = MasteryDistribution.Snapshot(),
@@ -92,6 +96,10 @@ class StatsViewModel(private val app: AppContainer) : ViewModel() {
         collect(app.content.grammarCount()) { s, v -> s.copy(totalGrammar = v) }
         collect(app.progress.learnedKanjiCount()) { s, v -> s.copy(learnedKanji = v) }
         collect(app.content.kanjiCount()) { s, v -> s.copy(totalKanji = v) }
+        collect(app.content.kanjiCountByLevel("N5")) { s, v -> s.copy(totalKanjiN5 = v) }
+        collect(app.content.kanjiCountByLevel("N4")) { s, v -> s.copy(totalKanjiN4 = v) }
+        collect(app.content.learnedKanjiCountByLevel("N5")) { s, v -> s.copy(learnedKanjiN5 = v) }
+        collect(app.content.learnedKanjiCountByLevel("N4")) { s, v -> s.copy(learnedKanjiN4 = v) }
 
         collect(
             combine(app.progress.wordStabilities(), app.progress.kanjiStabilities()) { words, kanji ->
@@ -322,7 +330,11 @@ fun StatsScreen(nav: NavHostController) {
                         style = MaterialTheme.typography.bodyLarge,
                     )
                     Text(
-                        "汉字：已学 ${state.learnedKanji} / ${state.totalKanji}",
+                        "汉字 N5：已学 ${state.learnedKanjiN5} / ${state.totalKanjiN5}",
+                        style = MaterialTheme.typography.bodyLarge,
+                    )
+                    Text(
+                        "汉字 N4：已学 ${state.learnedKanjiN4} / ${state.totalKanjiN4}",
                         style = MaterialTheme.typography.bodyLarge,
                     )
                 }

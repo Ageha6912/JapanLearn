@@ -102,12 +102,13 @@ class KanjiSessionViewModel(private val app: AppContainer) : ViewModel() {
                 refreshCanReview()
                 return@launch
             }
-            var kanji = app.content.nextNewKanji(remaining)
+            val level = app.settings.studyLevel.value.ifEmpty { "N5" }
+            var kanji = app.content.nextNewKanji(remaining, level)
             var retries = 0
             while (kanji.isEmpty() && retries < 20) {
                 kotlinx.coroutines.delay(300)
                 retries++
-                kanji = app.content.nextNewKanji(remaining)
+                kanji = app.content.nextNewKanji(remaining, level)
             }
             if (kanji.isEmpty()) {
                 _state.update { it.copy(phase = SessionPhase.DONE) }

@@ -42,10 +42,11 @@ class ContentScaleTest {
     }
 
     @Test
-    fun `kanji json 约 300 以上 N5 汉字`() {
+    fun `kanji json 597 字 N5 397 + N4 200`() {
         val file = ContentJson.decodeFromString<KanjiFile>(readContent("kanji.json"))
-        assertTrue(file.kanji.size >= 300)
-        assertTrue(file.kanji.all { it.level == "N5" })
+        assertEquals(597, file.kanji.size)
+        assertEquals(397, file.kanji.count { it.level == "N5" })
+        assertEquals(200, file.kanji.count { it.level == "N4" })
         assertTrue(file.kanji.all { it.examples.isNotEmpty() })
     }
 

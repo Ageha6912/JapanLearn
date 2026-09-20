@@ -83,9 +83,18 @@ class LearnViewModel(private val app: AppContainer) : ViewModel() {
                 kanjiDaily = com.japanlearn.app.domain.StudyPlanner.kanjiDailyCount(v, hasGoal),
             )
         }
-        collect(app.content.kanjiCount()) { s, v -> s.copy(kanjiTotal = v) }
-        collect(app.progress.learnedKanjiCount()) { s, v -> s.copy(kanjiLearned = v) }
+        // 汉字进度跟学习级别（PRD §19.16），与课程词进度同一切换源
+        collect(kanjiProgressFlow()) { s, (total, learned) ->
+            s.copy(kanjiTotal = total, kanjiLearned = learned)
+        }
         collect(courseFlow()) { s, (rows, current) -> s.copy(unitRows = rows, currentUnit = current) }
+    }
+
+    private fun kanjiProgressFlow() = app.settings.studyLevel.flatMapLatest { level ->
+        combine(
+            app.content.kanjiCountByLevel(level),
+            app.content.learnedKanjiCountByLevel(level),
+        ) { total: Int, learned: Int -> total to learned }
     }
 
     /** 当前级别 → 单元进度 + 当前单元（手动覆盖优先，PRD §19.8）。 */
@@ -162,7 +171,7 @@ fun LearnTabScreen(nav: NavHostController) {
             StaggerIn(3) {
                 LearnEntry(
                     title = "汉字专项",
-                    subtitle = "音训 · 词例 · 已学 ${state.kanjiLearned}/${state.kanjiTotal} · 今日约 ${state.kanjiDaily} 字",
+                    subtitle = "音训 · 词例 · ${state.studyLevel} 已学 ${state.kanjiLearned}/${state.kanjiTotal} · 今日约 ${state.kanjiDaily} 字",
                     icon = Icons.Filled.Grade,
                     tint = MaterialTheme.colorScheme.tertiary,
                     progress = if (state.kanjiTotal > 0) state.kanjiLearned.toFloat() / state.kanjiTotal else 0f,
